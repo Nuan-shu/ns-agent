@@ -3,38 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NsAgent 架构网络图 — v0.1.0 / v0.2.0</title>
+<title>NsAgent 架构网络图</title>
 <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.6/dist/vis-network.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
-    background: #f1f5f9; color: #334155; overflow: hidden;
-  }
+  body { font-family: 'PingFang SC','Microsoft YaHei',-apple-system,sans-serif; background: #f1f5f9; color: #334155; overflow: hidden; }
 
-  #header {
-    height: 52px; background: #fff; display: flex; align-items: center; padding: 0 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06); z-index: 10; position: relative;
-    gap: 12px; flex-shrink: 0;
-  }
+  #header { height: 52px; background: #fff; display: flex; align-items: center; padding: 0 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); z-index: 10; position: relative; gap: 12px; flex-shrink: 0; }
   #header h1 { font-size: 17px; font-weight: 700; color: #0f172a; }
 
-  /* 版本切换按钮组 */
-  .version-switch {
-    display: flex; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;
-  }
-  .version-switch button {
-    padding: 4px 16px; font-size: 12px; border: none; cursor: pointer;
-    font-weight: 500; font-family: inherit; transition: all 0.2s;
-    background: #f8fafc; color: #64748b;
-  }
+  .version-switch { display: flex; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+  .version-switch button { padding: 4px 16px; font-size: 12px; border: none; cursor: pointer; font-weight: 500; font-family: inherit; transition: all 0.2s; background: #f8fafc; color: #64748b; }
   .version-switch button:first-child { border-right: 1px solid #e2e8f0; }
-  .version-switch button.active {
-    background: #3b6df0; color: #fff;
-  }
-  .version-switch button:not(.active):hover {
-    background: #eff6ff; color: #3b6df0;
-  }
+  .version-switch button.active { background: #3b6df0; color: #fff; }
+  .version-switch button:not(.active):hover { background: #eff6ff; color: #3b6df0; }
 
   #header .badge { font-size: 11px; background: #3b6df0; color: #fff; padding: 2px 10px; border-radius: 10px; font-weight: 500; }
   #header .stats { font-size: 12px; color: #94a3b8; margin-left: auto; display: flex; gap: 16px; }
@@ -42,94 +24,46 @@
 
   #main { display: flex; height: calc(100vh - 52px); }
 
-  #left-panel {
-    width: 200px; background: #fff; border-right: 1px solid #e2e8f0;
-    padding: 16px; overflow-y: auto; flex-shrink: 0;
-    display: flex; flex-direction: column; gap: 16px;
-  }
+  #left-panel { width: 200px; background: #fff; border-right: 1px solid #e2e8f0; padding: 16px; overflow-y: auto; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
   #left-panel h3 { font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
   .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; margin: 6px 0; }
   .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
   .legend-line { width: 16px; height: 2px; border-radius: 1px; flex-shrink: 0; }
+  .legend-item .star { color: #eab308; font-size: 13px; margin-right: -2px; }
   .stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 2px 0; }
   .stat-row .val { font-weight: 600; }
 
-  #graph {
-    flex: 1; background: #fafbfc;
-    background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
+  #graph { flex: 1; background: #fafbfc; background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px); background-size: 24px 24px; }
 
-  #right-panel {
-    width: 440px; background: #fff; border-left: 1px solid #e2e8f0;
-    overflow-y: auto; flex-shrink: 0; padding: 0;
-  }
+  #right-panel { width: 440px; background: #fff; border-left: 1px solid #e2e8f0; overflow-y: auto; flex-shrink: 0; padding: 0; }
   .panel-version { display: none; }
   .panel-version.active { display: block; }
 
-  #right-panel h2 {
-    font-size: 15px; color: #0f172a; padding: 16px 20px 12px;
-    position: sticky; top: 0; background: #fff; z-index: 2;
-    border-bottom: 2px solid #3b6df0; margin: 0;
-  }
+  #right-panel h2 { font-size: 15px; color: #0f172a; padding: 16px 20px 12px; position: sticky; top: 0; background: #fff; z-index: 2; border-bottom: 2px solid #3b6df0; margin: 0; }
   .pkg-section { padding: 0 20px; }
-  .pkg-title {
-    font-size: 13px; font-weight: 700; color: #64748b; padding: 14px 0 6px;
-    text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 44px;
-    background: #fff; z-index: 1; margin: 0; border-bottom: 1px solid #f1f5f9;
-  }
-  .file-section {
-    padding: 8px 0; border-bottom: 1px solid #f1f5f9;
-    transition: background 0.3s;
-  }
+  .pkg-title { font-size: 13px; font-weight: 700; color: #64748b; padding: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 44px; background: #fff; z-index: 1; margin: 0; border-bottom: 1px solid #f1f5f9; }
+  .file-section { padding: 8px 0; border-bottom: 1px solid #f1f5f9; transition: background 0.3s; }
   .file-section.highlight { background: #eff6ff; margin: 0 -20px; padding: 8px 20px; border-radius: 4px; }
-  .file-name {
-    font-size: 13px; font-weight: 600; color: #1e293b;
-    font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
-    padding: 4px 0;
-  }
-  .func-card {
-    margin: 8px 0 12px 12px; padding: 10px 12px;
-    background: #f8fafc; border-radius: 6px;
-    border-left: 3px solid #3b6df0;
-    font-size: 12px; line-height: 1.6;
-  }
-  .func-card .sig {
-    font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
-    font-weight: 600; font-size: 13px; color: #0f172a;
-  }
+  .file-name { font-size: 13px; font-weight: 600; color: #1e293b; font-family: 'SF Mono','Fira Code','Menlo',monospace; padding: 4px 0; }
+  .func-card { margin: 8px 0 12px 12px; padding: 10px 12px; background: #f8fafc; border-radius: 6px; border-left: 3px solid #3b6df0; font-size: 12px; line-height: 1.6; }
+  .func-card .sig { font-family: 'SF Mono','Fira Code','Menlo',monospace; font-weight: 600; font-size: 13px; color: #0f172a; }
   .func-card .desc { color: #475569; margin: 4px 0; font-size: 12px; }
   .func-card .io { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
   .func-card .io .tag { padding: 2px 8px; border-radius: 4px; font-size: 11px; white-space: nowrap; }
   .func-card .io .in-tag  { background: #dbeafe; color: #1d4ed8; }
   .func-card .io .out-tag { background: #dcfce7; color: #166534; }
   .func-card .calls { margin-top: 6px; font-size: 11px; }
-  .func-card .calls .call-item {
-    padding: 3px 8px; margin: 2px 0; border-radius: 3px;
-    font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace; font-size: 11px;
-  }
+  .func-card .calls .call-item { padding: 3px 8px; margin: 2px 0; border-radius: 3px; font-family: 'SF Mono','Fira Code','Menlo',monospace; font-size: 11px; }
   .call-runtime { background: #eff6ff; color: #1d4ed8; }
   .call-register { background: #f1f5f9; color: #64748b; }
   .empty-badge { color: #94a3b8; font-style: italic; font-size: 12px; padding: 8px 0; }
-  .new-badge {
-    display: inline-block; font-size: 10px; background: #10b981; color: #fff;
-    padding: 1px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500;
-  }
-  .mod-badge {
-    display: inline-block; font-size: 10px; background: #f59e0b; color: #fff;
-    padding: 1px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500;
-  }
-  .section-note {
-    margin: 4px 0 12px 12px; font-size: 11px; color: #94a3b8;
-    padding: 6px 10px; background: #fffbeb; border-radius: 4px;
-    border-left: 2px solid #f59e0b;
-  }
-  .highlight-node { box-shadow: 0 0 0 3px #10b981 !important; }
+  .new-badge { display: inline-block; font-size: 10px; background: #10b981; color: #fff; padding: 1px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500; }
+  .mod-badge { display: inline-block; font-size: 10px; background: #f59e0b; color: #fff; padding: 1px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500; }
+  .section-note { margin: 4px 0 12px 12px; font-size: 11px; color: #94a3b8; padding: 6px 10px; background: #fffbeb; border-radius: 4px; border-left: 2px solid #f59e0b; }
 
-  /* 版本历史表 */
   .history-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 4px; }
   .history-table td { padding: 4px 2px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
-  .history-table .ver { font-weight: 700; color: #3b6df0; white-space: nowrap; font-family: 'SF Mono', monospace; }
+  .history-table .ver { font-weight: 700; color: #3b6df0; white-space: nowrap; font-family: 'SF Mono',monospace; }
   .history-table .date { color: #94a3b8; white-space: nowrap; font-size: 10px; }
   .history-table .desc { color: #475569; line-height: 1.4; }
   .history-table .delta { color: #10b981; white-space: nowrap; font-size: 10px; font-weight: 600; }
@@ -149,384 +83,160 @@
   <div class="stats" id="stats-display">
     <span>文件 <b>9</b></span>
     <span>函数 <b>12</b></span>
-    <span>跨文件调用 <b>8</b></span>
+    <span>调用 <b>8</b></span>
   </div>
 </div>
 
 <div id="main">
-  <!-- 左侧：图例 -->
   <div id="left-panel">
     <div>
       <h3>包 / 颜色</h3>
-      <div class="legend-item"><span class="legend-dot" style="background:#6366f1;"></span> 入口 (main.py)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#6366f1;"></span> 入口</div>
       <div class="legend-item"><span class="legend-dot" style="background:#3b6df0;"></span> core</div>
       <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> tools</div>
       <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> knowledge</div>
       <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6;"></span> memory</div>
     </div>
     <div>
-      <h3>连线类型</h3>
+      <h3>节点标记</h3>
+      <div class="legend-item"><span class="star">★</span> 当前版本新增</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> 当前版本修改</div>
       <div class="legend-item"><span class="legend-line" style="background:#3b6df0;"></span> 运行时调用</div>
-      <div class="legend-item"><span class="legend-line" style="background:#94a3b8;border:1px dashed #94a3b8;background:none;height:0;"></span> import 注册</div>
-    </div>
-    <div id="version-diff" style="display:none;">
-      <h3>v0.1.0 -> v0.2.0</h3>
-      <div class="stat-row"><span>新增文件</span><span class="val">+4</span></div>
-      <div class="stat-row"><span>修改文件</span><span class="val">2</span></div>
-      <div class="stat-row"><span>新增函数</span><span class="val">+9</span></div>
-      <div class="stat-row"><span>新增连线</span><span class="val">+4</span></div>
+      <div class="legend-item"><span class="legend-line" style="background:#94a3b8;border:1px dashed #94a3b8;height:0;"></span> import 注册</div>
     </div>
     <div>
       <h3>版本历史</h3>
       <table class="history-table" id="history-table">
-        <tr id="hist-v020" class="current">
-          <td class="ver">v0.2.0</td>
-          <td class="date">06-12</td>
-          <td class="desc">三源统合 + 会话持久化 + API重试</td>
-          <td class="delta">+4 +9</td>
+        <tr id="hist-v020">
+          <td class="ver">v0.2.0</td><td class="date">06-12</td>
+          <td class="desc">三源统合 + 会话持久化 + API重试</td><td class="delta">+4 +9</td>
         </tr>
-        <tr id="hist-v010">
-          <td class="ver">v0.1.0</td>
-          <td class="date">06-11</td>
-          <td class="desc">框架筑基 — 工具注册表 + 多源搜索</td>
-          <td class="delta">9 12</td>
+        <tr id="hist-v010" class="current">
+          <td class="ver">v0.1.0</td><td class="date">06-11</td>
+          <td class="desc">框架筑基 — 工具注册表 + 多源搜索</td><td class="delta">9 12</td>
         </tr>
       </table>
     </div>
   </div>
 
-  <!-- 中间：网络图 -->
   <div id="graph"></div>
 
-  <!-- 右侧：详情面板 -->
   <div id="right-panel">
-    <!-- ==== v0.1.0 面板 ==== -->
+    <!-- ============ v0.1.0 面板 ============ -->
     <div class="panel-version active" id="panel-v010">
-      <h2>全部函数详情</h2>
-
+      <h2>v0.1.0 — 函数详情</h2>
       <div class="pkg-section">
-        <p class="pkg-title">入口 — main.py</p>
+        <p class="pkg-title">main.py</p>
         <div class="file-section" id="detail-v010-main.py">
           <div class="file-name">main.py</div>
-          <div class="func-card">
-            <div class="sig">(模块顶层)</div>
-            <div class="desc">导入 4 个工具模块触发 <code>register()</code> 报到注册表，然后启动 <code>chat()</code> REPL</div>
-            <div class="io"><span class="tag in-tag">入: 无</span><span class="tag out-tag">出: 无</span></div>
-            <div class="calls">
-              <div class="call-item call-runtime">-> core/agent.py <b>chat()</b> — 启动交互式 REPL</div>
-            </div>
-          </div>
+          <div class="func-card"><div class="sig">(模块顶层)</div><div class="desc">导入 4 个工具模块触发 <code>register()</code>，启动 <code>chat()</code> REPL</div></div>
         </div>
       </div>
-
       <div class="pkg-section">
         <p class="pkg-title">core</p>
         <div class="file-section" id="detail-v010-core/agent.py">
-          <div class="file-name">core/agent.py — Agent 核心循环</div>
-          <div class="func-card">
-            <div class="sig">run(messages=None)</div>
-            <div class="desc">Agent 主循环 — 发送消息给 DeepSeek LLM，有 tool_calls 就执行工具并继续循环，否则输出回复并结束。是整个 Agent 的心跳机制。</div>
-            <div class="io">
-              <span class="tag in-tag">入: messages: list[dict] | None</span>
-              <span class="tag out-tag">出: None — 直接 print 输出</span>
-            </div>
-            <div class="calls">
-              <div class="call-item call-runtime">-> tools/registry.py <b>get_tool_definitions()</b></div>
-              <div class="call-item call-runtime">-> tools/registry.py <b>execute(name, args)</b></div>
-            </div>
-          </div>
-          <div class="func-card">
-            <div class="sig">chat()</div>
-            <div class="desc">交互式 REPL — 读取用户输入 -> 追加到 messages -> 调用 run() -> 循环，支持 /exit 退出。</div>
-            <div class="io">
-              <span class="tag in-tag">入: 无 — 从 stdin 逐行读取</span>
-              <span class="tag out-tag">出: None</span>
-            </div>
-            <div class="calls">
-              <div class="call-item call-runtime">-> core/agent.py <b>run(messages=...)</b></div>
-            </div>
-          </div>
+          <div class="file-name">core/agent.py</div>
+          <div class="func-card"><div class="sig">run(messages=None)</div><div class="desc">Agent 主循环 — 发送消息给 DeepSeek，有 tool_calls 则执行工具并继续，否则输出回复。</div></div>
+          <div class="func-card"><div class="sig">chat()</div><div class="desc">交互式 REPL，支持 /exit 退出。</div></div>
         </div>
       </div>
-
       <div class="pkg-section">
         <p class="pkg-title">tools</p>
         <div class="file-section" id="detail-v010-tools/registry.py">
-          <div class="file-name">tools/registry.py — 工具注册表（中心枢纽）</div>
-          <div class="func-card">
-            <div class="sig">register(name, definition, handler)</div>
-            <div class="desc">注册一个工具到全局注册表 <code>_registry</code>。工具模块在 import 时自动调用此函数报到，Agent Loop 无需知道具体工具有哪些。</div>
-            <div class="io">
-              <span class="tag in-tag">入: name: str | definition: dict | handler: callable</span>
-              <span class="tag out-tag">出: None — 写入全局 _registry 字典</span>
-            </div>
-            <div class="calls">
-              <div class="call-item call-register"><- 被调用: time_tool.py, file_tools.py(x2), terminal_tool.py, search_tool.py</div>
-            </div>
-          </div>
-          <div class="func-card">
-            <div class="sig">get_tool_definitions()</div>
-            <div class="desc">返回所有已注册工具的 definition 列表，拼给 LLM 的 tools 参数。</div>
-            <div class="io"><span class="tag in-tag">入: 无</span><span class="tag out-tag">出: list[dict]</span></div>
-            <div class="calls"><div class="call-item call-runtime"><- 被 core/agent.py <b>run()</b> 调用</div></div>
-          </div>
-          <div class="func-card">
-            <div class="sig">execute(name, args)</div>
-            <div class="desc">根据工具名查表，调用对应 handler 函数。查不到则返回错误字符串（永不抛异常）。</div>
-            <div class="io"><span class="tag in-tag">入: name: str | args: dict</span><span class="tag out-tag">出: str</span></div>
-            <div class="calls"><div class="call-item call-runtime"><- 被 core/agent.py <b>run()</b> 调用</div></div>
-          </div>
+          <div class="file-name">tools/registry.py — 工具注册表</div>
+          <div class="func-card"><div class="sig">register(name, definition, handler)</div><div class="desc">注册工具到全局 <code>_registry</code> 字典。</div></div>
+          <div class="func-card"><div class="sig">get_tool_definitions()</div><div class="desc">返回所有已注册工具的 JSON Schema 列表。</div></div>
+          <div class="func-card"><div class="sig">execute(name, args)</div><div class="desc">根据工具名查表执行，查不到返回错误字符串。</div></div>
         </div>
-
         <div class="file-section" id="detail-v010-tools/search_tool.py">
-          <div class="file-name">tools/search_tool.py — 知识库搜索工具</div>
-          <div class="func-card">
-            <div class="sig">search_knowledge(query)</div>
-            <div class="desc">Agent 面向 LLM 的工具函数 — 调用 knowledge.search 做多源联合搜索（年报 + Agent 文档），返回格式化文本。</div>
-            <div class="io"><span class="tag in-tag">入: query: str</span><span class="tag out-tag">出: str — 格式化搜索结果</span></div>
-            <div class="calls">
-              <div class="call-item call-runtime">-> knowledge/search.py <b>search_formatted(query)</b></div>
-              <div class="call-item call-register">-> tools/registry.py <b>register("search_knowledge", ...)</b></div>
-            </div>
-          </div>
+          <div class="file-name">tools/search_tool.py — 知识搜索</div>
+          <div class="func-card"><div class="sig">search_knowledge(query)</div><div class="desc">多源联合搜索（年报 + Agent文档），返回格式化文本。</div></div>
         </div>
-
         <div class="file-section" id="detail-v010-tools/file_tools.py">
-          <div class="file-name">tools/file_tools.py — 文件读写工具</div>
-          <div class="func-card">
-            <div class="sig">read_file(path, offset=1, limit=200)</div>
-            <div class="desc">读取文件内容，返回带行号的文本。支持 ~ 展开、偏移量控制和行数限制。</div>
-            <div class="io"><span class="tag in-tag">入: path: str | offset: int=1 | limit: int=200</span><span class="tag out-tag">出: str</span></div>
-            <div class="calls"><div class="call-item call-register">-> tools/registry.py <b>register("read_file", ...)</b></div></div>
-          </div>
-          <div class="func-card">
-            <div class="sig">write_file(path, content)</div>
-            <div class="desc">覆盖写入文件内容，自动创建父目录。</div>
-            <div class="io"><span class="tag in-tag">入: path: str | content: str</span><span class="tag out-tag">出: str</span></div>
-            <div class="calls"><div class="call-item call-register">-> tools/registry.py <b>register("write_file", ...)</b></div></div>
-          </div>
+          <div class="file-name">tools/file_tools.py — 文件读写</div>
+          <div class="func-card"><div class="sig">read_file(path, ...)</div><div class="desc">读取文件，返回带行号的文本。</div></div>
+          <div class="func-card"><div class="sig">write_file(path, content)</div><div class="desc">覆盖写入文件。</div></div>
         </div>
-
         <div class="file-section" id="detail-v010-tools/terminal_tool.py">
-          <div class="file-name">tools/terminal_tool.py — 终端命令执行</div>
-          <div class="func-card">
-            <div class="sig">run_command(command, timeout=30)</div>
-            <div class="desc">在 ns-agent 项目目录下执行 shell 命令（subprocess.run），返回 stdout + stderr 合并。</div>
-            <div class="io"><span class="tag in-tag">入: command: str | timeout: int=30</span><span class="tag out-tag">出: str</span></div>
-            <div class="calls"><div class="call-item call-register">-> tools/registry.py <b>register("terminal", ...)</b></div></div>
-          </div>
+          <div class="file-name">tools/terminal_tool.py — 终端执行</div>
+          <div class="func-card"><div class="sig">run_command(command, timeout=30)</div><div class="desc">执行 shell 命令。</div></div>
         </div>
-
         <div class="file-section" id="detail-v010-tools/time_tool.py">
           <div class="file-name">tools/time_tool.py — 时间工具</div>
-          <div class="func-card">
-            <div class="sig">get_current_time()</div>
-            <div class="desc">返回当前日期时间字符串，让 Agent 知道「现在」是什么时候。</div>
-            <div class="io"><span class="tag in-tag">入: 无</span><span class="tag out-tag">出: str — "2026-06-11 14:30:00"</span></div>
-            <div class="calls"><div class="call-item call-register">-> tools/registry.py <b>register("get_current_time", ...)</b></div></div>
-          </div>
+          <div class="func-card"><div class="sig">get_current_time()</div><div class="desc">返回当前日期时间字符串。</div></div>
         </div>
       </div>
-
       <div class="pkg-section">
         <p class="pkg-title">knowledge</p>
         <div class="file-section" id="detail-v010-knowledge/search.py">
-          <div class="file-name">knowledge/search.py — 统一多源搜索</div>
-          <div class="func-card">
-            <div class="sig">unified_search(query, top_k=5)</div>
-            <div class="desc">用 bge-small-zh-v1.5 将 query 编码为向量，并行查询 ChromaDB 二源（annual_reports 1683块 + agent_engineering 27块），按 cosine 距离合并排序返回。</div>
-            <div class="io"><span class="tag in-tag">入: query: str | top_k: int=5</span><span class="tag out-tag">出: list[dict]</span></div>
-            <div class="calls" style="color:#94a3b8;">（调用外部库: chromadb, sentence_transformers）</div>
-          </div>
-          <div class="func-card">
-            <div class="sig">search_formatted(query, top_k=5)</div>
-            <div class="desc">对 unified_search 结果做格式化，每条结果标注来源（年报/Agent工程）、距离分数、内容摘要。</div>
-            <div class="io"><span class="tag in-tag">入: query: str | top_k: int=5</span><span class="tag out-tag">出: str</span></div>
-            <div class="calls"><div class="call-item call-runtime">-> knowledge/search.py <b>unified_search(query, top_k)</b></div></div>
-          </div>
+          <div class="file-name">knowledge/search.py — 多源搜索</div>
+          <div class="func-card"><div class="sig">unified_search(query, top_k=5)</div><div class="desc">ChromaDB 二源搜索（年报 1683 + Agent工程 27）。</div></div>
+          <div class="func-card"><div class="sig">search_formatted(query, top_k=5)</div><div class="desc">格式化搜索结果。</div></div>
         </div>
       </div>
-
       <div class="pkg-section">
         <p class="pkg-title">memory</p>
         <div class="file-section" id="detail-v010-memory/__init__.py">
           <div class="file-name">memory/__init__.py</div>
-          <div class="empty-badge">（空占位 — 规划中：对话历史持久化、token 估算与裁剪、摘要压缩）</div>
+          <div class="empty-badge">（空占位 — 规划中）</div>
         </div>
       </div>
     </div>
 
-    <!-- ==== v0.2.0 面板 ==== -->
+    <!-- ============ v0.2.0 面板 ============ -->
     <div class="panel-version" id="panel-v020">
-      <h2>全部函数详情 <span style="font-size:12px;color:#94a3b8;font-weight:400;">— <span class="new-badge" style="font-size:11px">NEW</span> 新增 &nbsp;<span class="mod-badge" style="font-size:11px">MOD</span> 修改</span></h2>
-
+      <h2>v0.2.0 — 函数详情 <span style="font-size:12px;color:#94a3b8;font-weight:400;">— <span class="new-badge" style="font-size:11px">NEW</span> 新增 <span class="mod-badge" style="font-size:11px">MOD</span> 修改</span></h2>
       <div class="pkg-section">
-        <p class="pkg-title">入口 — main.py</p>
+        <p class="pkg-title">main.py</p>
         <div class="file-section" id="detail-v020-main.py">
           <div class="file-name">main.py</div>
-          <div class="func-card">
-            <div class="sig">(模块顶层)</div>
-            <div class="desc">导入 4 个工具模块触发 <code>register()</code> 报到注册表，然后启动 <code>chat()</code> REPL</div>
-            <div class="io"><span class="tag in-tag">入: 无</span><span class="tag out-tag">出: 无</span></div>
-            <div class="calls"><div class="call-item call-runtime">-> core/agent.py <b>chat()</b> — 启动交互式 REPL</div></div>
-          </div>
+          <div class="func-card"><div class="sig">(模块顶层)</div><div class="desc">导入 4 个工具模块触发 <code>register()</code>，启动 <code>chat()</code> REPL</div></div>
         </div>
       </div>
-
       <div class="pkg-section">
         <p class="pkg-title">core</p>
         <div class="file-section" id="detail-v020-core/agent.py">
-          <div class="file-name">core/agent.py <span class="mod-badge">MOD</span> — Agent 核心循环</div>
-          <div class="section-note">v0.2.0 改动：接入会话持久化 + API 重试 + 统一错误处理；新增 /new 命令；/exit 输出 session_id</div>
-          <div class="func-card">
-            <div class="sig">run(messages=None, session_id=None) <span class="mod-badge">MOD</span></div>
-            <div class="desc">Agent 主循环 — 通过 <code>call_with_retry</code> 调用 DeepSeek LLM（指数退避重试），有 tool_calls 就执行工具并同步保存到 SQLite 会话，否则输出回复并结束。</div>
-            <div class="io">
-              <span class="tag in-tag">入: messages: list[dict] | None | session_id: str | None</span>
-              <span class="tag out-tag">出: None — 直接 print 输出</span>
-            </div>
-            <div class="calls">
-              <div class="call-item call-runtime">-> tools/registry.py <b>get_tool_definitions() / execute()</b></div>
-              <div class="call-item call-runtime">-> core/retry.py <b>call_with_retry()</b> <span class="new-badge">NEW</span></div>
-              <div class="call-item call-runtime">-> memory/session.py <b>save_message()</b> <span class="new-badge">NEW</span></div>
-            </div>
-          </div>
-          <div class="func-card">
-            <div class="sig">chat() <span class="mod-badge">MOD</span></div>
-            <div class="desc">交互式 REPL — 启动时自动 <code>init_db()</code> + 24h 内自动恢复上次会话；新增 <code>/new</code> 命令开始全新会话；<code>/exit</code> 输出 session_id 供追溯。</div>
-            <div class="io"><span class="tag in-tag">入: 无</span><span class="tag out-tag">出: None</span></div>
-            <div class="calls">
-              <div class="call-item call-runtime">-> core/agent.py <b>run(messages, session_id)</b></div>
-              <div class="call-item call-runtime">-> memory/session.py <b>init_db / get_last_session / create_session / save_message</b> <span class="new-badge">NEW</span></div>
-              <div class="call-item call-runtime">-> core/errors.py <b>NsAgentError</b> <span class="new-badge">NEW</span></div>
-            </div>
-          </div>
+          <div class="file-name">core/agent.py <span class="mod-badge">MOD</span></div>
+          <div class="section-note">接入会话持久化 + API 重试 + 统一错误处理；新增 /new 命令</div>
+          <div class="func-card"><div class="sig">run(messages=None, session_id=None) <span class="mod-badge">MOD</span></div><div class="desc">Agent 主循环 — <code>call_with_retry</code> 调用 LLM，tool_calls 执行后同步保存 SQLite。</div></div>
+          <div class="func-card"><div class="sig">chat() <span class="mod-badge">MOD</span></div><div class="desc">启动时 <code>init_db()</code> + 24h 自动恢复会话；<code>/new</code> 新会话；<code>/exit</code> 输出 session_id。</div></div>
         </div>
-
         <div class="file-section" id="detail-v020-core/retry.py">
-          <div class="file-name">core/retry.py <span class="new-badge">NEW</span> — API 重试机制</div>
-          <div class="func-card">
-            <div class="sig">call_with_retry(fn, *args, **kwargs)</div>
-            <div class="desc">指数退避重试包装器 — 最多 3 次重试（1s -> 2s -> 4s）。只重试可恢复错误（APIConnectionError / APITimeoutError / RateLimitError / InternalServerError），400/401 直接抛出。</div>
-            <div class="io"><span class="tag in-tag">入: fn: callable + 透传参数</span><span class="tag out-tag">出: fn 的返回值</span></div>
-            <div class="calls" style="color:#94a3b8;">（调用外部库: openai, time）</div>
-          </div>
+          <div class="file-name">core/retry.py <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">call_with_retry(fn, *args, **kwargs)</div><div class="desc">指数退避重试（1s→2s→4s，最多 3 次）。只重试可恢复错误。</div></div>
         </div>
-
         <div class="file-section" id="detail-v020-core/errors.py">
-          <div class="file-name">core/errors.py <span class="new-badge">NEW</span> — 统一异常体系</div>
-          <div class="func-card">
-            <div class="sig">NsAgentError(message, code=None, details=None)</div>
-            <div class="desc">NsAgent 异常基类 — 支持错误码（code）和额外上下文（details），提供 <code>to_dict()</code> 统一序列化。子类：APIError / ToolError / ConfigError。</div>
-            <div class="io"><span class="tag in-tag">入: message: str | code: str | None | details: dict | None</span><span class="tag out-tag">出: Exception</span></div>
-            <div class="calls" style="color:#94a3b8;">子类: APIError / ToolError / ConfigError</div>
-          </div>
+          <div class="file-name">core/errors.py <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">NsAgentError(message, code=None, details=None)</div><div class="desc">统一异常基类。子类：APIError / ToolError / ConfigError。</div></div>
         </div>
       </div>
-
       <div class="pkg-section">
         <p class="pkg-title">tools</p>
-
-        <div class="file-section" id="detail-v020-tools/registry.py">
-          <div class="file-name">tools/registry.py — 工具注册表（中心枢纽）</div>
-          <div class="func-card">
-            <div class="sig">register(name, definition, handler)</div>
-            <div class="desc">注册工具到全局注册表 <code>_registry</code>。工具模块 import 时自动报到，Agent Loop 无需知道具体工具有哪些。</div>
-            <div class="io"><span class="tag in-tag">入: name: str | definition: dict | handler: callable</span><span class="tag out-tag">出: None</span></div>
-            <div class="calls"><div class="call-item call-register"><- 被调用: time_tool.py, file_tools.py(x2), terminal_tool.py, search_tool.py</div></div>
-          </div>
-          <div class="func-card">
-            <div class="sig">get_tool_definitions()</div>
-            <div class="desc">返回所有已注册工具的 definition 列表，拼给 LLM 的 tools 参数。</div>
-            <div class="io"><span class="tag in-tag">入: 无</span><span class="tag out-tag">出: list[dict]</span></div>
-          </div>
-          <div class="func-card">
-            <div class="sig">execute(name, args)</div>
-            <div class="desc">根据工具名查表，调用对应 handler。查不到返回错误字符串（永不抛异常）。</div>
-            <div class="io"><span class="tag in-tag">入: name: str | args: dict</span><span class="tag out-tag">出: str</span></div>
-          </div>
-        </div>
-
-        <div class="file-section" id="detail-v020-tools/search_tool.py">
-          <div class="file-name">tools/search_tool.py — 知识库搜索工具</div>
-          <div class="func-card">
-            <div class="sig">search_knowledge(query)</div>
-            <div class="desc">Agent 面向 LLM 的工具函数 — 调用 knowledge.search 做三源联合搜索（年报 + Agent工程 + Wiki），返回格式化文本。</div>
-            <div class="io"><span class="tag in-tag">入: query: str</span><span class="tag out-tag">出: str — 含来源标注的搜索结果</span></div>
-            <div class="calls">
-              <div class="call-item call-runtime">-> knowledge/search.py <b>search_formatted(query)</b></div>
-              <div class="call-item call-register">-> tools/registry.py <b>register("search_knowledge", ...)</b></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="file-section" id="detail-v020-tools/file_tools.py">
-          <div class="file-name">tools/file_tools.py — 文件读写工具</div>
-          <div class="func-card"><div class="sig">read_file(path, offset=1, limit=200)</div><div class="desc">读取文件内容，返回带行号的文本。</div><div class="io"><span class="tag in-tag">入: path: str | offset: int=1 | limit: int=200</span><span class="tag out-tag">出: str</span></div></div>
-          <div class="func-card"><div class="sig">write_file(path, content)</div><div class="desc">覆盖写入文件内容，自动创建父目录。</div><div class="io"><span class="tag in-tag">入: path: str | content: str</span><span class="tag out-tag">出: str</span></div></div>
-        </div>
-
-        <div class="file-section" id="detail-v020-tools/terminal_tool.py">
-          <div class="file-name">tools/terminal_tool.py — 终端命令执行</div>
-          <div class="func-card"><div class="sig">run_command(command, timeout=30)</div><div class="desc">执行 shell 命令（subprocess.run），返回 stdout + stderr 合并。</div><div class="io"><span class="tag in-tag">入: command: str | timeout: int=30</span><span class="tag out-tag">出: str</span></div></div>
-        </div>
-
-        <div class="file-section" id="detail-v020-tools/time_tool.py">
-          <div class="file-name">tools/time_tool.py — 时间工具</div>
-          <div class="func-card"><div class="sig">get_current_time()</div><div class="desc">返回当前日期时间字符串。</div><div class="io"><span class="tag in-tag">入: 无</span><span class="tag out-tag">出: str — "2026-06-11 14:30:00"</span></div></div>
-        </div>
+        <div class="file-section" id="detail-v020-tools/registry.py"><div class="file-name">tools/registry.py</div><div class="func-card"><div class="sig">register / get_tool_definitions / execute</div><div class="desc">工具注册表 — 中心枢纽。</div></div></div>
+        <div class="file-section" id="detail-v020-tools/search_tool.py"><div class="file-name">tools/search_tool.py</div><div class="func-card"><div class="sig">search_knowledge(query)</div><div class="desc">三源联合搜索（年报 + Agent工程 + Wiki）。</div></div></div>
+        <div class="file-section" id="detail-v020-tools/file_tools.py"><div class="file-name">tools/file_tools.py</div><div class="func-card"><div class="sig">read_file / write_file</div><div class="desc">文件读写工具。</div></div></div>
+        <div class="file-section" id="detail-v020-tools/terminal_tool.py"><div class="file-name">tools/terminal_tool.py</div><div class="func-card"><div class="sig">run_command(command, timeout=30)</div><div class="desc">执行 shell 命令。</div></div></div>
+        <div class="file-section" id="detail-v020-tools/time_tool.py"><div class="file-name">tools/time_tool.py</div><div class="func-card"><div class="sig">get_current_time()</div><div class="desc">返回当前时间。</div></div></div>
       </div>
-
       <div class="pkg-section">
         <p class="pkg-title">knowledge</p>
         <div class="file-section" id="detail-v020-knowledge/search.py">
-          <div class="file-name">knowledge/search.py <span class="mod-badge">MOD</span> — 统一多源搜索</div>
-          <div class="section-note">v0.2.0 改动：KNOWN_COLLECTIONS 二源->三源（+ wiki_knowledge 262块）；source_label 新增 "Wiki"</div>
-          <div class="func-card">
-            <div class="sig">unified_search(query, top_k=5) <span class="mod-badge">MOD</span></div>
-            <div class="desc">并行查询 ChromaDB 三源（annual_reports 1683块 + agent_engineering 27块 + wiki_knowledge 262块 = 1972块），按 cosine 距离合并排序返回。</div>
-            <div class="io"><span class="tag in-tag">入: query: str | top_k: int=5</span><span class="tag out-tag">出: list[dict]</span></div>
-          </div>
-          <div class="func-card">
-            <div class="sig">search_formatted(query, top_k=5)</div>
-            <div class="desc">格式化搜索结果，来源标注（年报/Agent工程/Wiki）、距离分数、内容摘要（截断 300 字）。</div>
-            <div class="io"><span class="tag in-tag">入: query: str | top_k: int=5</span><span class="tag out-tag">出: str</span></div>
-          </div>
+          <div class="file-name">knowledge/search.py <span class="mod-badge">MOD</span></div>
+          <div class="section-note">二源→三源（+ wiki_knowledge 262块）</div>
+          <div class="func-card"><div class="sig">unified_search(query, top_k=5) <span class="mod-badge">MOD</span></div><div class="desc">三源并行搜索（年报 1683 + Agent工程 27 + Wiki 262 = 1972 块）。</div></div>
+          <div class="func-card"><div class="sig">search_formatted(query, top_k=5)</div><div class="desc">格式化结果（年报/Agent工程/Wiki）。</div></div>
         </div>
-
         <div class="file-section" id="detail-v020-knowledge/ingest_wiki.py">
-          <div class="file-name">knowledge/ingest_wiki.py <span class="new-badge">NEW</span> — Wiki 知识入库</div>
-          <div class="func-card">
-            <div class="sig">list_md_files(root)</div>
-            <div class="desc">递归扫描 Wiki 目录下所有 .md 文件，自动排除 00.配置 Config/ 等敏感目录。</div>
-            <div class="io"><span class="tag in-tag">入: root: Path</span><span class="tag out-tag">出: list[Path]</span></div>
-          </div>
-          <div class="func-card">
-            <div class="sig">chunk_by_headers(text, source_path)</div>
-            <div class="desc">按 ## 二级标题分割文档，前言标注为"(前言)"，元数据包含来源文件和章节标题。</div>
-            <div class="io"><span class="tag in-tag">入: text: str | source_path: Path</span><span class="tag out-tag">出: Iterator[(chunk_text, metadata)]</span></div>
-          </div>
-          <div class="func-card">
-            <div class="sig">ingest()</div>
-            <div class="desc">主入库流程 — 扫描 Wiki 46 篇 -> 按标题分块 -> bge 向量化 -> 写入 ChromaDB wiki_knowledge（262块）。</div>
-            <div class="io"><span class="tag in-tag">入: 无</span><span class="tag out-tag">出: None — print 进度日志</span></div>
-            <div class="calls">
-              <div class="call-item call-runtime">-> knowledge/search.py <b>_client, _embed_model</b></div>
-            </div>
-          </div>
+          <div class="file-name">knowledge/ingest_wiki.py <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">list_md_files / chunk_by_headers / ingest</div><div class="desc">Wiki 46篇→262块→ChromaDB wiki_knowledge。</div></div>
         </div>
       </div>
-
       <div class="pkg-section">
-        <p class="pkg-title">memory <span class="new-badge" style="font-size:11px">v0.2.0 实现</span></p>
+        <p class="pkg-title">memory</p>
         <div class="file-section" id="detail-v020-memory/session.py">
-          <div class="file-name">memory/session.py <span class="new-badge">NEW</span> — SQLite 会话持久化</div>
-          <div class="section-note">v0.1.0 中 memory/ 为空占位；v0.2.0 实现完整 CRUD + 24h 自动恢复</div>
-          <div class="func-card"><div class="sig">init_db()</div><div class="desc">建表（幂等）— sessions + messages 表，自动创建 data/sessions.db。</div></div>
-          <div class="func-card"><div class="sig">create_session()</div><div class="desc">新建会话，生成 12 位 hex session_id。</div><div class="io"><span class="tag out-tag">出: str — session_id</span></div></div>
-          <div class="func-card"><div class="sig">save_message(session_id, msg)</div><div class="desc">保存一条消息 — 兼容 system/user/assistant（含 tool_calls JSON）/tool 四种格式，同步更新 sessions.updated_at。</div></div>
-          <div class="func-card"><div class="sig">load_session(session_id)</div><div class="desc">从数据库恢复完整消息列表，自动还原 tool_calls JSON 和 tool_call_id。</div><div class="io"><span class="tag out-tag">出: list[dict] — OpenAI 兼容消息列表</span></div></div>
-          <div class="func-card"><div class="sig">get_last_session()</div><div class="desc">查询最近 24h 内最后更新的会话 ID，chat() 启动时调用。</div><div class="io"><span class="tag out-tag">出: str | None</span></div></div>
+          <div class="file-name">memory/session.py <span class="new-badge">NEW</span></div>
+          <div class="section-note">v0.1.0 空占位 → v0.2.0 完整 CRUD + 24h 恢复</div>
+          <div class="func-card"><div class="sig">init_db / create_session / save_message / load_session / get_last_session</div><div class="desc">SQLite 会话持久化，兼容 system/user/assistant/tool 四种消息格式。</div></div>
         </div>
       </div>
     </div>
@@ -535,92 +245,165 @@
 
 <script>
 // ============================
-// v0.1.0 数据
+// 所有节点（统一数据集，固定坐标）
+// 坐标规则: L0 x=-500 | L1 x=-200 | L2 x=100 | L3 x=400
 // ============================
-const nodesV010 = new vis.DataSet([
-  { id: "v010-main.py", label: "main.py\n─────\n入口脚本", group: "entry", level: 0, title: "入口 — 加载工具模块 -> 启动 Agent REPL" },
-  { id: "v010-core/agent.py", label: "agent.py\n─────\nAgent Loop", group: "core", level: 1, title: "核心 — Agent 主循环 + REPL" },
-  { id: "v010-tools/registry.py", label: "registry.py\n─────\n工具注册表", group: "tools", level: 2, title: "工具注册表 — 中心枢纽" },
-  { id: "v010-tools/search_tool.py", label: "search_tool.py\n─────\n知识搜索", group: "tools", level: 2, title: "知识库搜索工具" },
-  { id: "v010-tools/file_tools.py", label: "file_tools.py\n─────\n文件读写", group: "tools", level: 2, title: "文件工具" },
-  { id: "v010-tools/terminal_tool.py", label: "terminal_tool.py\n─────\n终端执行", group: "tools", level: 2, title: "终端工具" },
-  { id: "v010-tools/time_tool.py", label: "time_tool.py\n─────\n时间工具", group: "tools", level: 2, title: "时间工具" },
-  { id: "v010-knowledge/search.py", label: "search.py\n─────\n多源搜索", group: "knowledge", level: 3, title: "知识层 — ChromaDB 二源搜索" },
-  { id: "v010-memory/__init__.py", label: "__init__.py\n─────\n（空占位）", group: "memory", level: 3, title: "记忆模块 — 尚未实现" }
-]);
-
-const edgesV010 = new vis.DataSet([
-  { from: "v010-main.py", to: "v010-core/agent.py", label: "chat()", arrows: "to", color: { color: "#3b6df0" }, width: 2.5, smooth: { type: "curvedCCW" } },
-  { from: "v010-core/agent.py", to: "v010-tools/registry.py", label: "get_tool_definitions()\nexecute()", arrows: "to", color: { color: "#3b6df0" }, width: 2.5, smooth: { type: "curvedCCW" } },
-  { from: "v010-tools/search_tool.py", to: "v010-tools/registry.py", label: "register()", arrows: "to", color: { color: "#94a3b8" }, width: 1, dashes: true, smooth: { type: "curvedCCW" } },
-  { from: "v010-tools/file_tools.py", to: "v010-tools/registry.py", label: "register()x2", arrows: "to", color: { color: "#94a3b8" }, width: 1, dashes: true, smooth: { type: "curvedCCW" } },
-  { from: "v010-tools/terminal_tool.py", to: "v010-tools/registry.py", label: "register()", arrows: "to", color: { color: "#94a3b8" }, width: 1, dashes: true, smooth: { type: "curvedCCW" } },
-  { from: "v010-tools/time_tool.py", to: "v010-tools/registry.py", label: "register()", arrows: "to", color: { color: "#94a3b8" }, width: 1, dashes: true, smooth: { type: "curvedCCW" } },
-  { from: "v010-tools/search_tool.py", to: "v010-knowledge/search.py", label: "search_formatted()", arrows: "to", color: { color: "#10b981" }, width: 2, smooth: { type: "curvedCCW" } },
-]);
-
-// ============================
-// v0.2.0 数据
-// ============================
-const nodesV020 = new vis.DataSet([
-  { id: "v020-main.py", label: "main.py\n─────\n入口脚本", group: "entry", level: 0, title: "入口" },
-  { id: "v020-core/agent.py", label: "agent.py\n─────\nAgent Loop", group: "core", level: 1, title: "核心 — Agent 主循环（v0.2.0 改造）" },
-  { id: "v020-core/retry.py", label: "retry.py\n─────\nAPI 重试", group: "core", level: 1, title: "NEW — 指数退避重试" },
-  { id: "v020-core/errors.py", label: "errors.py\n─────\n统一异常", group: "core", level: 1, title: "NEW — NsAgentError 异常体系" },
-  { id: "v020-tools/registry.py", label: "registry.py\n─────\n工具注册表", group: "tools", level: 2, title: "工具注册表 — 中心枢纽" },
-  { id: "v020-tools/search_tool.py", label: "search_tool.py\n─────\n知识搜索", group: "tools", level: 2, title: "知识库搜索工具" },
-  { id: "v020-tools/file_tools.py", label: "file_tools.py\n─────\n文件读写", group: "tools", level: 2, title: "文件工具" },
-  { id: "v020-tools/terminal_tool.py", label: "terminal_tool.py\n─────\n终端执行", group: "tools", level: 2, title: "终端工具" },
-  { id: "v020-tools/time_tool.py", label: "time_tool.py\n─────\n时间工具", group: "tools", level: 2, title: "时间工具" },
-  { id: "v020-knowledge/search.py", label: "search.py\n─────\n多源搜索", group: "knowledge", level: 3, title: "知识层 — 三源统合（+Wiki）" },
-  { id: "v020-knowledge/ingest_wiki.py", label: "ingest_wiki.py\n─────\nWiki 入库", group: "knowledge", level: 3, title: "NEW — Wiki 46篇 262块入库" },
-  { id: "v020-memory/session.py", label: "session.py\n─────\n会话持久化", group: "memory", level: 3, title: "NEW — SQLite 会话存储 + 恢复" },
-]);
-
-const edgesV020 = new vis.DataSet([
-  { from: "v020-main.py", to: "v020-core/agent.py", label: "chat()", arrows: "to", color: { color: "#3b6df0" }, width: 2.5, smooth: { type: "curvedCCW" } },
-  { from: "v020-core/agent.py", to: "v020-tools/registry.py", label: "get_tool_definitions()\nexecute()", arrows: "to", color: { color: "#3b6df0" }, width: 2.5, smooth: { type: "curvedCCW" } },
-  { from: "v020-core/agent.py", to: "v020-core/retry.py", label: "call_with_retry()", arrows: "to", color: { color: "#10b981" }, width: 2, smooth: { type: "curvedCCW" } },
-  { from: "v020-core/agent.py", to: "v020-core/errors.py", label: "NsAgentError", arrows: "to", color: { color: "#6366f1" }, width: 1.5, dashes: true, smooth: { type: "curvedCCW" } },
-  { from: "v020-core/agent.py", to: "v020-memory/session.py", label: "init_db/create\nsave/load/get_last", arrows: "to", color: { color: "#10b981" }, width: 2, smooth: { type: "curvedCCW" } },
-  { from: "v020-tools/search_tool.py", to: "v020-tools/registry.py", label: "register()", arrows: "to", color: { color: "#94a3b8" }, width: 1, dashes: true, smooth: { type: "curvedCCW" } },
-  { from: "v020-tools/file_tools.py", to: "v020-tools/registry.py", label: "register() x2", arrows: "to", color: { color: "#94a3b8" }, width: 1, dashes: true, smooth: { type: "curvedCCW" } },
-  { from: "v020-tools/terminal_tool.py", to: "v020-tools/registry.py", label: "register()", arrows: "to", color: { color: "#94a3b8" }, width: 1, dashes: true, smooth: { type: "curvedCCW" } },
-  { from: "v020-tools/time_tool.py", to: "v020-tools/registry.py", label: "register()", arrows: "to", color: { color: "#94a3b8" }, width: 1, dashes: true, smooth: { type: "curvedCCW" } },
-  { from: "v020-tools/search_tool.py", to: "v020-knowledge/search.py", label: "search_formatted()", arrows: "to", color: { color: "#10b981" }, width: 2, smooth: { type: "curvedCCW" } },
-  { from: "v020-knowledge/ingest_wiki.py", to: "v020-knowledge/search.py", label: "_client\n_embed_model", arrows: "to", color: { color: "#f59e0b" }, width: 1.5, smooth: { type: "curvedCCW" } },
+const allNodes = new vis.DataSet([
+  // L0 入口
+  { id:"main.py",               group:"entry",     x:-500, y:0,   versions:["v010","v020"], status:{v010:"new",v020:"existing"} },
+  // L1 核心
+  { id:"core/agent.py",         group:"core",      x:-200, y:-150,versions:["v010","v020"], status:{v010:"new",v020:"modified"} },
+  { id:"core/retry.py",         group:"core",      x:-200, y:0,   versions:["v020"],       status:{v020:"new"} },
+  { id:"core/errors.py",        group:"core",      x:-200, y:150, versions:["v020"],       status:{v020:"new"} },
+  // L2 工具
+  { id:"tools/registry.py",     group:"tools",     x:100,  y:-200,versions:["v010","v020"], status:{v010:"new",v020:"existing"} },
+  { id:"tools/search_tool.py",  group:"tools",     x:100,  y:-100,versions:["v010","v020"], status:{v010:"new",v020:"existing"} },
+  { id:"tools/file_tools.py",   group:"tools",     x:100,  y:0,   versions:["v010","v020"], status:{v010:"new",v020:"existing"} },
+  { id:"tools/terminal_tool.py",group:"tools",     x:100,  y:100, versions:["v010","v020"], status:{v010:"new",v020:"existing"} },
+  { id:"tools/time_tool.py",    group:"tools",     x:100,  y:200, versions:["v010","v020"], status:{v010:"new",v020:"existing"} },
+  // L3 数据层
+  { id:"knowledge/search.py",   group:"knowledge", x:400,  y:-150,versions:["v010","v020"], status:{v010:"new",v020:"modified"} },
+  { id:"knowledge/ingest_wiki.py",group:"knowledge",x:400, y:0,   versions:["v020"],       status:{v020:"new"} },
+  { id:"memory/__init__.py",    group:"memory",    x:400,  y:150, versions:["v010"],       status:{v010:"new"} },
+  { id:"memory/session.py",     group:"memory",    x:400,  y:150, versions:["v020"],       status:{v020:"new"} },
 ]);
 
 // ============================
-// 网络图配置
+// 所有边（统一数据集）
 // ============================
-const container = document.getElementById("graph");
-let currentVersion = "v010";
+const allEdges = new vis.DataSet([
+  { from:"main.py",to:"core/agent.py",                versions:["v010","v020"], label:"chat()",                   color:{color:"#3b6df0"},width:2.5 },
+  { from:"core/agent.py",to:"tools/registry.py",       versions:["v010","v020"], label:"get_tool_defs\nexecute()",color:{color:"#3b6df0"},width:2.5 },
+  { from:"core/agent.py",to:"core/retry.py",           versions:["v020"],       label:"call_with_retry()",       color:{color:"#10b981"},width:2   },
+  { from:"core/agent.py",to:"core/errors.py",          versions:["v020"],       label:"NsAgentError",            color:{color:"#6366f1"},width:1.5,dashes:true },
+  { from:"core/agent.py",to:"memory/session.py",       versions:["v020"],       label:"init/create\nsave/load",  color:{color:"#10b981"},width:2   },
+  { from:"tools/search_tool.py",to:"tools/registry.py",versions:["v010","v020"],label:"register()",              color:{color:"#94a3b8"},width:1,  dashes:true },
+  { from:"tools/file_tools.py",to:"tools/registry.py", versions:["v010","v020"],label:"register() x2",           color:{color:"#94a3b8"},width:1,  dashes:true },
+  { from:"tools/terminal_tool.py",to:"tools/registry.py",versions:["v010","v020"],label:"register()",           color:{color:"#94a3b8"},width:1,  dashes:true },
+  { from:"tools/time_tool.py",to:"tools/registry.py",  versions:["v010","v020"],label:"register()",              color:{color:"#94a3b8"},width:1,  dashes:true },
+  { from:"tools/search_tool.py",to:"knowledge/search.py",versions:["v010","v020"],label:"search_formatted()",    color:{color:"#10b981"},width:2   },
+  { from:"knowledge/ingest_wiki.py",to:"knowledge/search.py",versions:["v020"], label:"_client\n_embed_model",   color:{color:"#f59e0b"},width:1.5 },
+]);
 
-const options = {
-  layout: {
-    hierarchical: { enabled: true, direction: "LR", levelSeparation: 260, nodeSpacing: 140, treeSpacing: 50, sortMethod: "directed", shakeTowards: "roots" }
-  },
-  physics: { hierarchicalRepulsion: { nodeDistance: 150, centralGravity: 0, springLength: 200, springConstant: 0.01 }, stabilization: { iterations: 150 } },
-  edges: { smooth: { type: "curvedCCW", roundness: 0.2 }, font: { size: 10, color: "#64748b", face: "PingFang SC", background: "#fff", strokeWidth: 2 } },
-  nodes: {
-    shape: "box", margin: { top: 10, bottom: 10, left: 14, right: 14 },
-    font: { size: 12, face: "PingFang SC", color: "#334155", multi: true },
-    borderWidth: 2, widthConstraint: { minimum: 130, maximum: 170 },
-    shadow: { enabled: true, size: 3, color: "rgba(0,0,0,0.06)" }
-  },
-  groups: {
-    entry:    { color: { background: "#eef2ff", border: "#6366f1", highlight: { border: "#4f46e5", background: "#e0e7ff" } } },
-    core:     { color: { background: "#eff6ff", border: "#3b6df0", highlight: { border: "#2563eb", background: "#dbeafe" } } },
-    tools:    { color: { background: "#ecfdf5", border: "#10b981", highlight: { border: "#059669", background: "#d1fae5" } } },
-    knowledge:{ color: { background: "#fffbeb", border: "#f59e0b", highlight: { border: "#d97706", background: "#fef3c7" } } },
-    memory:   { color: { background: "#f5f3ff", border: "#8b5cf6", highlight: { border: "#7c3aed", background: "#ede9fe" } } }
-  },
-  interaction: { hover: true, navigationButtons: true, keyboard: true }
+// 版本统计
+const versionStats = {
+  v010: { files:9,  funcs:12, calls:8 },
+  v020: { files:12, funcs:21, calls:11 },
 };
 
-// 初始加载 v0.1.0
-const network = new vis.Network(container, { nodes: nodesV010, edges: edgesV010 }, options);
+// 节点基础标签
+const nodeLabels = {
+  "main.py":                 "main.py\n─────\n入口脚本",
+  "core/agent.py":           "agent.py\n─────\nAgent Loop",
+  "core/retry.py":           "retry.py\n─────\nAPI 重试",
+  "core/errors.py":          "errors.py\n─────\n统一异常",
+  "tools/registry.py":       "registry.py\n─────\n工具注册表",
+  "tools/search_tool.py":    "search_tool.py\n─────\n知识搜索",
+  "tools/file_tools.py":     "file_tools.py\n─────\n文件读写",
+  "tools/terminal_tool.py":  "terminal_tool.py\n─────\n终端执行",
+  "tools/time_tool.py":      "time_tool.py\n─────\n时间工具",
+  "knowledge/search.py":     "search.py\n─────\n多源搜索",
+  "knowledge/ingest_wiki.py":"ingest_wiki.py\n─────\nWiki 入库",
+  "memory/__init__.py":      "__init__.py\n─────\n（空占位）",
+  "memory/session.py":       "session.py\n─────\n会话持久化",
+};
+
+let currentVersion = "v010";
+
+function buildLabel(nodeId, version) {
+  const base = nodeLabels[nodeId] || nodeId;
+  const node = allNodes.get(nodeId);
+  if (!node || !node.status) return base;
+  const st = node.status[version];
+  if (st === "new")      return "★ " + base;
+  if (st === "modified") return "* " + base;
+  return base;
+}
+
+function buildColor(nodeId, version) {
+  const node = allNodes.get(nodeId);
+  const groupColors = {
+    entry:    {bg:"#eef2ff",bd:"#6366f1",hi:{bg:"#e0e7ff",bd:"#4f46e5"}},
+    core:     {bg:"#eff6ff",bd:"#3b6df0",hi:{bg:"#dbeafe",bd:"#2563eb"}},
+    tools:    {bg:"#ecfdf5",bd:"#10b981",hi:{bg:"#d1fae5",bd:"#059669"}},
+    knowledge:{bg:"#fffbeb",bd:"#f59e0b",hi:{bg:"#fef3c7",bd:"#d97706"}},
+    memory:   {bg:"#f5f3ff",bd:"#8b5cf6",hi:{bg:"#ede9fe",bd:"#7c3aed"}},
+  };
+  const gc = groupColors[node.group] || groupColors.core;
+  if (!node || !node.status) return { background:gc.bg, border:gc.bd, highlight:{border:gc.hi.bd,background:gc.hi.bg} };
+  const st = node.status[version];
+  if (st === "new")      return { background:gc.bg, border:"#eab308", highlight:{border:"#ca8a04",background:gc.hi.bg} };
+  if (st === "modified") return { background:gc.bg, border:"#f59e0b", highlight:{border:"#d97706",background:gc.hi.bg} };
+  return { background:gc.bg, border:gc.bd, highlight:{border:gc.hi.bd,background:gc.hi.bg} };
+}
+
+function getVersionData(version) {
+  const nodeArr = allNodes.get({ filter: n => n.versions.includes(version) });
+  const edgeArr = allEdges.get({ filter: e => e.versions.includes(version) });
+
+  const nodesOut = nodeArr.map(n => ({
+    id: n.id, group: n.group, x: n.x, y: n.y, fixed: { x: true, y: true },
+    label: buildLabel(n.id, version),
+    color: buildColor(n.id, version),
+    title: n.id,
+    shape: "box",
+    margin: { top:10, bottom:10, left:14, right:14 },
+    font: { size:12, face:"PingFang SC", color:"#334155", multi:true },
+    borderWidth: 2,
+    widthConstraint: { minimum:130, maximum:170 },
+    shadow: { enabled:true, size:3, color:"rgba(0,0,0,0.06)" }
+  }));
+
+  const edgesOut = edgeArr.map(e => ({
+    from: e.from, to: e.to, label: e.label, arrows: "to",
+    color: e.color, width: e.width,
+    dashes: e.dashes || false,
+    smooth: { type:"curvedCCW", roundness:0.2 },
+    font: { size:10, color:"#64748b", face:"PingFang SC", background:"#fff", strokeWidth:2 }
+  }));
+
+  return { nodes: new vis.DataSet(nodesOut), edges: new vis.DataSet(edgesOut) };
+}
+
+// ============================
+// 初始化网络（physics 仅用于首版布局，随后冻结）
+// ============================
+const container = document.getElementById("graph");
+let { nodes: initNodes, edges: initEdges } = getVersionData("v010");
+
+const options = {
+  physics: {
+    enabled: true,
+    stabilization: { iterations: 50, fit: true }
+  },
+  edges: {
+    smooth: { type:"curvedCCW", roundness:0.2 },
+    font: { size:10, color:"#64748b", face:"PingFang SC", background:"#fff", strokeWidth:2 }
+  },
+  nodes: {
+    shape: "box",
+    margin: { top:10, bottom:10, left:14, right:14 },
+    font: { size:12, face:"PingFang SC", color:"#334155", multi:true },
+    borderWidth: 2,
+    widthConstraint: { minimum:130, maximum:170 },
+    shadow: { enabled:true, size:3, color:"rgba(0,0,0,0.06)" }
+  },
+  interaction: { hover:true, navigationButtons:true, keyboard:true }
+};
+
+const network = new vis.Network(container, { nodes: initNodes, edges: initEdges }, options);
+
+// 首版稳定后冻结物理，此后的版本切换不再移动节点
+network.once("stabilized", function() {
+  // 记录第一版稳定后的实际位置，后续所有版本复用
+  const positions = network.getPositions();
+  allNodes.forEach(n => {
+    if (positions[n.id]) {
+      allNodes.update({ id: n.id, x: positions[n.id].x, y: positions[n.id].y });
+    }
+  });
+  network.setOptions({ physics: false });
+});
 
 // ============================
 // 版本切换
@@ -629,60 +412,50 @@ function switchVersion(version) {
   if (version === currentVersion) return;
   currentVersion = version;
 
-  // 按钮状态
-  document.getElementById("btn-v010").classList.toggle("active", version === "v010");
-  document.getElementById("btn-v020").classList.toggle("active", version === "v020");
+  document.getElementById("btn-v010").classList.toggle("active", version==="v010");
+  document.getElementById("btn-v020").classList.toggle("active", version==="v020");
 
-  // 徽章 + 统计
-  if (version === "v010") {
-    document.getElementById("active-badge").textContent = "v0.1.0";
-    document.getElementById("stats-display").innerHTML = '<span>文件 <b>9</b></span><span>函数 <b>12</b></span><span>跨文件调用 <b>8</b></span>';
-    document.getElementById("version-diff").style.display = "none";
-  } else {
-    document.getElementById("active-badge").textContent = "v0.2.0";
-    document.getElementById("stats-display").innerHTML = '<span>文件 <b>12</b></span><span>函数 <b>21</b></span><span>跨文件调用 <b>11</b></span>';
-    document.getElementById("version-diff").style.display = "block";
-  }
-
-  // 切换图数据
-  if (version === "v010") {
-    network.setData({ nodes: nodesV010, edges: edgesV010 });
-  } else {
-    network.setData({ nodes: nodesV020, edges: edgesV020 });
-  }
-
-  // 切换右侧面板
-  document.getElementById("panel-v010").classList.toggle("active", version === "v010");
-  document.getElementById("panel-v020").classList.toggle("active", version === "v020");
-
-  // 清除高亮
-  document.querySelectorAll(".file-section.highlight").forEach(el => el.classList.remove("highlight"));
+  const st = versionStats[version];
+  document.getElementById("active-badge").textContent = version==="v010"?"v0.1.0":"v0.2.0";
+  document.getElementById("stats-display").innerHTML =
+    '<span>文件 <b>'+st.files+'</b></span><span>函数 <b>'+st.funcs+'</b></span><span>调用 <b>'+st.calls+'</b></span>';
 
   // 版本历史高亮
-  document.querySelectorAll("#history-table tr").forEach(tr => tr.classList.remove("current"));
-  const histRow = document.getElementById("hist-" + version);
-  if (histRow) histRow.classList.add("current");
+  document.querySelectorAll("#history-table tr").forEach(tr=>tr.classList.remove("current"));
+  const hr = document.getElementById("hist-"+version);
+  if (hr) hr.classList.add("current");
+
+  // 切换面板
+  document.getElementById("panel-v010").classList.toggle("active", version==="v010");
+  document.getElementById("panel-v020").classList.toggle("active", version==="v020");
+
+  // 切换图数据（位置冻结）
+  const { nodes: newNodes, edges: newEdges } = getVersionData(version);
+  network.setOptions({ physics: false });
+  network.setData({ nodes: newNodes, edges: newEdges });
+
+  // 清除高亮
+  document.querySelectorAll(".file-section.highlight").forEach(el=>el.classList.remove("highlight"));
 }
 
 // ============================
-// 点击节点 -> 滚动右侧面板 + 高亮
+// 点击节点 → 滚动右侧面板
 // ============================
 network.on("click", function(params) {
-  document.querySelectorAll(".file-section.highlight").forEach(el => el.classList.remove("highlight"));
+  document.querySelectorAll(".file-section.highlight").forEach(el=>el.classList.remove("highlight"));
   if (params.nodes.length === 0) return;
   const nodeId = params.nodes[0];
-  const detailId = "detail-" + nodeId;
+  const detailId = "detail-" + currentVersion + "-" + nodeId;
   const target = document.getElementById(detailId);
   if (target) {
     target.classList.add("highlight");
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    target.scrollIntoView({ behavior:"smooth", block:"start" });
   }
 });
 
 network.on("deselectNode", function() {
-  document.querySelectorAll(".file-section.highlight").forEach(el => el.classList.remove("highlight"));
+  document.querySelectorAll(".file-section.highlight").forEach(el=>el.classList.remove("highlight"));
 });
 </script>
-
 </body>
 </html>
