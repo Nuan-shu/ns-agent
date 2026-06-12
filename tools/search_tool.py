@@ -4,7 +4,7 @@ from knowledge.search import search_formatted
 
 
 def search_knowledge(query):
-    """搜索知识库（年报 + Agent文档 + Wiki），返回格式化结果。"""
+    """搜索知识库(年报 + Agent文档 + Wiki)，返回格式化结果。"""
     return search_formatted(query)
 
 

@@ -11,12 +11,12 @@ from sentence_transformers import SentenceTransformer
 
 # === 初始化 ===
 
-CHROMA_PATH = str(Path(__file__).parent.parent.parent / "rag-project/backend/chroma_data")
+CHROMA_PATH = str(Path(__file__).parent.parent.parent / "AI工程/rag-project/backend/chroma_data")
 
 _client = chromadb.PersistentClient(path=CHROMA_PATH)
 
 # 已知的集合（wiki_knowledge 待后续入库后加入）
-KNOWN_COLLECTIONS = ["annual_reports", "agent_engineering"]
+KNOWN_COLLECTIONS = ["annual_reports", "agent_engineering", "wiki_knowledge"]
 
 # bge 中文语义模型（384维）
 _embed_model = SentenceTransformer(
@@ -71,7 +71,7 @@ def search_formatted(query, top_k=5):
     
     lines = [f"搜索「{query}」找到 {len(results)} 条结果：\n"]
     for i, r in enumerate(results, 1):
-        source_label = {"annual_reports": "年报", "agent_engineering": "Agent工程"}
+        source_label = {"annual_reports": "年报", "agent_engineering": "Agent工程", "wiki_knowledge": "Wiki"}
         label = source_label.get(r["source"], r["source"])
         lines.append(f"[{i}] 来源：{label}（距离 {r['distance']}）")
         lines.append(f"    {r['content'][:300]}")

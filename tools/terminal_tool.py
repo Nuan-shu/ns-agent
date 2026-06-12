@@ -8,7 +8,7 @@ def run_command(command, timeout=30):
     try:
         result = subprocess.run(
             command, shell=True, capture_output=True,
-            text=True, timeout=timeout, cwd="/Users/ns/Projects/AI工程/ns-agent"
+            text=True, timeout=timeout, cwd="/Users/ns/Projects/ns-agent"
         )
         output = result.stdout
         if result.stderr:

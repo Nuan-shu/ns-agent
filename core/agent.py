@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from tools.registry import get_tool_definitions, execute
+from memory import session as sess
+from core.retry import call_with_retry
+from core.errors import NsAgentError
 
 # 加载 .env（agent.py 在 core/ 下，.env 在项目根目录）
 load_dotenv(Path(__file__).parent.parent / ".env")
@@ -30,7 +33,7 @@ SYSTEM_PROMPT = """你是 NsAgent，一个本地 AI 助手。
 3. 用中文回复"""
 
 
-def run(messages=None):
+def run(messages=None, session_id=None):
     """启动 Agent Loop。messages 为初始消息列表。"""
     if messages is None:
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -42,7 +45,8 @@ def run(messages=None):
     while True:
         print(f">>> 发送请求（{len(messages)} 条消息）...")
         
-        response = client.chat.completions.create(
+        response = call_with_retry(
+            client.chat.completions.create,
             model="deepseek-chat",
             messages=messages,
             tools=tools if tools else None,
@@ -75,29 +79,55 @@ def run(messages=None):
                     "function": {"name": name, "arguments": tc.function.arguments}
                 }]
             })
+            if session_id:
+                sess.save_message(session_id, messages[-1])
             messages.append({
                 "role": "tool",
                 "tool_call_id": tc.id,
                 "content": str(result)
             })
+            if session_id:
+                sess.save_message(session_id, messages[-1])
 
 
 def chat():
-    """交互式 REPL。"""
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    print("NsAgent v0.1.0 — 输入 /exit 退出\n")
-    
+    """交互式 REPL。自动恢复 24h 内会话。"""
+    sess.init_db()
+    session_id = sess.get_last_session()
+
+    if session_id:
+        old_messages = sess.load_session(session_id)
+        print(f"NsAgent v0.1.0 — 恢复了上次会话（{len(old_messages)} 条消息）")
+        print("输入 /new 开始新会话，/exit 退出\n")
+        messages = old_messages
+    else:
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        session_id = sess.create_session()
+        sess.save_message(session_id, messages[0])
+        print("NsAgent v0.1.0 — 输入 /exit 退出\n")
+
     while True:
         user_input = input("你: ").strip()
         if not user_input:
             continue
         if user_input == "/exit":
-            print("再见。")
+            print(f"会话 {session_id} 已保存，再见。")
             break
-        
+        if user_input == "/new":
+            session_id = sess.create_session()
+            messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+            sess.save_message(session_id, messages[0])
+            print("新会话已开始。")
+            continue
+
+        snapshot = len(messages)
         messages.append({"role": "user", "content": user_input})
+        sess.save_message(session_id, messages[-1])
         try:
-            run(messages=messages)
+            run(messages=messages, session_id=session_id)
+        except NsAgentError as e:
+            print(f"NsAgent 错误 [{e.code}]: {e.message}")
+            del messages[snapshot:]
         except Exception as e:
-            print(f"错误: {e}")
-            messages.pop()  # 移除失败的用户消息
+            print(f"未预期错误: {type(e).__name__}: {e}")
+            del messages[snapshot:]
