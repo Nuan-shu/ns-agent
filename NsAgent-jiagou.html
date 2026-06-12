@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NsAgent v0.2.0 — 架构全景 · 逐行注释</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'PingFang SC','Microsoft YaHei',-apple-system,sans-serif; background:#f1f5f9; color:#334155; line-height:1.7; }
+  .container { max-width:1100px; margin:0 auto; padding:40px 24px; }
+
+  h1 { font-size:28px; color:#0f172a; margin-bottom:8px; }
+  .subtitle { color:#64748b; font-size:14px; margin-bottom:32px; }
+
+  .toc { background:#fff; border-radius:12px; padding:24px 28px; margin-bottom:40px; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+  .toc h2 { font-size:16px; color:#0f172a; margin-bottom:16px; }
+  .toc ol { padding-left:20px; }
+  .toc li { margin:6px 0; font-size:13px; }
+  .toc a { color:#3b6df0; text-decoration:none; }
+  .toc a:hover { text-decoration:underline; }
+  .toc .dep { color:#94a3b8; font-size:11px; margin-left:6px; }
+
+  .arch-card { background:#fff; border-radius:12px; padding:24px 28px; margin-bottom:24px; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+  .arch-card h2 { font-size:18px; color:#0f172a; margin-bottom:6px; }
+  .arch-card .meta { font-size:12px; color:#94a3b8; margin-bottom:16px; display:flex; gap:16px; flex-wrap:wrap; }
+  .arch-card .meta span { background:#f1f5f9; padding:2px 10px; border-radius:4px; }
+  .arch-card .purpose { background:#eff6ff; border-left:3px solid #3b6df0; padding:10px 14px; border-radius:0 6px 6px 0; margin-bottom:16px; font-size:13px; }
+
+  .code-block { background:#1e293b; border-radius:8px; overflow-x:auto; margin-bottom:16px; }
+  .code-block table { width:100%; border-collapse:collapse; }
+  .code-block td { padding:2px 0; vertical-align:top; }
+  .code-block .ln { width:44px; text-align:right; padding-right:12px; color:#64748b; font-size:12px; font-family:'SF Mono','Fira Code',monospace; user-select:none; border-right:1px solid #334155; }
+  .code-block .code { padding-left:14px; font-size:13px; font-family:'SF Mono','Fira Code',monospace; color:#e2e8f0; white-space:pre; }
+  .code-block .code .kw { color:#c084fc; }
+  .code-block .code .str { color:#86efac; }
+  .code-block .code .cmt { color:#64748b; font-style:italic; }
+  .code-block .code .fn { color:#60a5fa; }
+  .code-block .code .num { color:#fbbf24; }
+  .code-block .code .op { color:#f472b6; }
+
+  .annotations { margin-top:12px; }
+  .annotations h3 { font-size:14px; color:#0f172a; margin-bottom:10px; }
+  .ann-item { display:flex; gap:12px; padding:8px 0; border-bottom:1px solid #f1f5f9; font-size:13px; }
+  .ann-item .ann-ln { min-width:36px; color:#3b6df0; font-family:'SF Mono',monospace; font-weight:600; font-size:12px; }
+  .ann-item .ann-text { color:#475569; }
+  .ann-item .ann-text code { background:#f1f5f9; padding:1px 5px; border-radius:3px; font-size:12px; color:#0f172a; }
+
+  .call-graph { margin-top:16px; }
+  .call-graph .call-row { display:flex; gap:8px; align-items:center; font-size:12px; padding:4px 0; font-family:'SF Mono',monospace; }
+  .call-graph .call-from { color:#3b6df0; }
+  .call-graph .call-arrow { color:#94a3b8; }
+  .call-graph .call-to { color:#10b981; }
+
+  .divider { border:none; border-top:2px solid #e2e8f0; margin:40px 0; }
+  .overview-diagram { background:#0f172a; color:#e2e8f0; padding:20px; border-radius:8px; font-family:'SF Mono',monospace; font-size:12px; line-height:1.5; overflow-x:auto; white-space:pre; margin-bottom:40px; }
+
+  /* 版本切换 */
+  .version-bar { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+  .version-switch { display:flex; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden; }
+  .version-switch button { padding:6px 20px; font-size:13px; border:none; cursor:pointer; font-weight:500; font-family:inherit; transition:all .2s; background:#f8fafc; color:#64748b; }
+  .version-switch button:first-child { border-right:1px solid #e2e8f0; }
+  .version-switch button.active { background:#3b6df0; color:#fff; }
+  .version-switch button:not(.active):hover { background:#eff6ff; color:#3b6df0; }
+  .arch-card.hidden-version { display:none; }
+  .ver-tag { display:inline-block; font-size:10px; padding:1px 6px; border-radius:4px; margin-left:6px; font-weight:500; }
+  .ver-new { background:#10b981; color:#fff; }
+  .ver-mod { background:#f59e0b; color:#fff; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>NsAgent 架构全景 · 逐行注释</h1>
+<div class="version-bar">
+  <div class="version-switch">
+    <button id="btn-v010" onclick="switchVersion('v010')">v0.1.0</button>
+    <button id="btn-v020" class="active" onclick="switchVersion('v020')">v0.2.0</button>
+  </div>
+  <span style="font-size:12px;color:#94a3b8;">当前 <b id="ver-label">v0.2.0</b> — 12 文件</span>
+</div>
+
+<!-- ============ 目录 ============ -->
+<div class="toc" data-versions="v010,v020">
+<h2>目录</h2>
+<ol>
+<li><a href="#s1">tools/registry.py</a> <span class="dep">契约 — 工具注册表，整个框架的基石</span></li>
+<li><a href="#s2">tools/time_tool.py</a> <span class="dep">最简工具 — 验证注册表通路</span></li>
+<li><a href="#s3">tools/file_tools.py</a> <span class="dep">有参数有副作用 — 文件读写</span></li>
+<li><a href="#s4">tools/terminal_tool.py</a> <span class="dep">subprocess — 终端命令执行</span></li>
+<li><a href="#s5">knowledge/search.py</a> <span class="dep">数据层 — ChromaDB 三源统合搜索</span></li>
+<li><a href="#s6">tools/search_tool.py</a> <span class="dep">工具层包装 — 给 LLM 的知识搜索接口</span></li>
+<li><a href="#s7">core/retry.py</a> <span class="dep">v0.2.0 — API 指数退避重试</span></li>
+<li><a href="#s8">core/errors.py</a> <span class="dep">v0.2.0 — 统一异常体系</span></li>
+<li><a href="#s9">memory/session.py</a> <span class="dep">v0.2.0 — SQLite 会话持久化</span></li>
+<li><a href="#s10">core/agent.py</a> <span class="dep">消费者 — Agent Loop + REPL</span></li>
+<li><a href="#s11">main.py</a> <span class="dep">入口 — import 即注册</span></li>
+<li><a href="#s12">knowledge/ingest_wiki.py</a> <span class="dep">v0.2.0 — Wiki 入库脚本</span></li>
+</ol>
+</div>
+
+<!-- ============ 全景架构图 ============ -->
+<div class="overview-diagram" data-versions="v010,v020">
+┌────────────────────────────────────────────────────────────────────┐
+│                        NsAgent v0.2.0                              │
+│                                                                     │
+│  L0   main.py                                                       │
+│         │ import 触发 register()                                    │
+│         ▼                                                           │
+│  L1   core/agent.py  ←── retry.py  ←── errors.py                   │
+│         │  run()         call_with   NsAgentError                   │
+│         │  chat()         _retry()   APIError                       │
+│         │                                                           │
+│         ├──→ tools/registry.py  ◄── 所有工具的 register() 目的地     │
+│         │      register() / get_tool_definitions() / execute()      │
+│         │                                                           │
+│         ├──→ memory/session.py                                      │
+│         │      init_db / create / save / load / get_last             │
+│         │                                                           │
+│  L2   tools/                    每个文件 = 函数 + JSON Schema + register()
+│         time_tool.py    → get_current_time()                       │
+│         file_tools.py   → read_file() / write_file()              │
+│         terminal_tool.py → run_command()                           │
+│         search_tool.py  → search_knowledge()                       │
+│                               │                                     │
+│  L3                           ▼                                     │
+│       knowledge/                                                   │
+│         search.py         unified_search() / search_formatted()    │
+│         ingest_wiki.py    list_md_files / chunk_by_headers / ingest│
+│                              │                                      │
+│                              ▼                                      │
+│                         ChromaDB                                    │
+│                    ┌──────┼──────┐                                  │
+│              annual_reports  agent_engineering  wiki_knowledge      │
+│                1683 块         27 块              262 块             │
+│                                                                     │
+│  L3   memory/session.py  →  SQLite  sessions + messages             │
+└────────────────────────────────────────────────────────────────────┘
+</div>
+
+<!-- ============ 1. registry.py ============ -->
+<div class="arch-card" id="s1" data-versions="v010,v020">
+<h2>1. tools/registry.py — 工具注册表</h2>
+<div class="meta">
+  <span>创建：v0.1.0 Day 8</span><span>行数：36</span><span>3 个函数</span><span>被依赖：全项目</span>
+</div>
+<div class="purpose">
+<strong>在整个框架中的位置：</strong>最先写的代码文件。它是契约——所有工具在此报到，Agent Loop 从此读取。整个框架的「可扩展性」来源于注册表：加工具不改 Loop，改 Loop 不影响工具。
+</div>
+
+<div class="code-block"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cmt">"""工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。"""</span></td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="fn">_registry</span> <span class="op">=</span> {}  <span class="cmt"># {工具名: {"definition": {...}, "handler": 函数}}</span></td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cmt"># 调用工具时,会自动来这报道.在tools里调用该函数</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="kw">def</span> <span class="fn">register</span>(name, definition, handler):</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="cmt">"""注册一个工具。definition 是给 LLM 看的 JSON Schema。"""</span></td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="fn">_registry</span>[name] <span class="op">=</span> {<span class="str">"definition"</span>: definition, <span class="str">"handler"</span>: handler}</td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cmt"># 让LLM知道有哪些工具(main函数开具就调用了工具,所以可以直接让LLM知悉)</span></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="kw">def</span> <span class="fn">get_tool_definitions</span>():</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="cmt">"""返回所有工具的 definition 列表（给 LLM 的 tools 参数）。"""</span></td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="kw">return</span> [item[<span class="str">"definition"</span>] <span class="kw">for</span> item <span class="kw">in</span> <span class="fn">_registry</span>.values()]</td></tr>
+<tr><td class="ln">14</td><td class="code"></td></tr>
+<tr><td class="ln">15</td><td class="code"><span class="cmt"># 执行工具</span></td></tr>
+<tr><td class="ln">16</td><td class="code"><span class="kw">def</span> <span class="fn">execute</span>(name, args):</td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="cmt">"""根据工具名执行对应函数。"""</span></td></tr>
+<tr><td class="ln">18</td><td class="code">    <span class="kw">if</span> name <span class="kw">not in</span> <span class="fn">_registry</span>:</td></tr>
+<tr><td class="ln">19</td><td class="code">        <span class="kw">return</span> <span class="str">f"错误：未知工具 {name}"</span></td></tr>
+<tr><td class="ln">20</td><td class="code">    <span class="kw">return</span> <span class="fn">_registry</span>[name][<span class="str">"handler"</span>](<span class="op">**</span>args)</td></tr>
+</table></div>
+
+<div class="annotations">
+<h3>逐行注解</h3>
+<div class="ann-item"><span class="ann-ln">3</span><span class="ann-text"><code>_registry = {}</code> — 模块级字典，<strong>整个框架唯一的数据中枢</strong>。下划线前缀表示模块私有。所有工具的注册、查询、执行都通过这个字典。结构：<code>{"read_file": {"definition": {JSON Schema}, "handler": &lt;函数&gt;}, ...}</code></span></div>
+<div class="ann-item"><span class="ann-ln">6-8</span><span class="ann-text"><code>register(name, definition, handler)</code> — <strong>契约的第一面</strong>。工具模块调用此函数「报到」。三个参数缺一不可：name 是字符串键，definition 是 OpenAI function calling 格式的 JSON Schema（给 LLM 看的「工具说明书」），handler 是真正的 Python 函数引用。一行赋值完成注册，O(1) 写入。</span></div>
+<div class="ann-item"><span class="ann-ln">11-13</span><span class="ann-text"><code>get_tool_definitions()</code> — <strong>契约的第二面</strong>。Agent Loop 调用它获取工具列表，拼到 LLM 的 <code>tools</code> 参数里。推导式从 _registry 中只取 definition 部分，handler 不上传给 LLM。Loop 不需要知道工具有几个、叫什么——它只拿到一个 JSON 列表。</span></div>
+<div class="ann-item"><span class="ann-ln">16-20</span><span class="ann-text"><code>execute(name, args)</code> — <strong>契约的第三面</strong>。LLM 返回 tool_calls 后，Loop 调此函数执行。查表 O(1)，<code>**args</code> 解包字典为关键字参数传给 handler。查不到返回错误字符串而<strong>不抛异常</strong>——这是设计选择，因为 Agent 可以处理文本错误，但异常会打断 Loop。</span></div>
+</div>
+
+<div class="call-graph">
+<div class="call-row"><span class="call-arrow">← 被调用：</span><span class="call-from">time_tool.py, file_tools.py, terminal_tool.py, search_tool.py</span><span class="call-arrow">→ register()</span></div>
+<div class="call-row"><span class="call-arrow">← 被调用：</span><span class="call-from">core/agent.py run()</span><span class="call-arrow">→ get_tool_definitions() / execute()</span></div>
+</div>
+</div>
+
+<!-- ============ 2. time_tool.py ============ -->
+<div class="arch-card" id="s2" data-versions="v010,v020">
+<h2>2. tools/time_tool.py — 时间工具</h2>
+<div class="meta"><span>创建：v0.1.0 Day 8</span><span>行数：20</span><span>1 函数</span><span>依赖：registry</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>最简工具。零参数、零副作用、零外部依赖。作用是<strong>验证注册表通路</strong>——证明"定义一个工具 → register → Agent 能用"这条链路是通的。</div>
+
+<div class="code-block"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cmt">"""获取当前时间的工具。"""</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">from</span> tools.registry <span class="kw">import</span> register</td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="kw">from</span> datetime <span class="kw">import</span> datetime</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="kw">def</span> <span class="fn">get_current_time</span>():</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="cmt">"""返回当前日期时间字符串。"""</span></td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="kw">return</span> datetime.now().strftime(<span class="str">"%Y-%m-%d %H:%M:%S"</span>)</td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="fn">TOOL_DEFINITION</span> <span class="op">=</span> {</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="str">"type"</span>: <span class="str">"function"</span>,</td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="str">"function"</span>: {</td></tr>
+<tr><td class="ln">14</td><td class="code">        <span class="str">"name"</span>: <span class="str">"get_current_time"</span>,</td></tr>
+<tr><td class="ln">15</td><td class="code">        <span class="str">"description"</span>: <span class="str">"获取当前日期和时间"</span>,</td></tr>
+<tr><td class="ln">16</td><td class="code">        <span class="str">"parameters"</span>: {<span class="str">"type"</span>: <span class="str">"object"</span>, <span class="str">"properties"</span>: {}}</td></tr>
+<tr><td class="ln">17</td><td class="code">    }</td></tr>
+<tr><td class="ln">18</td><td class="code">}</td></tr>
+<tr><td class="ln">19</td><td class="code"></td></tr>
+<tr><td class="ln">20</td><td class="code"><span class="fn">register</span>(<span class="str">"get_current_time"</span>, <span class="fn">TOOL_DEFINITION</span>, get_current_time)</td></tr>
+</table></div>
+
+<div class="annotations">
+<h3>逐行注解</h3>
+<div class="ann-item"><span class="ann-ln">2</span><span class="ann-text">从 registry 导入 <code>register</code>。每个工具文件都从同一个地方导入同一个函数——这就是「报到」的机制。</span></div>
+<div class="ann-item"><span class="ann-ln">6-8</span><span class="ann-text">工具函数本身。零参数，只做一件事：返回当前时间字符串。没有任何业务逻辑，纯粹的数据提供者。</span></div>
+<div class="ann-item"><span class="ann-ln">11-18</span><span class="ann-text"><code>TOOL_DEFINITION</code> — <strong>给 LLM 看的 JSON Schema</strong>。OpenAI function calling 协议要求每条工具描述包含 type、function.name、function.description、function.parameters。这里的 parameters 是空 properties，因为无参数。</span></div>
+<div class="ann-item"><span class="ann-ln">20</span><span class="ann-text"><code>register("get_current_time", TOOL_DEFINITION, get_current_time)</code> — <strong>报到</strong>。模块导入时自动执行。三个参数对应注册表的三栏：名字（键）、说明书（给LLM）、函数（干活）。</span></div>
+</div>
+</div>
+
+<!-- ============ 3. file_tools.py ============ -->
+<div class="arch-card" id="s3" data-versions="v010,v020">
+<h2>3. tools/file_tools.py — 文件读写</h2>
+<div class="meta"><span>创建：v0.1.0 Day 8</span><span>行数：70</span><span>2 函数</span><span>依赖：registry + pathlib</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>比 time_tool 复杂——有参数、有副作用、需要错误处理。一个文件注册<strong>两个</strong>工具（read_file + write_file），证明「一个模块可以有多个工具」。</div>
+
+<div class="code-block"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cmt">"""文件读写工具 — read_file 和 write_file。"""</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">from</span> tools.registry <span class="kw">import</span> register</td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="kw">from</span> pathlib <span class="kw">import</span> Path</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="kw">def</span> <span class="fn">read_file</span>(path, offset<span class="op">=</span><span class="num">1</span>, limit<span class="op">=</span><span class="num">200</span>):</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="cmt">"""读取文件内容。offset 和 limit 控制读取范围。"""</span></td></tr>
+<tr><td class="ln">8</td><td class="code">    p <span class="op">=</span> <span class="fn">Path</span>(path).expanduser().resolve()</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="kw">if not</span> p.exists():</td></tr>
+<tr><td class="ln">10</td><td class="code">        <span class="kw">return</span> <span class="str">f"错误：文件不存在 {path}"</span></td></tr>
+<tr><td class="ln">11</td><td class="code">    <span class="kw">try</span>:</td></tr>
+<tr><td class="ln">12</td><td class="code">        lines <span class="op">=</span> p.read_text(encoding<span class="op">=</span><span class="str">"utf-8"</span>).split(<span class="str">"\n"</span>)</td></tr>
+<tr><td class="ln">13</td><td class="code">        total <span class="op">=</span> <span class="fn">len</span>(lines)</td></tr>
+<tr><td class="ln">14</td><td class="code">        start <span class="op">=</span> <span class="fn">max</span>(<span class="num">0</span>, offset <span class="op">-</span> <span class="num">1</span>)</td></tr>
+<tr><td class="ln">15</td><td class="code">        end <span class="op">=</span> <span class="fn">min</span>(total, start <span class="op">+</span> limit)</td></tr>
+<tr><td class="ln">16</td><td class="code">        result <span class="op">=</span> []</td></tr>
+<tr><td class="ln">17</td><td class="code">        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(start, end):</td></tr>
+<tr><td class="ln">18</td><td class="code">            result.append(<span class="str">f"<span class="num">{i</span><span class="op">+</span><span class="num">1</span>}|<span class="num">{lines[i]}</span>"</span>)</td></tr>
+<tr><td class="ln">19</td><td class="code">        header <span class="op">=</span> <span class="str">f"文件 {path}（第 {start+1}-{end} 行 / 共 {total} 行）\n"</span></td></tr>
+<tr><td class="ln">20</td><td class="code">        <span class="kw">return</span> header <span class="op">+</span> <span class="str">"\n"</span>.join(result)</td></tr>
+<tr><td class="ln">21</td><td class="code">    <span class="kw">except</span> <span class="fn">Exception</span> <span class="kw">as</span> e:</td></tr>
+<tr><td class="ln">22</td><td class="code">        <span class="kw">return</span> <span class="str">f"错误：读取失败 {e}"</span></td></tr>
+<tr><td class="ln">23</td><td class="code"></td></tr>
+<tr><td class="ln">24</td><td class="code"></td></tr>
+<tr><td class="ln">25</td><td class="code"><span class="kw">def</span> <span class="fn">write_file</span>(path, content):</td></tr>
+<tr><td class="ln">26</td><td class="code">    <span class="cmt">"""写入文件内容（覆盖）。"""</span></td></tr>
+<tr><td class="ln">27</td><td class="code">    p <span class="op">=</span> <span class="fn">Path</span>(path).expanduser().resolve()</td></tr>
+<tr><td class="ln">28</td><td class="code">    <span class="kw">try</span>:</td></tr>
+<tr><td class="ln">29</td><td class="code">        p.parent.mkdir(parents<span class="op">=</span><span class="fn">True</span>, exist_ok<span class="op">=</span><span class="fn">True</span>)</td></tr>
+<tr><td class="ln">30</td><td class="code">        p.write_text(content, encoding<span class="op">=</span><span class="str">"utf-8"</span>)</td></tr>
+<tr><td class="ln">31</td><td class="code">        <span class="kw">return</span> <span class="str">f"已写入 {path}（{len(content)} 字符）"</span></td></tr>
+<tr><td class="ln">32</td><td class="code">    <span class="kw">except</span> <span class="fn">Exception</span> <span class="kw">as</span> e:</td></tr>
+<tr><td class="ln">33</td><td class="code">        <span class="kw">return</span> <span class="str">f"错误：写入失败 {e}"</span></td></tr>
+</table></div>
+
+<div class="annotations">
+<h3>逐行注解（关键行）</h3>
+<div class="ann-item"><span class="ann-ln">8</span><span class="ann-text"><code>Path(path).expanduser().resolve()</code> — 三步处理：① Path 包装 ② expanduser 把 ~ 展开为 /Users/ns ③ resolve 把相对路径变成绝对路径。这样 Agent 可以写 ~/file.txt，工具自动转成绝对路径。</span></div>
+<div class="ann-item"><span class="ann-ln">9-10</span><span class="ann-text">文件不存在时<strong>返回错误字符串</strong>，不抛异常。这是 NsAgent 工具的统一模式——函数返回值永远是字符串，Agent Loop 拿到的永远是文本。</span></div>
+<div class="ann-item"><span class="ann-ln">12</span><span class="ann-text"><code>.read_text() → .split("\n")</code> — 一次性读入全文然后按换行分割。对于几十 KB 的源码文件没问题，不适合 GB 级文件（但 Agent 目前没有读大文件的需求）。</span></div>
+<div class="ann-item"><span class="ann-ln">14-15</span><span class="ann-text"><code>start = max(0, offset-1)</code> —— offset 是给 LLM 看的 1-indexed 行号，转成 0-indexed 数组索引。end 用 min 防越界。</span></div>
+<div class="ann-item"><span class="ann-ln">29</span><span class="ann-text"><code>p.parent.mkdir(parents=True, exist_ok=True)</code> — 自动创建父目录。<code>parents=True</code> 相当于 mkdir -p，多级目录一次性创建。<code>exist_ok=True</code> 防止目录已存在时报错。</span></div>
+<div class="ann-item"><span class="ann-ln">69-70</span><span class="ann-text">文件末尾<strong>两次</strong> register()。一个模块注册两个工具——证明注册表不限制每个文件的工具数量。</span></div>
+</div>
+</div>
+
+<!-- ============ 4. terminal_tool.py ============ -->
+<div class="arch-card" id="s4" data-versions="v010,v020">
+<h2>4. tools/terminal_tool.py — 终端执行</h2>
+<div class="meta"><span>创建：v0.1.0 Day 8</span><span>行数：39</span><span>1 函数</span><span>依赖：registry + subprocess</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>最强大的工具。Agent 可以通过它执行任何 shell 命令——安装包、运行脚本、查看文件。这是 Agent 从「读」到「写+执行」的质变。也是安全风险最大的工具。</div>
+
+<div class="code-block"><table>
+<tr><td class="ln">8</td><td class="code">    <span class="kw">try</span>:</td></tr>
+<tr><td class="ln">9</td><td class="code">        result <span class="op">=</span> subprocess.<span class="fn">run</span>(</td></tr>
+<tr><td class="ln">10</td><td class="code">            command, shell<span class="op">=</span><span class="fn">True</span>, capture_output<span class="op">=</span><span class="fn">True</span>,</td></tr>
+<tr><td class="ln">11</td><td class="code">            text<span class="op">=</span><span class="fn">True</span>, timeout<span class="op">=</span>timeout, cwd<span class="op">=</span><span class="str">"/Users/ns/Projects/ns-agent"</span></td></tr>
+<tr><td class="ln">12</td><td class="code">        )</td></tr>
+<tr><td class="ln">13</td><td class="code">        output <span class="op">=</span> result.stdout</td></tr>
+<tr><td class="ln">14</td><td class="code">        <span class="kw">if</span> result.stderr:</td></tr>
+<tr><td class="ln">15</td><td class="code">            output <span class="op">+=</span> <span class="str">"\n[stderr]\n"</span> <span class="op">+</span> result.stderr</td></tr>
+<tr><td class="ln">16</td><td class="code">        <span class="kw">return</span> output <span class="kw">or</span> <span class="str">f"命令执行完毕（退出码 {result.returncode}）"</span></td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="kw">except</span> subprocess.<span class="fn">TimeoutExpired</span>:</td></tr>
+<tr><td class="ln">18</td><td class="code">        <span class="kw">return</span> <span class="str">f"错误：命令超时（>{timeout}秒）"</span></td></tr>
+</table></div>
+
+<div class="annotations">
+<h3>逐行注解</h3>
+<div class="ann-item"><span class="ann-ln">9-12</span><span class="ann-text"><code>subprocess.run()</code> — 五个关键参数：① <code>shell=True</code> 允许管道/重定向（如 <code>ls | grep py</code>）；② <code>capture_output=True</code> 捕获 stdout 和 stderr 到内存；③ <code>text=True</code> 返回字符串而非 bytes；④ <code>timeout=30</code> 防止命令挂死；⑤ <code>cwd</code> 固定工作目录，让 Agent 的命令在项目目录下执行。</span></div>
+<div class="ann-item"><span class="ann-ln">14-15</span><span class="ann-text">合并 stderr：不是只返回 stdout。很多工具（如 git、pip）把有用信息打在 stderr。Agent 需要看到完整输出。</span></div>
+<div class="ann-item"><span class="ann-ln">17-18</span><span class="ann-text">区分超时异常：<code>TimeoutExpired</code> 单独 catch，给出明确超时信息，而不是笼统的「出错」。</span></div>
+<div class="ann-item"><span class="ann-ln">10</span><span class="ann-text"><code>shell=True</code> — 当前版本无安全限制。v0.4.0 企业级阶段会增加命令白名单和审批机制。</span></div>
+</div>
+</div>
+
+<!-- ============ 5. knowledge/search.py ============ -->
+<div class="arch-card" id="s5" data-versions="v010,v020">
+<h2>5. knowledge/search.py — 统一多源搜索</h2>
+<div class="meta"><span>创建：v0.1.0 Day 8 · v0.2.0 修改</span><span>行数：80</span><span>2 函数</span><span>依赖：chromadb + bge 模型</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>数据层核心。不依赖 tools/ 或 core/，是独立的搜索引擎。v0.1.0 搜二源（年报+Agent工程），v0.2.0 升级为三源（+Wiki 262块）。</div>
+
+<div class="code-block"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cmt">"""统一多源搜索 — 一个查询并行搜索所有知识库。"""</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">import</span> os</td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="kw">from</span> pathlib <span class="kw">import</span> Path</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cmt"># 离线模式，避免 sentence-transformers 直连 huggingface</span></td></tr>
+<tr><td class="ln">6</td><td class="code">os.environ[<span class="str">"HF_HUB_OFFLINE"</span>] <span class="op">=</span> <span class="str">"1"</span></td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="kw">import</span> chromadb</td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="kw">from</span> sentence_transformers <span class="kw">import</span> SentenceTransformer</td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="cmt"># === 初始化 ===</span></td></tr>
+<tr><td class="ln">12</td><td class="code"></td></tr>
+<tr><td class="ln">14</td><td class="code"><span class="fn">CHROMA_PATH</span> <span class="op">=</span> <span class="fn">str</span>(<span class="fn">Path</span>(__file__).parent.parent.parent <span class="op">/</span> <span class="str">"AI工程/rag-project/backend/chroma_data"</span>)</td></tr>
+<tr><td class="ln">15</td><td class="code"></td></tr>
+<tr><td class="ln">16</td><td class="code"><span class="fn">_client</span> <span class="op">=</span> chromadb.<span class="fn">PersistentClient</span>(path<span class="op">=</span><span class="fn">CHROMA_PATH</span>)</td></tr>
+<tr><td class="ln">17</td><td class="code"></td></tr>
+<tr><td class="ln">19</td><td class="code"><span class="fn">KNOWN_COLLECTIONS</span> <span class="op">=</span> [<span class="str">"annual_reports"</span>, <span class="str">"agent_engineering"</span>, <span class="str">"wiki_knowledge"</span>]</td></tr>
+<tr><td class="ln">20</td><td class="code"></td></tr>
+<tr><td class="ln">22</td><td class="code"><span class="fn">_embed_model</span> <span class="op">=</span> <span class="fn">SentenceTransformer</span>(</td></tr>
+<tr><td class="ln">23</td><td class="code">    <span class="str">"BAAI/bge-small-zh-v1.5"</span>,</td></tr>
+<tr><td class="ln">24</td><td class="code">    local_files_only<span class="op">=</span><span class="fn">True</span></td></tr>
+<tr><td class="ln">25</td><td class="code">)</td></tr>
+<tr><td class="ln">26</td><td class="code"></td></tr>
+<tr><td class="ln">30</td><td class="code"><span class="kw">def</span> <span class="fn">unified_search</span>(query, top_k<span class="op">=</span><span class="num">5</span>):</td></tr>
+<tr><td class="ln">40</td><td class="code">    query_vec <span class="op">=</span> <span class="fn">_embed_model</span>.encode(query).tolist()</td></tr>
+<tr><td class="ln">41</td><td class="code">    all_results <span class="op">=</span> []</td></tr>
+<tr><td class="ln">42</td><td class="code"></td></tr>
+<tr><td class="ln">43</td><td class="code">    <span class="kw">for</span> coll_name <span class="kw">in</span> <span class="fn">KNOWN_COLLECTIONS</span>:</td></tr>
+<tr><td class="ln">44</td><td class="code">        <span class="kw">try</span>:</td></tr>
+<tr><td class="ln">45</td><td class="code">            collection <span class="op">=</span> <span class="fn">_client</span>.get_collection(coll_name)</td></tr>
+<tr><td class="ln">46</td><td class="code">            results <span class="op">=</span> collection.query(</td></tr>
+<tr><td class="ln">47</td><td class="code">                query_embeddings<span class="op">=</span>[query_vec],</td></tr>
+<tr><td class="ln">48</td><td class="code">                n_results<span class="op">=</span>top_k</td></tr>
+<tr><td class="ln">49</td><td class="code">            )</td></tr>
+<tr><td class="ln">50</td><td class="code">            <span class="kw">for</span> doc, dist <span class="kw">in</span> <span class="fn">zip</span>(results[<span class="str">"documents"</span>][<span class="num">0</span>], results[<span class="str">"distances"</span>][<span class="num">0</span>]):</td></tr>
+<tr><td class="ln">51</td><td class="code">                all_results.append({</td></tr>
+<tr><td class="ln">52</td><td class="code">                    <span class="str">"source"</span>: coll_name,</td></tr>
+<tr><td class="ln">53</td><td class="code">                    <span class="str">"content"</span>: doc,</td></tr>
+<tr><td class="ln">54</td><td class="code">                    <span class="str">"distance"</span>: <span class="fn">round</span>(dist, <span class="num">4</span>)</td></tr>
+<tr><td class="ln">55</td><td class="code">                })</td></tr>
+<tr><td class="ln">58</td><td class="code">        <span class="kw">except</span> <span class="fn">Exception</span>:</td></tr>
+<tr><td class="ln">59</td><td class="code">            <span class="kw">continue</span>  <span class="cmt"># 集合不存在就跳过</span></td></tr>
+<tr><td class="ln">60</td><td class="code"></td></tr>
+<tr><td class="ln">62</td><td class="code">    all_results.sort(key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="str">"distance"</span>])</td></tr>
+<tr><td class="ln">63</td><td class="code">    <span class="kw">return</span> all_results</td></tr>
+</table></div>
+
+<div class="annotations">
+<h3>逐行注解</h3>
+<div class="ann-item"><span class="ann-ln">6</span><span class="ann-text"><code>os.environ["HF_HUB_OFFLINE"] = "1"</code> — <strong>必须在 import sentence_transformers 之前设置</strong>。新版 sentence-transformers 不再尊重 HF_ENDPOINT 环境变量。这行防止每次启动时直连 huggingface.co 做 HEAD 验证（国内网络必超时）。</span></div>
+<div class="ann-item"><span class="ann-ln">14</span><span class="ann-text"><code>Path(__file__).parent.parent.parent</code> — 三层 parent：search.py → knowledge/ → ns-agent/ → AI工程/rag-project/backend/chroma_data。这个路径是跨项目引用：ns-agent 的 ChromaDB 数据存储在 rag-project 之下，共享同一份向量库。</span></div>
+<div class="ann-item"><span class="ann-ln">16</span><span class="ann-text"><code>PersistentClient</code>（不是 Ephemeral）——数据落盘，重启不丢。路径指向 rag-project 的 chroma_data 目录。</span></div>
+<div class="ann-item"><span class="ann-ln">19</span><span class="ann-text"><code>KNOWN_COLLECTIONS</code> — <strong>v0.2.0 关键改动</strong>。从 ["annual_reports", "agent_engineering"] 升级为三源。加新知识库只需在这里加一行，unified_search 自动覆盖。</span></div>
+<div class="ann-item"><span class="ann-ln">40</span><span class="ann-text"><code>_embed_model.encode(query).tolist()</code> — 把中文查询文本变成一个 384 维浮点数向量。bge-small-zh-v1.5 是 BAAI 的中文嵌入模型，专门优化中文语义。</span></div>
+<div class="ann-item"><span class="ann-ln">43-59</span><span class="ann-text"><strong>并行搜索循环</strong>——遍历三个集合，每个发一次 query 请求。结果按 collection 分组返回。用 try/except 包裹每个集合：某个集合不存在就跳过（continue），不阻塞其他集合的搜索。如果三个都没命中，返回空列表。</span></div>
+<div class="ann-item"><span class="ann-ln">62</span><span class="ann-text"><code>sort(key=lambda x: x["distance"])</code> — cosine 距离越小越相关。三源结果混合排序后，Agent 看到的是按相关度排列的混合结果，不区分来源。</span></div>
+</div>
+</div>
+
+<!-- 剩余较大文件用简洁格式 -->
+
+<!-- ============ 6. search_tool.py ============ -->
+<div class="arch-card" id="s6" data-versions="v010,v020">
+<h2>6. tools/search_tool.py — 知识搜索工具</h2>
+<div class="meta"><span>创建：v0.1.0 Day 8</span><span>行数：26</span><span>1 函数</span><span>依赖：registry + knowledge/search.py</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>工具层（给 LLM 看的接口）与知识层（具体搜索逻辑）的<strong>分离点</strong>。search_knowledge 只有 3 行——它不干活，只做转发：LLM 调用它，它调 search_formatted，结果原样返回。这种分层让知识层的改动（加数据源、换模型）不影响工具层。</div>
+
+<div class="annotations">
+<h3>关键注解</h3>
+<div class="ann-item"><span class="ann-ln">2</span><span class="ann-text"><code>from tools.registry import register</code> — 标准报到接口</span></div>
+<div class="ann-item"><span class="ann-ln">3</span><span class="ann-text"><code>from knowledge.search import search_formatted</code> — 只导入格式化搜索函数，不导入底层 unified_search 或 ChromaDB 连接。工具层对知识层内部实现一无所知——这就是分层的好处。</span></div>
+<div class="ann-item"><span class="ann-ln">6-8</span><span class="ann-text"><code>search_knowledge(query)</code> — <strong>整个函数只有一行 return</strong>。如果把 return 行删掉换成 print，这个函数就是零行逻辑。它的存在意义不是计算，而是「把 LLM 的 function calling 请求路由到正确的知识层函数」。</span></div>
+<div class="ann-item"><span class="ann-ln">26</span><span class="ann-text"><code>register("search_knowledge", SEARCH_DEF, search_knowledge)</code> — 报到。与时间工具、文件工具同样的模式。</span></div>
+</div>
+</div>
+
+<!-- ============ 7. retry.py ============ -->
+<div class="arch-card" id="s7" data-versions="v020">
+<h2>7. core/retry.py — API 重试</h2>
+<div class="meta"><span>创建：v0.2.0 Day 9</span><span>行数：36</span><span>1 函数</span><span>依赖：openai</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>v0.2.0 新增。agent.py 的 API 调用不直接调 openai，而是包在 call_with_retry 里。指数退避 1s→2s→4s，最多 3 次。只重试可恢复错误（网络/限流/5xx），400/401 直接抛。</div>
+
+<div class="annotations">
+<h3>关键注解</h3>
+<div class="ann-item"><span class="ann-ln">10-11</span><span class="ann-text"><code>MAX_RETRIES = 3, BASE_DELAY = 1</code> — 常量而非硬编码。改配置只需改这一处。</span></div>
+<div class="ann-item"><span class="ann-ln">14</span><span class="ann-text"><code>RETRYABLE = (APIConnectionError, APITimeoutError, RateLimitError, InternalServerError)</code> — 白名单设计。不在元组里的异常（如 400 BadRequest）直接穿透，不浪费重试。</span></div>
+<div class="ann-item"><span class="ann-ln">29</span><span class="ann-text"><code>delay = BASE_DELAY * (2 ** (attempt - 1))</code> — 指数退避：第1次等 1s，第2次等 2s，第3次等 4s。</span></div>
+<div class="ann-item"><span class="ann-ln">23-25</span><span class="ann-text">调用成功时直接 <code>return fn(*args, **kwargs)</code>，不经过任何后处理。retry 是透明包装器——成功路径零开销。</span></div>
+</div>
+</div>
+
+<!-- ============ 8. errors.py ============ -->
+<div class="arch-card" id="s8" data-versions="v020">
+<h2>8. core/errors.py — 统一异常</h2>
+<div class="meta"><span>创建：v0.2.0 Day 9</span><span>行数：30</span><span>1 基类 + 3 子类</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>v0.2.0 新增。替代裸 except Exception，让 agent.py 的 chat() 能区分「API 挂了」「工具炸了」「配置错了」。NsAgentError 基类提供 to_dict() 统一序列化。</div>
+
+<div class="annotations">
+<h3>关键注解</h3>
+<div class="ann-item"><span class="ann-ln">4</span><span class="ann-text"><code>class NsAgentError(Exception)</code> — 继承 Python 内置 Exception，可以用在任何 try/except 中。</span></div>
+<div class="ann-item"><span class="ann-ln">6-10</span><span class="ann-text">三个属性：message（给人类看的）、code（给程序判断的，如 "API_TIMEOUT"）、details（额外上下文 dict）。code 和 details 可选，最小情况只传 message。</span></div>
+<div class="ann-item"><span class="ann-ln">12-18</span><span class="ann-text"><code>to_dict()</code> — 方便序列化返回给前端或日志系统。<code>{"error": "...", "code": "...", "details": {...}}</code>。</span></div>
+<div class="ann-item"><span class="ann-ln">21-30</span><span class="ann-text">三个子类：<code>APIError</code>（DeepSeek 调用失败）、<code>ToolError</code>（文件不存在/命令超时）、<code>ConfigError</code>（缺 API Key）。子类不覆写任何方法，只靠类名区分错误类型。</span></div>
+</div>
+</div>
+
+<!-- ============ 9. session.py ============ -->
+<div class="arch-card" id="s9" data-versions="v020">
+<h2>9. memory/session.py — 会话持久化</h2>
+<div class="meta"><span>创建：v0.2.0 Day 9</span><span>行数：119</span><span>5 个函数</span><span>依赖：sqlite3</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>v0.2.0 新增。v0.1.0 的 memory/ 是空占位，v0.2.0 实现完整 CRUD。agent.py 每次 messages.append 后同步调 save_message()，启动时自动恢复 24h 内会话。</div>
+
+<div class="annotations">
+<h3>关键注解</h3>
+<div class="ann-item"><span class="ann-ln">8</span><span class="ann-text"><code>DB_PATH = Path(__file__).parent.parent / "data" / "sessions.db"</code> — 数据库文件在 ns-agent/data/ 下，不入 git（.gitignore 已排除 data/）。</span></div>
+<div class="ann-item"><span class="ann-ln">11-15</span><span class="ann-text"><code>_connect()</code> — 私有辅助函数，被所有公开函数调用。自动创建 data/ 目录 + 设置 row_factory 为 Row 对象（可以用列名访问而非索引）。每个调用创建新连接用完关闭，不保持长连接。</span></div>
+<div class="ann-item"><span class="ann-ln">18-39</span><span class="ann-text"><code>init_db()</code> — <strong>幂等建表</strong>。sessions 表：id（12位hex主键）/ created_at / updated_at。messages 表：自增 id / session_id（外键）/ role（system|user|assistant|tool）/ content（可空 — assistant 发 tool_calls 时 content 为 None）/ tool_calls（JSON 字符串）/ tool_call_id（tool 消息用）/ created_at。</span></div>
+<div class="ann-item"><span class="ann-ln">44</span><span class="ann-text"><code>uuid.uuid4().hex[:12]</code> — 12 位唯一会话 ID，碰撞概率极低，足够简单。</span></div>
+<div class="ann-item"><span class="ann-ln">56-83</span><span class="ann-text"><code>save_message()</code> — <strong>兼容四种消息格式</strong>。tool_calls 字段用 json.dumps 序列化——assistant 消息可能带多函数调用数组。同时更新 sessions.updated_at 供 get_last_session 判断活跃性。</span></div>
+<div class="ann-item"><span class="ann-ln">86-107</span><span class="ann-text"><code>load_session()</code> — 从 DB 重建消息列表。tool_calls JSON 反序列化 + content 为 None 的处理，确保返回的 messages 可以直接喂给 OpenAI API。</span></div>
+<div class="ann-item"><span class="ann-ln">110-119</span><span class="ann-text"><code>get_last_session()</code> — 24 小时窗口查询。如果用户 10 分钟前退出、现在重启，自动恢复。如果上次是昨天，返回 None 触发创建新会话。</span></div>
+</div>
+</div>
+
+<!-- ============ 10. agent.py ============ -->
+<div class="arch-card" id="s10" data-versions="v010,v020">
+<h2>10. core/agent.py — Agent Loop</h2>
+<div class="meta"><span>创建：v0.1.0 Day 8 · v0.2.0 修改</span><span>行数：133</span><span>2 函数</span><span>依赖：registry + session + retry + errors</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>消费者。Agent Loop 不关心工具有哪些——它只从 registry 读、只调 registry 执行。它是整个框架唯一的「循环」——while True → LLM → 工具 → LLM → 输出。v0.2.0 新增了 session_id 参数（每条消息落库）、call_with_retry（API 调用包装）、NsAgentError（异常分类）。</div>
+
+<div class="annotations">
+<h3>v0.2.0 关键改动注解</h3>
+<div class="ann-item"><span class="ann-ln">9</span><span class="ann-text"><code>from memory import session as sess</code> — <strong>v0.2.0 新增</strong>。别名 sess 避免与函数参数 session_id 混淆。</span></div>
+<div class="ann-item"><span class="ann-ln">10</span><span class="ann-text"><code>from core.retry import call_with_retry</code> — <strong>v0.2.0 新增</strong>。替代裸 client.chat.completions.create。</span></div>
+<div class="ann-item"><span class="ann-ln">11</span><span class="ann-text"><code>from core.errors import NsAgentError</code> — <strong>v0.2.0 新增</strong>。chat() 的 except 子句用它区分错误类型。</span></div>
+<div class="ann-item"><span class="ann-ln">14</span><span class="ann-text"><code>load_dotenv(Path(__file__).parent.parent / ".env")</code> — 两层的 parent：agent.py → core/ → ns-agent/ → .env。从代码所在位置向上找，不依赖 CWD。</span></div>
+<div class="ann-item"><span class="ann-ln">36-37</span><span class="ann-text"><code>def run(messages=None, session_id=None)</code> — <strong>v0.2.0 新增 session_id 参数</strong>。如果传入，每次 append 消息后同步存 SQLite。如果为 None（旧调用方式），不存。</span></div>
+<div class="ann-item"><span class="ann-ln">45-54</span><span class="ann-text"><strong>Agent Loop 核心</strong>——while True 永不退出（除非 break）。每次循环：① 发 messages 给 LLM ② LLM 返回 tool_calls 或文本 ③ 有 tool_calls？执行工具 + 结果塞回 messages + 继续循环 ④ 无 tool_calls？输出文本 + break。整个 while 循环里 messages 越滚越大——这是 Agent 的「记忆」机制。</span></div>
+<div class="ann-item"><span class="ann-ln">48-53</span><span class="ann-text"><code>call_with_retry(client.chat.completions.create, ...)</code> — <strong>v0.2.0 关键改动</strong>。不再是裸 create()，而是传给 retry 包装器。第一个参数是函数引用，后面是关键字参数。</span></div>
+<div class="ann-item"><span class="ann-ln">73-90</span><span class="ann-text">两次 append + 两次 save_message：① assistant 消息（tool_calls）② tool 消息（执行结果）。<strong>tool 消息的 tool_call_id 必须匹配 assistant 消息的 tc.id</strong>，否则 OpenAI API 拒绝。session_id 判空保护——不传 session_id 就不存库，兼容旧调用。</span></div>
+<div class="ann-item"><span class="ann-ln">93-134</span><span class="ann-text"><code>chat()</code> — <strong>v0.2.0 大幅改进</strong>：① <code>init_db()</code> 确保数据库就绪 ② <code>get_last_session()</code> 查 24h 会话 ③ 有新会话则恢复，没有则创建 ④ system prompt 也存入 DB ⑤ <code>/new</code> 命令创建新会话 ⑥ <code>/exit</code> 输出 session_id ⑦ <code>snapshot = len(messages)</code> + <code>del messages[snapshot:]</code> 实现异常时精确回滚——不残留半条消息破坏对话状态。</span></div>
+</div>
+</div>
+
+<!-- ============ 11. main.py ============ -->
+<div class="arch-card" id="s11" data-versions="v010,v020">
+<h2>11. main.py — 入口</h2>
+<div class="meta"><span>创建：v0.1.0 Day 8</span><span>行数：11</span><span>依赖：tools/* + core/agent.py</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>最简入口。Python 的 import 语句就是初始化机制——4 个工具 import 触发 5 个 register() 调用。chat() 启动时注册表已就绪。</div>
+
+<div class="annotations">
+<h3>关键注解</h3>
+<div class="ann-item"><span class="ann-ln">3-6</span><span class="ann-text"><code>import tools.xxx</code> — <strong>这 4 行 import 是整个框架的初始化</strong>。Python 的 import 语句会执行被导入模块的顶层代码——每个工具文件的最后一行 <code>register("xxx", DEF, fn)</code> 就在此时执行。chat() 被调用时，注册表里已经有 5 个工具（time + read_file + write_file + terminal + search_knowledge）。</span></div>
+<div class="ann-item"><span class="ann-ln">3-6</span><span class="ann-text"><code># noqa: F401</code> — 抑制 linter 的「imported but unused」警告。这些 import 确实没有被本文件直接使用，但它们的<strong>副作用</strong>（register）是必要的。</span></div>
+<div class="ann-item"><span class="ann-ln">10-11</span><span class="ann-text"><code>if __name__ == "__main__": chat()</code> — 标准 Python 入口保护。直接 <code>python main.py</code> 才启动 REPL，被 import 时不启动。</span></div>
+</div>
+</div>
+
+<!-- ============ 12. ingest_wiki.py ============ -->
+<div class="arch-card" id="s12" data-versions="v020">
+<h2>12. knowledge/ingest_wiki.py — Wiki 入库</h2>
+<div class="meta"><span>创建：v0.2.0 Day 9</span><span>行数：87</span><span>3 函数</span><span>依赖：knowledge/search.py</span></div>
+<div class="purpose"><strong>在整个框架中的位置：</strong>v0.2.0 新增，独立脚本（不 import 到 Agent 循环中）。运行一次将 Wiki 46 篇 .md 分块向量化写入 ChromaDB，之后 unified_search 自动覆盖。</div>
+
+<div class="annotations">
+<h3>关键注解</h3>
+<div class="ann-item"><span class="ann-ln">5</span><span class="ann-text"><code>from knowledge.search import _client, _embed_model</code> — 复用 search.py 的 ChromaDB 连接和 bge 模型。不自己新建连接，保证写入的 collection 和 unified_search 读取的是同一个。</span></div>
+<div class="ann-item"><span class="ann-ln">8</span><span class="ann-text"><code>EXCLUDE_DIRS</code> — 排除 00.配置 Config（含敏感信息）和工具目录。安全设计。</span></div>
+<div class="ann-item"><span class="ann-ln">12-21</span><span class="ann-text"><code>list_md_files()</code> — 用 rglob 递归扫描。排除逻辑：<code>parts & EXCLUDE_DIRS</code> 集合交集——路径中任一部分命中排除集就跳过。</span></div>
+<div class="ann-item"><span class="ann-ln">24-45</span><span class="ann-text"><code>chunk_by_headers()</code> — <strong>按 ## 标题分块</strong>。正则 <code>r"\n(?=## )"</code> 在标题前分割，保留标题在 chunk 内。第一个 section（## 之前）作为「前言」。每个 chunk 携带 source（相对路径）和 section（标题名）元数据。</span></div>
+<div class="ann-item"><span class="ann-ln">48-87</span><span class="ann-text"><code>ingest()</code> — 主流程。每文件一批处理（减少 ChromaDB 交互次数）。<code>show_progress_bar=False</code> 避免干扰终端输出。最终 46 文件 → 262 块。</span></div>
+<div class="ann-item"><span class="ann-ln">86-87</span><span class="ann-text"><code>if __name__ == "__main__": ingest()</code> — 作为独立脚本运行，不被 Agent 循环 import。</span></div>
+</div>
+</div>
+
+<!-- ============ 结尾 ============ -->
+<hr class="divider">
+<div class="arch-card">
+<h2>依赖关系总图</h2>
+<div class="call-graph" style="line-height:2.2">
+<div class="call-row"><span class="call-from">main.py</span> <span class="call-arrow">──import──></span> <span class="call-to">tools/*</span> <span style="color:#94a3b8;font-size:11px;">（触发 5 个 register()）</span></div>
+<div class="call-row"><span class="call-from">main.py</span> <span class="call-arrow">──调用──></span> <span class="call-to">core/agent.py chat()</span></div>
+<div class="call-row" style="margin-top:8px;"><span class="call-from">agent.py</span> <span class="call-arrow">──调用──></span> <span class="call-to">tools/registry.py</span> <span style="color:#94a3b8;font-size:11px;">get_tool_definitions() + execute()</span></div>
+<div class="call-row"><span class="call-from">agent.py</span> <span class="call-arrow">──调用──></span> <span class="call-to">core/retry.py</span> <span style="color:#94a3b8;font-size:11px;">call_with_retry()</span></div>
+<div class="call-row"><span class="call-from">agent.py</span> <span class="call-arrow">──except──></span> <span class="call-to">core/errors.py</span> <span style="color:#94a3b8;font-size:11px;">NsAgentError</span></div>
+<div class="call-row"><span class="call-from">agent.py</span> <span class="call-arrow">──调用──></span> <span class="call-to">memory/session.py</span> <span style="color:#94a3b8;font-size:11px;">init/create/save/load/get_last</span></div>
+<div class="call-row" style="margin-top:8px;"><span class="call-from">各工具文件</span> <span class="call-arrow">──register──></span> <span class="call-to">tools/registry.py</span> <span style="color:#94a3b8;font-size:11px;">import 时自动触发</span></div>
+<div class="call-row"><span class="call-from">search_tool.py</span> <span class="call-arrow">──调用──></span> <span class="call-to">knowledge/search.py</span> <span style="color:#94a3b8;font-size:11px;">search_formatted()</span></div>
+<div class="call-row"><span class="call-from">ingest_wiki.py</span> <span class="call-arrow">──复用──></span> <span class="call-to">knowledge/search.py</span> <span style="color:#94a3b8;font-size:11px;">_client + _embed_model</span></div>
+<div class="call-row"><span class="call-from">search.py</span> <span class="call-arrow">──读──></span> <span class="call-to">ChromaDB</span> <span style="color:#94a3b8;font-size:11px;">3 个 collection 共 1972 块</span></div>
+<div class="call-row"><span class="call-from">session.py</span> <span class="call-arrow">──读写──></span> <span class="call-to">SQLite</span> <span style="color:#94a3b8;font-size:11px;">data/sessions.db</span></div>
+</div>
+</div>
+
+</div>
+
+<script>
+function switchVersion(version) {
+  document.getElementById("btn-v010").classList.toggle("active", version==="v010");
+  document.getElementById("btn-v020").classList.toggle("active", version==="v020");
+
+  const stats = { v010: "9 文件", v020: "12 文件" };
+  document.getElementById("ver-label").textContent = version==="v010"?"v0.1.0":"v0.2.0";
+  document.getElementById("ver-label").parentElement.innerHTML =
+    '当前 <b id=\"ver-label\">' + (version==="v010"?"v0.1.0":"v0.2.0") + '</b> — ' + stats[version];
+
+  document.querySelectorAll("[data-versions]").forEach(el => {
+    const vers = el.getAttribute("data-versions");
+    el.classList.toggle("hidden-version", !vers.includes(version));
+  });
+}
+</script>
+</body>
+</html>
