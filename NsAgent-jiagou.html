@@ -76,7 +76,7 @@
     <button id="btn-v010" onclick="switchVersion('v010')">v0.1.0</button>
     <button id="btn-v020" class="active" onclick="switchVersion('v020')">v0.2.0</button>
   </div>
-  <span style="font-size:12px;color:#94a3b8;">当前 <b id="ver-label">v0.2.0</b> — 12 文件</span>
+  <span style="font-size:12px;color:#94a3b8;" id="ver-info">当前 <b>v0.2.0</b> — 12 文件</span>
 </div>
 
 <!-- ============ 目录 ============ -->
@@ -512,14 +512,17 @@ function switchVersion(version) {
   document.getElementById("btn-v010").classList.toggle("active", version==="v010");
   document.getElementById("btn-v020").classList.toggle("active", version==="v020");
 
-  const stats = { v010: "9 文件", v020: "12 文件" };
-  document.getElementById("ver-label").textContent = version==="v010"?"v0.1.0":"v0.2.0";
-  document.getElementById("ver-label").parentElement.innerHTML =
-    '当前 <b id=\"ver-label\">' + (version==="v010"?"v0.1.0":"v0.2.0") + '</b> — ' + stats[version];
+  var verName = version==="v010" ? "v0.1.0" : "v0.2.0";
+  var stats = { v010: "9 文件", v020: "12 文件" };
+  document.getElementById("ver-info").innerHTML = "当前 <b>" + verName + "</b> — " + stats[version];
 
-  document.querySelectorAll("[data-versions]").forEach(el => {
-    const vers = el.getAttribute("data-versions");
-    el.classList.toggle("hidden-version", !vers.includes(version));
+  document.querySelectorAll("[data-versions]").forEach(function(el) {
+    var vers = el.getAttribute("data-versions");
+    if (vers.indexOf(version) === -1) {
+      el.classList.add("hidden-version");
+    } else {
+      el.classList.remove("hidden-version");
+    }
   });
 }
 </script>
