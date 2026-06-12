@@ -80,7 +80,20 @@
 </div>
 
 <!-- ============ 目录 ============ -->
-<div class="toc" data-versions="v010,v020">
+<div class="toc" data-versions="v010">
+<h2>目录</h2>
+<ol>
+<li><a href="#s1">tools/registry.py</a> <span class="dep">契约 — 工具注册表</span></li>
+<li><a href="#s2">tools/time_tool.py</a> <span class="dep">最简工具</span></li>
+<li><a href="#s3">tools/file_tools.py</a> <span class="dep">文件读写</span></li>
+<li><a href="#s4">tools/terminal_tool.py</a> <span class="dep">终端执行</span></li>
+<li><a href="#s5">knowledge/search.py</a> <span class="dep">二源搜索（年报+Agent工程）</span></li>
+<li><a href="#s6">tools/search_tool.py</a> <span class="dep">工具层包装</span></li>
+<li><a href="#s10">core/agent.py</a> <span class="dep">Agent Loop + REPL</span></li>
+<li><a href="#s11">main.py</a> <span class="dep">入口</span></li>
+</ol>
+</div>
+<div class="toc hidden-version" data-versions="v020">
 <h2>目录</h2>
 <ol>
 <li><a href="#s1">tools/registry.py</a> <span class="dep">契约 — 工具注册表，整个框架的基石</span></li>
@@ -99,7 +112,37 @@
 </div>
 
 <!-- ============ 全景架构图 ============ -->
-<div class="overview-diagram" data-versions="v010,v020">
+<div class="overview-diagram" data-versions="v010">
+┌─────────────────────────────────────────────────────┐
+│                    NsAgent v0.1.0                     │
+│                                                       │
+│  L0   main.py                                         │
+│         │ import 触发 register()                       │
+│         ▼                                             │
+│  L1   core/agent.py                                   │
+│         │  run() / chat()                             │
+│         │                                             │
+│         └──→ tools/registry.py  ◄── 5 个 register()    │
+│                register / get_tool_defs / execute      │
+│                                                       │
+│  L2   tools/                                          │
+│         time_tool.py    → get_current_time()          │
+│         file_tools.py   → read_file / write_file      │
+│         terminal_tool.py → run_command()              │
+│         search_tool.py  → search_knowledge()          │
+│                              │                        │
+│  L3                          ▼                        │
+│       knowledge/search.py                              │
+│         unified_search / search_formatted              │
+│              │                                        │
+│              ▼                                        │
+│         ChromaDB (二源)                                │
+│    annual_reports 1683  +  agent_engineering 27       │
+│                                                       │
+│       memory/__init__.py  （空占位）                    │
+└─────────────────────────────────────────────────────┘
+</div>
+<div class="overview-diagram hidden-version" data-versions="v020">
 ┌────────────────────────────────────────────────────────────────────┐
 │                        NsAgent v0.2.0                              │
 │                                                                     │
@@ -488,8 +531,19 @@
 
 <!-- ============ 结尾 ============ -->
 <hr class="divider">
-<div class="arch-card">
-<h2>依赖关系总图</h2>
+<div class="arch-card" data-versions="v010">
+<h2>依赖关系总图 — v0.1.0</h2>
+<div class="call-graph" style="line-height:2.2">
+<div class="call-row"><span class="call-from">main.py</span> <span class="call-arrow">──import──></span> <span class="call-to">tools/*</span> <span style="color:#94a3b8;font-size:11px;">（触发 5 个 register()）</span></div>
+<div class="call-row"><span class="call-from">main.py</span> <span class="call-arrow">──调用──></span> <span class="call-to">core/agent.py chat()</span></div>
+<div class="call-row" style="margin-top:8px;"><span class="call-from">agent.py</span> <span class="call-arrow">──调用──></span> <span class="call-to">tools/registry.py</span> <span style="color:#94a3b8;font-size:11px;">get_tool_definitions() + execute()</span></div>
+<div class="call-row" style="margin-top:8px;"><span class="call-from">各工具文件</span> <span class="call-arrow">──register──></span> <span class="call-to">tools/registry.py</span> <span style="color:#94a3b8;font-size:11px;">import 时自动触发</span></div>
+<div class="call-row"><span class="call-from">search_tool.py</span> <span class="call-arrow">──调用──></span> <span class="call-to">knowledge/search.py</span> <span style="color:#94a3b8;font-size:11px;">search_formatted()</span></div>
+<div class="call-row"><span class="call-from">search.py</span> <span class="call-arrow">──读──></span> <span class="call-to">ChromaDB</span> <span style="color:#94a3b8;font-size:11px;">2 个 collection 共 1710 块</span></div>
+</div>
+</div>
+<div class="arch-card hidden-version" data-versions="v020">
+<h2>依赖关系总图 — v0.2.0</h2>
 <div class="call-graph" style="line-height:2.2">
 <div class="call-row"><span class="call-from">main.py</span> <span class="call-arrow">──import──></span> <span class="call-to">tools/*</span> <span style="color:#94a3b8;font-size:11px;">（触发 5 个 register()）</span></div>
 <div class="call-row"><span class="call-from">main.py</span> <span class="call-arrow">──调用──></span> <span class="call-to">core/agent.py chat()</span></div>
