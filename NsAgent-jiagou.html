@@ -80,7 +80,7 @@
 </div>
 
 <!-- ============ 目录 ============ -->
-<div class="toc" data-versions="v010">
+<div class="toc hidden-version" data-versions="v010">
 <h2>目录</h2>
 <ol>
 <li><a href="#s1">tools/registry.py</a> <span class="dep">契约 — 工具注册表</span></li>
@@ -93,7 +93,7 @@
 <li><a href="#s11">main.py</a> <span class="dep">入口</span></li>
 </ol>
 </div>
-<div class="toc hidden-version" data-versions="v020">
+<div class="toc" data-versions="v020">
 <h2>目录</h2>
 <ol>
 <li><a href="#s1">tools/registry.py</a> <span class="dep">契约 — 工具注册表，整个框架的基石</span></li>
@@ -112,7 +112,7 @@
 </div>
 
 <!-- ============ 全景架构图 ============ -->
-<div class="overview-diagram" data-versions="v010">
+<div class="overview-diagram hidden-version" data-versions="v010">
 ┌─────────────────────────────────────────────────────┐
 │                    NsAgent v0.1.0                     │
 │                                                       │
@@ -142,7 +142,7 @@
 │       memory/__init__.py  （空占位）                    │
 └─────────────────────────────────────────────────────┘
 </div>
-<div class="overview-diagram hidden-version" data-versions="v020">
+<div class="overview-diagram" data-versions="v020">
 ┌────────────────────────────────────────────────────────────────────┐
 │                        NsAgent v0.2.0                              │
 │                                                                     │
@@ -531,7 +531,7 @@
 
 <!-- ============ 结尾 ============ -->
 <hr class="divider">
-<div class="arch-card" data-versions="v010">
+<div class="arch-card hidden-version" data-versions="v010">
 <h2>依赖关系总图 — v0.1.0</h2>
 <div class="call-graph" style="line-height:2.2">
 <div class="call-row"><span class="call-from">main.py</span> <span class="call-arrow">──import──></span> <span class="call-to">tools/*</span> <span style="color:#94a3b8;font-size:11px;">（触发 5 个 register()）</span></div>
@@ -542,7 +542,7 @@
 <div class="call-row"><span class="call-from">search.py</span> <span class="call-arrow">──读──></span> <span class="call-to">ChromaDB</span> <span style="color:#94a3b8;font-size:11px;">2 个 collection 共 1710 块</span></div>
 </div>
 </div>
-<div class="arch-card hidden-version" data-versions="v020">
+<div class="arch-card" data-versions="v020">
 <h2>依赖关系总图 — v0.2.0</h2>
 <div class="call-graph" style="line-height:2.2">
 <div class="call-row"><span class="call-from">main.py</span> <span class="call-arrow">──import──></span> <span class="call-to">tools/*</span> <span style="color:#94a3b8;font-size:11px;">（触发 5 个 register()）</span></div>
@@ -579,6 +579,8 @@ function switchVersion(version) {
     }
   });
 }
+// 页面加载时初始化
+switchVersion("v020");
 </script>
 </body>
 </html>
