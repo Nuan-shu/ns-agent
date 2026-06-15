@@ -2,7 +2,7 @@
 import json
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # pyright: ignore
 from openai import OpenAI
 
 from tools.registry import get_tool_definitions, execute
@@ -29,8 +29,7 @@ SYSTEM_PROMPT = """你是 NsAgent，一个本地 AI 助手。
 
 工作原则：
 1. 先搜索知识库再回答
-2. 修改文件前先 read_file 确认内容
-3. 用中文回复"""
+2. 修改文件前先 read_file 确认内容 3. 用中文回复"""
 
 
 def run(messages=None, session_id=None):
