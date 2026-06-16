@@ -1,9 +1,10 @@
 """会话持久化 — SQLite 存储对话历史，启动时恢复。"""
+
+from datetime import datetime, timedelta
 import json
+from pathlib import Path
 import sqlite3
 import uuid
-from datetime import datetime, timedelta
-from pathlib import Path
 
 DB_PATH = Path(__file__).parent.parent / "data" / "sessions.db"
 
@@ -45,8 +46,7 @@ def create_session():
     now = datetime.now().isoformat()
     conn = _connect()
     conn.execute(
-        "INSERT INTO sessions (id, created_at, updated_at) VALUES (?, ?, ?)",
-        (sid, now, now)
+        "INSERT INTO sessions (id, created_at, updated_at) VALUES (?, ?, ?)", (sid, now, now)
     )
     conn.commit()
     conn.close()
@@ -72,13 +72,10 @@ def save_message(session_id, msg):
             msg.get("content"),
             json.dumps(msg.get("tool_calls")) if msg.get("tool_calls") else None,
             msg.get("tool_call_id"),
-            now
-        )
+            now,
+        ),
     )
-    conn.execute(
-        "UPDATE sessions SET updated_at = ? WHERE id = ?",
-        (now, session_id)
-    )
+    conn.execute("UPDATE sessions SET updated_at = ? WHERE id = ?", (now, session_id))
     conn.commit()
     conn.close()
 
@@ -89,7 +86,7 @@ def load_session(session_id):
     rows = conn.execute(
         "SELECT role, content, tool_calls, tool_call_id FROM messages "
         "WHERE session_id = ? ORDER BY id",
-        (session_id,)
+        (session_id,),
     ).fetchall()
     conn.close()
 
@@ -112,8 +109,7 @@ def get_last_session():
     cutoff = (datetime.now() - timedelta(hours=24)).isoformat()
     conn = _connect()
     row = conn.execute(
-        "SELECT id FROM sessions WHERE updated_at >= ? ORDER BY updated_at DESC LIMIT 1",
-        (cutoff,)
+        "SELECT id FROM sessions WHERE updated_at >= ? ORDER BY updated_at DESC LIMIT 1", (cutoff,)
     ).fetchone()
     conn.close()
     return row["id"] if row else None

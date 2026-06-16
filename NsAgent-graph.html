@@ -77,13 +77,14 @@
   <h1>NsAgent 架构网络图</h1>
   <div class="version-switch">
     <button id="btn-v010" onclick="switchVersion('v010')">v0.1.0</button>
-    <button id="btn-v020" class="active" onclick="switchVersion('v020')">v0.2.0</button>
+    <button id="btn-v020" onclick="switchVersion('v020')">v0.2.0</button>
+    <button id="btn-v030" class="active" onclick="switchVersion('v030')">v0.3.0</button>
   </div>
-  <span class="badge" id="active-badge">v0.2.0</span>
+  <span class="badge" id="active-badge">v0.3.0</span>
   <div class="stats" id="stats-display">
-    <span>文件 <b>12</b></span>
-    <span>函数 <b>21</b></span>
-    <span>调用 <b>11</b></span>
+    <span>文件 <b>24</b></span>
+    <span>函数 <b>35</b></span>
+    <span>调用 <b>19</b></span>
   </div>
 </div>
 
@@ -96,6 +97,9 @@
       <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> tools</div>
       <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> knowledge</div>
       <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6;"></span> memory</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#ec4899;"></span> skills</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#14b8a6;"></span> finance</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#64748b;"></span> infra</div>
     </div>
     <div>
       <h3>节点标记</h3>
@@ -107,7 +111,11 @@
     <div>
       <h3>版本历史</h3>
       <table class="history-table" id="history-table">
-        <tr id="hist-v020" class="current">
+        <tr id="hist-v030" class="current">
+          <td class="ver">v0.3.0</td><td class="date">06-16</td>
+          <td class="desc">金融工具集 + 技能系统 + Prompt分层 + 上下文压缩</td><td class="delta">+11 -1</td>
+        </tr>
+        <tr id="hist-v020">
           <td class="ver">v0.2.0</td><td class="date">06-12</td>
           <td class="desc">三源统合 + 会话持久化 + API重试</td><td class="delta">+4 +9</td>
         </tr>
@@ -186,6 +194,77 @@
         </div>
       </div>
     </div>
+
+    <!-- ============ v0.3.0 面板 ============ -->
+    <div class="panel-version active" id="panel-v030">
+      <h2>v0.3.0 — 函数详情 <span style="font-size:12px;color:#94a3b8;font-weight:400;">— <span class="new-badge" style="font-size:11px">NEW</span> 新增 <span class="mod-badge" style="font-size:11px">MOD</span> 修改</span></h2>
+
+      <div class="pkg-section">
+        <p class="pkg-title">core（新增）</p>
+        <div class="file-section">
+          <div class="file-name">core/prompt.py <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">build_prompt(skills_text="")</div><div class="desc">组装分层 System Prompt：身份/工具/规则/安全四层，支持技能内容动态注入。</div></div>
+        </div>
+        <div class="file-section">
+          <div class="file-name">core/context.py <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">count_tokens(text)</div><div class="desc">粗略估算 token 数（中文 2 字符/token，英文 4 字符/token）。</div></div>
+          <div class="func-card"><div class="sig">compress(messages, max_tokens, keep_last)</div><div class="desc">对话超限时自动将中间消息压缩为摘要，保留 system + 摘要 + 最后 N 条。</div></div>
+        </div>
+      </div>
+
+      <div class="pkg-section">
+        <p class="pkg-title">skills（新增）</p>
+        <div class="file-section">
+          <div class="file-name">skills/registry.py <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">register_skill(name, trigger, description, content)</div><div class="desc">注册技能，trigger 用 | 分隔多关键词。</div></div>
+          <div class="func-card"><div class="sig">match_skills(user_input)</div><div class="desc">根据用户输入匹配已注册技能。</div></div>
+          <div class="func-card"><div class="sig">inject_skills(messages, matched)</div><div class="desc">将匹配技能的内容注入 System Prompt。</div></div>
+        </div>
+        <div class="file-section">
+          <div class="file-name">skills/finance.py <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">(模块顶层)</div><div class="desc">注册"财报分析"技能：触发词=营收/利润/年报等，注入财报分析规范。</div></div>
+        </div>
+      </div>
+
+      <div class="pkg-section">
+        <p class="pkg-title">tools/finance（新增）</p>
+        <div class="file-section">
+          <div class="file-name">tools/finance/market_data.py <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">get_stock_price(code)</div><div class="desc">调用 akshare 查 A 股实时行情：最新价、涨跌幅、成交量、成交额。</div></div>
+        </div>
+        <div class="file-section">
+          <div class="file-name">tools/finance/financial_report.py <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">financial_report(stock_name)</div><div class="desc">多指标并行搜索年报：营收/净利润/增长率/每股收益，去重后返回结构化数据。</div></div>
+        </div>
+      </div>
+
+      <div class="pkg-section">
+        <p class="pkg-title">修改模块</p>
+        <div class="file-section">
+          <div class="file-name">knowledge/search.py <span class="mod-badge">MOD</span></div>
+          <div class="func-card"><div class="sig">unified_search(query, top_k, collections=None)</div><div class="desc">新增 collections 参数支持定向搜索指定知识库。</div></div>
+        </div>
+        <div class="file-section">
+          <div class="file-name">core/agent.py <span class="mod-badge">MOD</span></div>
+          <div class="func-card"><div class="sig">(模块顶层)</div><div class="desc">集成技能注入（match/inject 到 chat 循环）+ 上下文压缩（run 循环前检查 token 数）。</div></div>
+        </div>
+      </div>
+
+      <div class="pkg-section">
+        <p class="pkg-title">基础设施</p>
+        <div class="file-section">
+          <div class="file-name">pyproject.toml <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">(配置文件)</div><div class="desc">项目依赖声明 + ruff/pytest 配置，区分运行时与开发依赖。</div></div>
+        </div>
+        <div class="file-section">
+          <div class="file-name">CONVENTIONS.md <span class="new-badge">NEW</span></div>
+          <div class="func-card"><div class="sig">(规范文档)</div><div class="desc">10 章编码规范：文件结构/命名/工具定义/注释/Prompt/依赖原则。</div></div>
+        </div>
+      </div>
+
+      <div class="section-note">★ v0.3.0 删除：tools/finance/financial_search.py（被 financial_report 替代）</div>
+    </div>
+
 
     <!-- ============ v0.2.0 面板 ============ -->
     <div class="panel-version active" id="panel-v020">
@@ -270,6 +349,16 @@ const allNodes = new vis.DataSet([
   { id:"knowledge/ingest_wiki.py",group:"knowledge",x:400, y:0,   versions:["v020"],       status:{v020:"new"} },
   { id:"memory/__init__.py",    group:"memory",    x:400,  y:150, versions:["v010"],       status:{v010:"new"} },
   { id:"memory/session.py",     group:"memory",    x:400,  y:150, versions:["v020"],       status:{v020:"new"} },
+  { id:"core/prompt.py",         group:"core",    x:-250, y:-180, versions:["v030"], status:{v030:"new"} },
+  { id:"core/context.py",        group:"core",    x:-250, y:-80,  versions:["v030"], status:{v030:"new"} },
+  { id:"skills/registry.py",     group:"skills",  x:0,    y:-250, versions:["v030"], status:{v030:"new"} },
+  { id:"skills/finance.py",      group:"skills",  x:0,    y:-340, versions:["v030"], status:{v030:"new"} },
+  { id:"tools/finance/market_data.py",   group:"tools", x:220, y:-250, versions:["v030"], status:{v030:"new"} },
+  { id:"tools/finance/financial_report.py",group:"tools", x:380, y:-200, versions:["v030"],status:{v030:"new"} },
+  { id:"pyproject.toml",         group:"infra",   x:500,  y:200,  versions:["v030"], status:{v030:"new"} },
+  { id:"CONVENTIONS.md",         group:"infra",   x:500,  y:280,  versions:["v030"], status:{v030:"new"} },
+]);
+
 ]);
 
 // ============================
@@ -287,12 +376,23 @@ const allEdges = new vis.DataSet([
   { from:"tools/time_tool.py",to:"tools/registry.py",  versions:["v010","v020"],label:"register()",              color:{color:"#94a3b8"},width:1,  dashes:true },
   { from:"tools/search_tool.py",to:"knowledge/search.py",versions:["v010","v020"],label:"search_formatted()",    color:{color:"#10b981"},width:2   },
   { from:"knowledge/ingest_wiki.py",to:"knowledge/search.py",versions:["v020"], label:"_client\n_embed_model",   color:{color:"#f59e0b"},width:1.5 },
+  { from:"core/agent.py",to:"core/prompt.py",            versions:["v030"], label:"build_prompt()",       color:{color:"#3b6df0"},width:2 },
+  { from:"core/agent.py",to:"core/context.py",           versions:["v030"], label:"compress()",           color:{color:"#3b6df0"},width:2 },
+  { from:"core/agent.py",to:"skills/registry.py",        versions:["v030"], label:"match/inject",         color:{color:"#10b981"},width:2 },
+  { from:"skills/finance.py",to:"skills/registry.py",    versions:["v030"], label:"register_skill()",     color:{color:"#94a3b8"},width:1,dashes:true },
+  { from:"tools/finance/market_data.py",to:"tools/registry.py",versions:["v030"],label:"register()",    color:{color:"#94a3b8"},width:1,dashes:true },
+  { from:"tools/finance/financial_report.py",to:"tools/registry.py",versions:["v030"],label:"register()",color:{color:"#94a3b8"},width:1,dashes:true },
+  { from:"tools/finance/financial_report.py",to:"knowledge/search.py",versions:["v030"],label:"unified_search()",color:{color:"#10b981"},width:2 },
+  { from:"tools/finance/market_data.py",to:"knowledge/search.py",versions:["v030"],label:"(akshare)",   color:{color:"#6366f1"},width:1.5 },
+]);
+
 ]);
 
 // 版本统计
 const versionStats = {
   v010: { files:9,  funcs:12, calls:8 },
   v020: { files:12, funcs:21, calls:11 },
+  v030: { files:24, funcs:35, calls:19 },
 };
 
 // 节点基础标签
@@ -309,10 +409,18 @@ const nodeLabels = {
   "knowledge/search.py":     "search.py\n─────\n多源搜索",
   "knowledge/ingest_wiki.py":"ingest_wiki.py\n─────\nWiki 入库",
   "memory/__init__.py":      "__init__.py\n─────\n（空占位）",
+  "core/prompt.py":         "prompt.py\n─────\nPrompt分层",
+  "core/context.py":        "context.py\n─────\n上下文压缩",
+  "skills/registry.py":     "registry.py\n─────\n技能注册表",
+  "skills/finance.py":      "finance.py\n─────\n财报分析",
+  "tools/finance/market_data.py":   "market_data.py\n─────\n实时行情",
+  "tools/finance/financial_report.py":"fin_report.py\n─────\n年报报告",
+  "pyproject.toml":         "pyproject.toml\n─────\n项目配置",
+  "CONVENTIONS.md":         "CONVENTIONS.md\n─────\n编码规范",
   "memory/session.py":       "session.py\n─────\n会话持久化",
 };
 
-let currentVersion = "v020";
+let currentVersion = "v030";
 
 function buildLabel(nodeId, version) {
   const base = nodeLabels[nodeId] || nodeId;
@@ -332,6 +440,9 @@ function buildColor(nodeId, version) {
     tools:    {bg:"#ecfdf5",bd:"#10b981",hi:{bg:"#d1fae5",bd:"#059669"}},
     knowledge:{bg:"#fffbeb",bd:"#f59e0b",hi:{bg:"#fef3c7",bd:"#d97706"}},
     memory:   {bg:"#f5f3ff",bd:"#8b5cf6",hi:{bg:"#ede9fe",bd:"#7c3aed"}},
+    skills:   {bg:"#fdf2f8",bd:"#ec4899",hi:{bg:"#fce7f3",bd:"#db2777"}},
+    finance:  {bg:"#f0fdfa",bd:"#14b8a6",hi:{bg:"#ccfbf1",bd:"#0d9488"}},
+    infra:    {bg:"#f8fafc",bd:"#64748b",hi:{bg:"#f1f5f9",bd:"#475569"}},
   };
   const gc = groupColors[node.group] || groupColors.core;
   if (!node || !node.status) return { background:gc.bg, border:gc.bd, highlight:{border:gc.hi.bd,background:gc.hi.bg} };
@@ -373,7 +484,7 @@ function getVersionData(version) {
 // 初始化网络（physics 仅用于首版布局，随后冻结）
 // ============================
 const container = document.getElementById("graph");
-let { nodes: initNodes, edges: initEdges } = getVersionData("v010");
+let { nodes: initNodes, edges: initEdges } = getVersionData("v030");
 
 const options = {
   physics: {
@@ -418,9 +529,11 @@ function switchVersion(version) {
 
   document.getElementById("btn-v010").classList.toggle("active", version==="v010");
   document.getElementById("btn-v020").classList.toggle("active", version==="v020");
+  document.getElementById("btn-v030").classList.toggle("active", version==="v030");
 
   const st = versionStats[version];
-  document.getElementById("active-badge").textContent = version==="v010"?"v0.1.0":"v0.2.0";
+  const labels = {v010:"v0.1.0", v020:"v0.2.0", v030:"v0.3.0"};
+  document.getElementById("active-badge").textContent = labels[version];
   document.getElementById("stats-display").innerHTML =
     '<span>文件 <b>'+st.files+'</b></span><span>函数 <b>'+st.funcs+'</b></span><span>调用 <b>'+st.calls+'</b></span>';
 
@@ -432,6 +545,7 @@ function switchVersion(version) {
   // 切换面板
   document.getElementById("panel-v010").classList.toggle("active", version==="v010");
   document.getElementById("panel-v020").classList.toggle("active", version==="v020");
+  document.getElementById("panel-v030").classList.toggle("active", version==="v030");
 
   // 切换图数据（位置冻结）
   const { nodes: newNodes, edges: newEdges } = getVersionData(version);

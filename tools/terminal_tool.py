@@ -1,14 +1,20 @@
 """终端命令执行工具。"""
-from tools.registry import register
+
 import subprocess
+
+from tools.registry import register
 
 
 def run_command(command, timeout=30):
     """执行 shell 命令并返回输出。"""
     try:
         result = subprocess.run(
-            command, shell=True, capture_output=True,
-            text=True, timeout=timeout, cwd="/Users/ns/Projects/ns-agent"
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd="/Users/ns/Projects/ns-agent",
         )
         output = result.stdout
         if result.stderr:
@@ -29,11 +35,11 @@ TERMINAL_DEF = {
             "type": "object",
             "properties": {
                 "command": {"type": "string", "description": "要执行的命令"},
-                "timeout": {"type": "integer", "description": "超时秒数（默认30）"}
+                "timeout": {"type": "integer", "description": "超时秒数（默认30）"},
             },
-            "required": ["command"]
-        }
-    }
+            "required": ["command"],
+        },
+    },
 }
 
 register("terminal", TERMINAL_DEF, run_command)

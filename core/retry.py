@@ -1,10 +1,12 @@
 """API 重试 — 指数退避，可重试错误自动重试。"""
+
 import time
+
 from openai import (
     APIConnectionError,
     APITimeoutError,
-    RateLimitError,
     InternalServerError,
+    RateLimitError,
 )
 
 MAX_RETRIES = 3

@@ -1,6 +1,8 @@
 """文件读写工具 — read_file 和 write_file。"""
-from tools.registry import register
+
 from pathlib import Path
+
+from tools.registry import register
 
 
 def read_file(path, offset=1, limit=200):
@@ -15,8 +17,8 @@ def read_file(path, offset=1, limit=200):
         end = min(total, start + limit)
         result = []
         for i in range(start, end):
-            result.append(f"{i+1}|{lines[i]}")
-        header = f"文件 {path}（第 {start+1}-{end} 行 / 共 {total} 行）\n"
+            result.append(f"{i + 1}|{lines[i]}")
+        header = f"文件 {path}（第 {start + 1}-{end} 行 / 共 {total} 行）\n"
         return header + "\n".join(result)
     except Exception as e:
         return f"错误：读取失败 {e}"
@@ -43,11 +45,11 @@ READ_DEF = {
             "properties": {
                 "path": {"type": "string", "description": "文件路径"},
                 "offset": {"type": "integer", "description": "起始行号（默认1）"},
-                "limit": {"type": "integer", "description": "读取行数（默认200）"}
+                "limit": {"type": "integer", "description": "读取行数（默认200）"},
             },
-            "required": ["path"]
-        }
-    }
+            "required": ["path"],
+        },
+    },
 }
 
 WRITE_DEF = {
@@ -59,11 +61,11 @@ WRITE_DEF = {
             "type": "object",
             "properties": {
                 "path": {"type": "string", "description": "文件路径"},
-                "content": {"type": "string", "description": "要写入的内容"}
+                "content": {"type": "string", "description": "要写入的内容"},
             },
-            "required": ["path", "content"]
-        }
-    }
+            "required": ["path", "content"],
+        },
+    },
 }
 
 register("read_file", READ_DEF, read_file)

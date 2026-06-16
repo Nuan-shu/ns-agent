@@ -3,9 +3,10 @@
 
 class NsAgentError(Exception):
     """NsAgent 异常基类。"""
+
     def __init__(self, message, code=None, details=None):
         self.message = message
-        self.code = code        # 机器可读的错误码
+        self.code = code  # 机器可读的错误码
         self.details = details  # 额外上下文（dict）
         super().__init__(message)
 

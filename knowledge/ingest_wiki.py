@@ -1,6 +1,7 @@
 """Wiki 入库 — 扫描 Wiki 目录 → 分块 → 向量化 → ChromaDB collection wiki_knowledge。"""
-import re
+
 from pathlib import Path
+import re
 
 from knowledge.search import _client, _embed_model  # 复用已有连接
 
