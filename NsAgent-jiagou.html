@@ -3,1365 +3,1994 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NsAgent 架构全景 · 逐行注释</title>
+<title>NsAgent 架构全景逐行注释 — v0.2.0 / v0.3.0</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'PingFang SC','Microsoft YaHei',-apple-system,sans-serif;background:#f1f5f9;color:#334155;line-height:1.7}
-.container{max-width:1100px;margin:0 auto;padding:40px 24px}
-h1{font-size:28px;color:#0f172a;margin-bottom:8px}
-.version-bar{display:flex;align-items:center;gap:12px;margin-bottom:24px}
-.version-switch{display:flex;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden}
-.version-switch button{padding:6px 20px;font-size:13px;border:none;cursor:pointer;font-weight:500;font-family:inherit;transition:all .2s;background:#f8fafc;color:#64748b}
-.version-switch button:first-child{border-right:1px solid #e2e8f0}
-.version-switch button.active{background:#3b6df0;color:#fff}
-.version-switch button:not(.active):hover{background:#eff6ff;color:#3b6df0}
-.toc{background:#fff;border-radius:12px;padding:24px 28px;margin-bottom:40px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
-.toc h2{font-size:16px;margin-bottom:12px}
-.toc ol{padding-left:20px}
-.toc li{margin:4px 0;font-size:13px}
-.toc a{color:#3b6df0;text-decoration:none}
-.toc a:hover{text-decoration:underline}
-.arch-card{background:#fff;border-radius:12px;padding:24px 28px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
-.arch-card h2{font-size:18px;color:#0f172a;margin-bottom:6px}
-.arch-card .meta{font-size:12px;color:#94a3b8;margin-bottom:16px;display:flex;gap:16px;flex-wrap:wrap}
-.arch-card .meta span{background:#f1f5f9;padding:2px 10px;border-radius:4px}
-.arch-card .purpose{background:#eff6ff;border-left:3px solid #3b6df0;padding:10px 14px;border-radius:0 6px 6px 0;margin-bottom:16px;font-size:13px}
-.code-block{background:#1e293b;border-radius:8px;overflow-x:auto;margin:12px 0}
-.code-block table{width:100%;border-collapse:collapse}
-.code-block td{padding:2px 0;vertical-align:top}
-.code-block .ln{width:44px;text-align:right;padding-right:12px;color:#64748b;font-size:12px;font-family:'SF Mono',monospace;user-select:none;border-right:1px solid #334155}
-.code-block .code{padding-left:14px;font-size:13px;font-family:'SF Mono',monospace;color:#e2e8f0;white-space:pre}
-.code-version h4{font-size:13px;color:#64748b;margin:8px 0 4px}
-.annotations{margin-top:20px;background:#f8fafc;border-radius:8px;padding:16px 20px}
-.annotations h3{font-size:14px;color:#0f172a;margin-bottom:12px}
-.ann-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #e2e8f0;font-size:13px}
-.ann-item:last-child{border-bottom:none}
-.ann-ln{min-width:40px;color:#3b6df0;font-family:'SF Mono',monospace;font-weight:600;font-size:12px;flex-shrink:0}
-.ann-text{color:#475569;line-height:1.7}
-.ann-text code{background:#e2e8f0;padding:1px 5px;border-radius:3px;font-size:12px;color:#0f172a}
-.ann-text b{color:#1e293b}
+body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;background:#f1f5f9;color:#334155;line-height:1.8}
+body.v020-view .ver-badge{display:none}
+body.v030-view .ver-badge{display:inline-block}
 .hidden-version{display:none!important}
-.ver-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:500}
-.ver-new-badge{background:#10b981;color:#fff}
-.ver-mod-badge{background:#f59e0b;color:#fff}
-/* v0.1.0 视图下隐藏 NEW/MOD 角标 */
-body.v010-view .ver-badge{display:none}
-body.v020-view .ver-badge{display:inline-block}
-.overview-diagram{background:#0f172a;color:#e2e8f0;padding:20px;border-radius:8px;font-family:'SF Mono',monospace;font-size:12px;line-height:1.5;overflow-x:auto;white-space:pre;margin-bottom:40px}
-.call-graph{margin-top:16px;line-height:2.2}
-.call-row{display:flex;gap:8px;align-items:center;font-size:12px;padding:4px 0;font-family:'SF Mono',monospace}
-.call-from{color:#3b6df0}
-.call-arrow{color:#94a3b8}
-.call-to{color:#10b981}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+.header{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10}
+.header h1{font-size:18px;color:#0f172a}
+.ver-switch{display:flex;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden}
+.ver-switch button{padding:4px 16px;font-size:12px;border:none;cursor:pointer;background:#f8fafc;color:#64748b;font-family:inherit}
+.ver-switch button.active{background:#3b6df0;color:#fff}
+.ver-info{font-size:12px;color:#94a3b8;margin-left:auto}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin:20px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-title{font-size:16px;font-weight:700;color:#1e293b;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card-desc{font-size:13px;color:#64748b;margin-bottom:16px}
+.badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;color:#fff}
+.badge-new{background:#10b981}
+.badge-mod{background:#f59e0b}
+.badge-keep{background:#94a3b8}
+.code-block{background:#1e293b;color:#e2e8f0;border-radius:8px;padding:16px;margin:12px 0;overflow-x:auto;font-family:"SF Mono","Fira Code",monospace;font-size:13px;line-height:1.6;white-space:pre}
+.code-label{font-size:11px;color:#94a3b8;margin-bottom:4px;font-weight:600}
+.annot{background:#f8fafc;border-left:3px solid #3b6df0;padding:10px 14px;margin:8px 0;font-size:13px;color:#475569;border-radius:0 6px 6px 0}
+.annot b{color:#1e293b}
+.annot code{background:#e2e8f0;padding:1px 4px;border-radius:3px;font-size:12px}
+.arch{background:#1e293b;color:#e2e8f0;padding:20px;border-radius:8px;font-family:monospace;font-size:12px;line-height:1.5;white-space:pre;margin:12px 0}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.toc-item{background:#f1f5f9;padding:4px 12px;border-radius:12px;font-size:12px;color:#475569;cursor:pointer;text-decoration:none}
+.toc-item:hover{background:#e2e8f0}
+.dep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;font-size:12px}
+.dep-item{background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:6px}
+.dep-item .from{color:#94a3b8;font-size:11px}
+.dep-item .to{color:#3b6df0;font-weight:600}
+.pkg-section{margin:24px 0}
+.pkg-title{font-size:14px;font-weight:700;color:#475569;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #e2e8f0}
 </style>
 </head>
-<body class="v020-view">
+<body class="v030-view">
+<div class="header">
+<h1>NsAgent 架构全景逐行注释</h1>
+<div class="ver-switch">
+<button id="btn-v020" onclick="switchVersion('v020')">v0.2.0</button>
+<button id="btn-v030" class="active" onclick="switchVersion('v030')">v0.3.0</button>
+</div>
+<span class="ver-info" id="ver-info">当前 <b>v0.3.0</b> — 24 文件</span>
+</div>
 <div class="container">
 
-<h1>NsAgent 架构全景 · 逐行注释</h1>
-<div class="version-bar">
-  <div class="version-switch">
-    <button id="btn-v010" onclick="switchVersion('v010')">v0.1.0</button>
-    <button id="btn-v020" class="active" onclick="switchVersion('v020')">v0.2.0</button>
-  </div>
-  <span style="font-size:12px;color:#94a3b8" id="ver-info">当前 <b>v0.2.0</b> — 12 文件</span>
+<div class="card" data-versions="v020 v030">
+<div class="card-title">架构全景</div>
+<div class="arch" data-versions="v020">ns-agent/ (v0.2.0 · 16 文件)
+├── main.py                    入口
+├── core/
+│   ├── agent.py               Agent Loop
+│   ├── retry.py               API 重试
+│   └── errors.py              统一异常
+├── tools/
+│   ├── registry.py            工具注册表
+│   └── time/file/terminal/search
+├── knowledge/
+│   ├── search.py              多源搜索
+│   └── ingest_wiki.py         Wiki 入库
+└── memory/
+    └── session.py             会话持久化</div>
+<div class="arch" data-versions="v030">ns-agent/ (v0.3.0 · 24 文件)
+├── main.py                    入口
+├── core/
+│   ├── agent.py               Agent Loop (+技能+压缩)
+│   ├── prompt.py           <span class="ver-badge badge-new">NEW</span> Prompt 分层
+│   ├── context.py          <span class="ver-badge badge-new">NEW</span> Token 计数+压缩
+│   ├── retry.py               API 重试
+│   └── errors.py              统一异常
+├── tools/
+│   ├── registry.py            工具注册表
+│   ├── time/file/terminal/search
+│   └── finance/            <span class="ver-badge badge-new">NEW</span>
+│       ├── market_data.py     实时行情
+│       └── financial_report   年报结构化报告
+├── skills/                 <span class="ver-badge badge-new">NEW</span>
+│   ├── registry.py            技能注册表
+│   └── finance.py             财报分析技能
+├── knowledge/
+│   ├── search.py              多源搜索(+定向)
+│   └── ingest_wiki.py         Wiki 入库
+├── memory/
+│   └── session.py             会话持久化
+├── pyproject.toml          <span class="ver-badge badge-new">NEW</span> 依赖+配置
+└── CONVENTIONS.md          <span class="ver-badge badge-new">NEW</span> 编码规范</div>
 </div>
+<div class="card" data-versions="v020 v030"><div class="card-title">文件目录</div><div class="toc">
+<a class="toc-item" data-versions="v020 v030" href="#core-__init__-py">core/__init__.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#core-agent-py">core/agent.py</a>
+<a class="toc-item" data-versions="v030" href="#core-context-py">core/context.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#core-errors-py">core/errors.py</a>
+<a class="toc-item" data-versions="v030" href="#core-prompt-py">core/prompt.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#core-retry-py">core/retry.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#knowledge-__init__-py">knowledge/__init__.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#knowledge-ingest_wiki-py">knowledge/ingest_wiki.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#knowledge-search-py">knowledge/search.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#main-py">main.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#memory-__init__-py">memory/__init__.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#memory-session-py">memory/session.py</a>
+<a class="toc-item" data-versions="v030" href="#skills-__init__-py">skills/__init__.py</a>
+<a class="toc-item" data-versions="v030" href="#skills-finance-py">skills/finance.py</a>
+<a class="toc-item" data-versions="v030" href="#skills-registry-py">skills/registry.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#tools-__init__-py">tools/__init__.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#tools-file_tools-py">tools/file_tools.py</a>
+<a class="toc-item" data-versions="v030" href="#tools-finance-__init__-py">tools/finance/__init__.py</a>
+<a class="toc-item" data-versions="v030" href="#tools-finance-financial_report-py">tools/finance/financial_report.py</a>
+<a class="toc-item" data-versions="v030" href="#tools-finance-market_data-py">tools/finance/market_data.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#tools-registry-py">tools/registry.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#tools-search_tool-py">tools/search_tool.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#tools-terminal_tool-py">tools/terminal_tool.py</a>
+<a class="toc-item" data-versions="v020 v030" href="#tools-time_tool-py">tools/time_tool.py</a>
+</div></div>
+<div class="pkg-section"><div class="pkg-title">入口</div>
+<div class="card" id="main-py" data-versions="v020 v030">
+<div class="card-title">main.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">入口脚本 — import 所有工具模块触发 register()</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 11 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 入口 — 加载工具 → 启动 Agent。&quot;&quot;&quot;
+# 导入工具模块 = 触发 register() 报到
+import tools.time_tool      # noqa: F401
+import tools.file_tools     # noqa: F401
+import tools.terminal_tool  # noqa: F401
+import tools.search_tool    # noqa: F401
 
-<div class="toc hidden-version" data-versions="v010">
-<h2>目录 — v0.1.0（8 文件）</h2>
-<ol><li><a href="#s1">tools/registry.py — 工具注册表</a></li>
-<li><a href="#s2">tools/time_tool.py — 时间工具</a></li>
-<li><a href="#s3">tools/file_tools.py — 文件读写</a></li>
-<li><a href="#s4">tools/terminal_tool.py — 终端执行</a></li>
-<li><a href="#s5">knowledge/search.py — 统一多源搜索</a></li>
-<li><a href="#s6">tools/search_tool.py — 知识搜索工具</a></li>
-<li><a href="#s10">core/agent.py — Agent Loop</a></li>
-<li><a href="#s11">main.py — 入口</a></li></ol>
-</div>
-<div class="toc" data-versions="v020">
-<h2>目录 — v0.2.0（12 文件）</h2>
-<ol><li><a href="#s1">tools/registry.py — 工具注册表</a></li>
-<li><a href="#s2">tools/time_tool.py — 时间工具</a></li>
-<li><a href="#s3">tools/file_tools.py — 文件读写</a></li>
-<li><a href="#s4">tools/terminal_tool.py — 终端执行</a></li>
-<li><a href="#s5">knowledge/search.py — 统一多源搜索</a></li>
-<li><a href="#s6">tools/search_tool.py — 知识搜索工具</a></li>
-<li><a href="#s7">core/retry.py — API 重试</a></li>
-<li><a href="#s8">core/errors.py — 统一异常</a></li>
-<li><a href="#s9">memory/session.py — 会话持久化</a></li>
-<li><a href="#s10">core/agent.py — Agent Loop</a></li>
-<li><a href="#s11">main.py — 入口</a></li>
-<li><a href="#s12">knowledge/ingest_wiki.py — Wiki入库</a></li></ol>
-</div>
+from core.agent import chat
 
-<div class="overview-diagram hidden-version" data-versions="v010">
-┌──────────────────────────────────────────┐
-│              NsAgent v0.1.0                │
-│                                            │
-│  L0  main.py                               │
-│        │ import 触发 register()             │
-│        ▼                                   │
-│  L1  core/agent.py                         │
-│        │ run() / chat()                    │
-│        │                                   │
-│        └──→ tools/registry.py              │
-│               register / get_tool_defs     │
-│               / execute                    │
-│                                            │
-│  L2  tools/                                │
-│        time_tool / file_tools              │
-│        terminal_tool / search_tool         │
-│                     │                      │
-│  L3                 ▼                      │
-│      knowledge/search.py                   │
-│           │                                │
-│           ▼                                │
-│      ChromaDB (二源)                        │
-│   annual_reports + agent_engineering       │
-│                                            │
-│      memory/__init__.py（空占位）            │
-└──────────────────────────────────────────┘
+if __name__ == &quot;__main__&quot;:
+    chat()
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 14 行 (+3 行)</div><div class="code-block">&quot;&quot;&quot;NsAgent 入口 — 加载工具 → 启动 Agent。&quot;&quot;&quot;
+
+# 导入工具模块 = 触发 register() 报到
+from core.agent import chat
+import skills.finance  # noqa: F401
+import tools.file_tools  # noqa: F401
+import tools.finance.financial_report  # noqa: F401
+import tools.finance.market_data  # noqa: F401
+import tools.search_tool  # noqa: F401
+import tools.terminal_tool  # noqa: F401
+import tools.time_tool  # noqa: F401
+
+if __name__ == &quot;__main__&quot;:
+    chat()
+</div></div>
 </div>
-<div class="overview-diagram" data-versions="v020">
-┌──────────────────────────────────────────────────────────┐
-│                    NsAgent v0.2.0                          │
-│                                                            │
-│  L0  main.py                                               │
-│        │ import 触发 register()                             │
-│        ▼                                                   │
-│  L1  core/agent.py ←── retry.py ←── errors.py              │
-│        │ run()          call_with    NsAgentError           │
-│        │ chat()         _retry()     APIError               │
-│        │                                                   │
-│        ├──→ tools/registry.py ◄── 5个register()            │
-│        │     register / get_tool_definitions / execute      │
-│        │                                                   │
-│        ├──→ memory/session.py                               │
-│        │     init_db / create / save / load / get_last      │
-│        │                                                   │
-│  L2  tools/         每个文件=函数+JSON Schema+register()    │
-│        time_tool / file_tools / terminal_tool / search_tool │
-│                           │                                 │
-│  L3                       ▼                                 │
-│      knowledge/                                             │
-│        search.py      unified_search / search_formatted     │
-│        ingest_wiki.py list_md_files / chunk_by_headers      │
-│                           │                                 │
-│                           ▼                                 │
-│                      ChromaDB (三源)                         │
-│          annual_reports + agent_engineering + wiki_knowledge│
-│              1683块          27块             262块          │
-│                                                            │
-│      memory/session.py → SQLite sessions + messages         │
-└──────────────────────────────────────────────────────────┘
+<div class="pkg-section"><div class="pkg-title">core/ — 6 个文件</div>
+<div class="card" id="core-__init__-py" data-versions="v020 v030">
+<div class="card-title">core/__init__.py </div>
+<div class="card-desc">core 包占位（空文件）</div>
 </div>
+<div class="card" id="core-agent-py" data-versions="v020 v030">
+<div class="card-title">core/agent.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">Agent Loop — 消息循环 + 工具调用 + 技能注入 + 上下文压缩</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 133 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 核心 — Agent Loop。不关心工具有哪些，只从注册表读取。&quot;&quot;&quot;
+import json
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+from openai import OpenAI
+
+from tools.registry import get_tool_definitions, execute
+from memory import session as sess
+from core.retry import call_with_retry
+from core.errors import NsAgentError
+
+# 加载 .env（agent.py 在 core/ 下，.env 在项目根目录）
+load_dotenv(Path(__file__).parent.parent / &quot;.env&quot;)
+
+client = OpenAI(
+    api_key=os.getenv(&quot;DEEPSEEK_API_KEY&quot;),
+    base_url=&quot;https://api.deepseek.com&quot;
+)
+
+SYSTEM_PROMPT = &quot;&quot;&quot;你是 NsAgent，一个本地 AI 助手。
+
+你有以下工具可以使用：
+- read_file: 读取文件
+- write_file: 写入文件
+- terminal: 执行终端命令
+- search_knowledge: 搜索本地知识库（年报、技术文档）
+- get_current_time: 获取当前时间
+
+工作原则：
+1. 先搜索知识库再回答
+2. 修改文件前先 read_file 确认内容
+3. 用中文回复&quot;&quot;&quot;
 
 
-<div class="arch-card" id="s1" data-versions="v010,v020">
-<h2>1. tools/registry.py — 工具注册表 <span class="ver-badge ver-mod-badge">MOD</span></h2>
-<div class="meta">
-  <span>v0.1.0: 21行</span>
-  <span>v0.2.0: 37行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>契约。最先写的代码文件。所有工具在此报到，Agent Loop 从此读取。加工具不改 Loop、改 Loop 不影响工具——这是整个框架可扩展性的基石。</div>
-<div class="code-version"><h4>v0.1.0 (21 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code"></td></tr>
-<tr><td class="ln">3</td><td class="code">_registry = {}  # {工具名: {&quot;definition&quot;: {...}, &quot;handler&quot;: 函数}}</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code"></td></tr>
-<tr><td class="ln">6</td><td class="code">def register(name, definition, handler):</td></tr>
-<tr><td class="ln">7</td><td class="code">    &quot;&quot;&quot;注册一个工具。definition 是给 LLM 看的 JSON Schema。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">8</td><td class="code">    _registry[name] = {&quot;definition&quot;: definition, &quot;handler&quot;: handler}</td></tr>
-<tr><td class="ln">9</td><td class="code"></td></tr>
-<tr><td class="ln">10</td><td class="code"></td></tr>
-<tr><td class="ln">11</td><td class="code">def get_tool_definitions():</td></tr>
-<tr><td class="ln">12</td><td class="code">    &quot;&quot;&quot;返回所有工具的 definition 列表（给 LLM 的 tools 参数）。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">13</td><td class="code">    return [item[&quot;definition&quot;] for item in _registry.values()]</td></tr>
-<tr><td class="ln">14</td><td class="code"></td></tr>
-<tr><td class="ln">15</td><td class="code"></td></tr>
-<tr><td class="ln">16</td><td class="code">def execute(name, args):</td></tr>
-<tr><td class="ln">17</td><td class="code">    &quot;&quot;&quot;根据工具名执行对应函数。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">18</td><td class="code">    if name not in _registry:</td></tr>
-<tr><td class="ln">19</td><td class="code">        return f&quot;错误：未知工具 {name}&quot;</td></tr>
-<tr><td class="ln">20</td><td class="code">    return _registry[name][&quot;handler&quot;](**args)</td></tr>
-<tr><td class="ln">21</td><td class="code"></td></tr>
-</table></div></div><div class="code-version"><h4>v0.2.0 (37 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code"></td></tr>
-<tr><td class="ln">3</td><td class="code">_registry = {}  # {工具名: {&quot;definition&quot;: {...}, &quot;handler&quot;: 函数}}</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code"># 调用工具时,会自动来这报道.在tools里调用该函数</td></tr>
-<tr><td class="ln">6</td><td class="code">def register(name, definition, handler):</td></tr>
-<tr><td class="ln">7</td><td class="code">    &quot;&quot;&quot;注册一个工具。definition 是给 LLM 看的 JSON Schema。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">8</td><td class="code">    _registry[name] = {&quot;definition&quot;: definition, &quot;handler&quot;: handler}</td></tr>
-<tr><td class="ln">9</td><td class="code"></td></tr>
-<tr><td class="ln">10</td><td class="code"># 让LLM知道有哪些工具(main函数开具就调用了工具,所以可以直接让LLM知悉)</td></tr>
-<tr><td class="ln">11</td><td class="code">def get_tool_definitions():</td></tr>
-<tr><td class="ln">12</td><td class="code">    &quot;&quot;&quot;返回所有工具的 definition 列表（给 LLM 的 tools 参数）。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">13</td><td class="code">    return [item[&quot;definition&quot;] for item in _registry.values()]</td></tr>
-<tr><td class="ln">14</td><td class="code"></td></tr>
-<tr><td class="ln">15</td><td class="code"># 执行工具</td></tr>
-<tr><td class="ln">16</td><td class="code">def execute(name, args):</td></tr>
-<tr><td class="ln">17</td><td class="code">    &quot;&quot;&quot;根据工具名执行对应函数。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">18</td><td class="code">    if name not in _registry:</td></tr>
-<tr><td class="ln">19</td><td class="code">        return f&quot;错误：未知工具 {name}&quot;</td></tr>
-<tr><td class="ln">20</td><td class="code">    return _registry[name][&quot;handler&quot;](**args)</td></tr>
-<tr><td class="ln">21</td><td class="code"></td></tr>
-<tr><td class="ln">22</td><td class="code"></td></tr>
-<tr><td class="ln">23</td><td class="code"></td></tr>
-<tr><td class="ln">24</td><td class="code"></td></tr>
-<tr><td class="ln">25</td><td class="code"></td></tr>
-<tr><td class="ln">26</td><td class="code">&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">27</td><td class="code">示例</td></tr>
-<tr><td class="ln">28</td><td class="code">     _registry = {</td></tr>
-<tr><td class="ln">29</td><td class="code">         &quot;read_file&quot;:   {&quot;definition&quot;: {...给LLM看的JSON...}, &quot;handler&quot;: &lt;read_file函数&gt;},</td></tr>
-<tr><td class="ln">30</td><td class="code">         &quot;write_file&quot;:  {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;write_file函数&gt;},</td></tr>
-<tr><td class="ln">31</td><td class="code">         &quot;terminal&quot;:    {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;run_command函数&gt;},</td></tr>
-<tr><td class="ln">32</td><td class="code">         ...</td></tr>
-<tr><td class="ln">33</td><td class="code">     }</td></tr>
-<tr><td class="ln">34</td><td class="code"></td></tr>
-<tr><td class="ln">35</td><td class="code"> Agent Loop 只需要知道 get_tool_definitions() 和 execute() 两个入口，不关心注册表里有什么。</td></tr>
-<tr><td class="ln">36</td><td class="code"></td></tr>
-<tr><td class="ln">37</td><td class="code">&quot;&quot;&quot;</td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">3</span><span class="ann-text"><code>_registry = {}</code> — <b>模块级字典，整个框架唯一的数据中枢</b>。下划线前缀表示私有。结构：<code>{"read_file": {"definition": {JSON Schema}, "handler": &lt;函数&gt;}, ...}</code>。每个工具在这里存两样东西：给 LLM 看的说明书（definition）和真正干活的函数（handler）。</span></div>
-<div class="ann-item"><span class="ann-ln">6-8</span><span class="ann-text"><code>register(name, definition, handler)</code> — <b>契约的第一面：报到</b>。工具文件 import 时自动调用。三个参数缺一不可：name 是字符串键（如 "read_file"），definition 是 OpenAI function calling 格式的 JSON Schema（告诉 LLM 这个工具怎么用），handler 是 Python 函数引用。一行赋值完成 O(1) 注册。</span></div>
-<div class="ann-item"><span class="ann-ln">11-13</span><span class="ann-text"><code>get_tool_definitions()</code> — <b>契约的第二面：查询</b>。Agent Loop 调它获取工具列表拼到 LLM 的 <code>tools</code> 参数。列表推导式从 _registry 中只取 definition，handler 不上传。Loop 不关心工具有几个、叫什么——它只拿到一个 JSON 数组。</span></div>
-<div class="ann-item"><span class="ann-ln">16-20</span><span class="ann-text"><code>execute(name, args)</code> — <b>契约的第三面：执行</b>。LLM 返回 tool_calls 后 Loop 调它。查表 O(1)，<code>**args</code> 解包字典为关键字参数。查不到返回错误字符串而<b>不抛异常</b>——这是关键设计选择：Agent 能处理文本错误，异常会打断 while True 循环。</span></div></div>
-</div>
+def run(messages=None, session_id=None):
+    &quot;&quot;&quot;启动 Agent Loop。messages 为初始消息列表。&quot;&quot;&quot;
+    if messages is None:
+        messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT}]
+    
+    # 获取已注册的工具列表
+    tools = get_tool_definitions()
+    print(f&quot;[NsAgent] 已加载 {len(tools)} 个工具\n&quot;)
+    
+    while True:
+        print(f&quot;&gt;&gt;&gt; 发送请求（{len(messages)} 条消息）...&quot;)
+        
+        response = call_with_retry(
+            client.chat.completions.create,
+            model=&quot;deepseek-chat&quot;,
+            messages=messages,
+            tools=tools if tools else None,
+            temperature=0.7
+        )
+        
+        msg = response.choices[0].message
+        
+        # 没有工具调用 → 输出回复 → 结束
+        if not msg.tool_calls:
+            print(f&quot;\n{msg.content}\n&quot;)
+            break
+        
+        # 处理工具调用
+        for tc in msg.tool_calls:
+            name = tc.function.name
+            args = json.loads(tc.function.arguments)
+            print(f&quot;  🔧 {name}({json.dumps(args, ensure_ascii=False)})&quot;)
+            
+            result = execute(name, args)
+            print(f&quot;     → {result[:100]}...&quot;)
+            
+            # 把工具调用和结果加入消息历史
+            messages.append({
+                &quot;role&quot;: &quot;assistant&quot;,
+                &quot;content&quot;: None,
+                &quot;tool_calls&quot;: [{
+                    &quot;id&quot;: tc.id,
+                    &quot;type&quot;: &quot;function&quot;,
+                    &quot;function&quot;: {&quot;name&quot;: name, &quot;arguments&quot;: tc.function.arguments}
+                }]
+            })
+            if session_id:
+                sess.save_message(session_id, messages[-1])
+            messages.append({
+                &quot;role&quot;: &quot;tool&quot;,
+                &quot;tool_call_id&quot;: tc.id,
+                &quot;content&quot;: str(result)
+            })
+            if session_id:
+                sess.save_message(session_id, messages[-1])
 
-<div class="arch-card" id="s2" data-versions="v010,v020">
-<h2>2. tools/time_tool.py — 时间工具</h2>
-<div class="meta">
-  <span>v0.1.0: 21行</span>
-  <span>v0.2.0: 21行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>最简工具。零参数、零副作用、纯函数。它的存在意义是<b>验证注册表通路</b>——证明「定义工具→register→Agent能用」这条链路是通的。</div>
-<div class="code-version"><h4>v0.2.0 (21 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;获取当前时间的工具。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">from tools.registry import register</td></tr>
-<tr><td class="ln">3</td><td class="code">from datetime import datetime</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code"></td></tr>
-<tr><td class="ln">6</td><td class="code">def get_current_time():</td></tr>
-<tr><td class="ln">7</td><td class="code">    &quot;&quot;&quot;返回当前日期时间字符串。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">8</td><td class="code">    return datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)</td></tr>
-<tr><td class="ln">9</td><td class="code"></td></tr>
-<tr><td class="ln">10</td><td class="code"></td></tr>
-<tr><td class="ln">11</td><td class="code">TOOL_DEFINITION = {</td></tr>
-<tr><td class="ln">12</td><td class="code">    &quot;type&quot;: &quot;function&quot;,</td></tr>
-<tr><td class="ln">13</td><td class="code">    &quot;function&quot;: {</td></tr>
-<tr><td class="ln">14</td><td class="code">        &quot;name&quot;: &quot;get_current_time&quot;,</td></tr>
-<tr><td class="ln">15</td><td class="code">        &quot;description&quot;: &quot;获取当前日期和时间&quot;,</td></tr>
-<tr><td class="ln">16</td><td class="code">        &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {}}</td></tr>
-<tr><td class="ln">17</td><td class="code">    }</td></tr>
-<tr><td class="ln">18</td><td class="code">}</td></tr>
-<tr><td class="ln">19</td><td class="code"></td></tr>
-<tr><td class="ln">20</td><td class="code">register(&quot;get_current_time&quot;, TOOL_DEFINITION, get_current_time)</td></tr>
-<tr><td class="ln">21</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">2</span><span class="ann-text"><code>from tools.registry import register</code> — 每个工具文件都从这里导入同一个 register 函数，这就是统一的报到入口。</span></div>
-<div class="ann-item"><span class="ann-ln">6-8</span><span class="ann-text"><code>get_current_time()</code> — 零参数、纯函数。只有一行 <code>datetime.now().strftime()</code>。没有 try/except，因为没有可能出错的操作。</span></div>
-<div class="ann-item"><span class="ann-ln">11-18</span><span class="ann-text"><code>TOOL_DEFINITION</code> — OpenAI function calling 协议要求的 JSON Schema。type 固定为 "function"，function.name 是 LLM 调用时的函数名，function.description 是给 LLM 看的一句话说明，parameters 这里是空对象（无参数）。</span></div>
-<div class="ann-item"><span class="ann-ln">20</span><span class="ann-text"><code>register("get_current_time", TOOL_DEFINITION, get_current_time)</code> — <b>import 即报到</b>。这行在模块顶层，Python import 这个文件时自动执行。main.py 里 <code>import tools.time_tool</code> 的那一瞬间，注册表里已经有了 get_current_time。</span></div></div>
-</div>
 
-<div class="arch-card" id="s3" data-versions="v010,v020">
-<h2>3. tools/file_tools.py — 文件读写</h2>
-<div class="meta">
-  <span>v0.1.0: 71行</span>
-  <span>v0.2.0: 71行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>比 time_tool 复杂——有参数、有副作用（读写磁盘）、需要错误处理。一个文件注册<b>两个</b>工具（read_file + write_file），证明「一个模块可以有多个工具」。</div>
-<div class="code-version"><h4>v0.2.0 (71 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;文件读写工具 — read_file 和 write_file。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">from tools.registry import register</td></tr>
-<tr><td class="ln">3</td><td class="code">from pathlib import Path</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code"></td></tr>
-<tr><td class="ln">6</td><td class="code">def read_file(path, offset=1, limit=200):</td></tr>
-<tr><td class="ln">7</td><td class="code">    &quot;&quot;&quot;读取文件内容。offset 和 limit 控制读取范围。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">8</td><td class="code">    p = Path(path).expanduser().resolve()</td></tr>
-<tr><td class="ln">9</td><td class="code">    if not p.exists():</td></tr>
-<tr><td class="ln">10</td><td class="code">        return f&quot;错误：文件不存在 {path}&quot;</td></tr>
-<tr><td class="ln">11</td><td class="code">    try:</td></tr>
-<tr><td class="ln">12</td><td class="code">        lines = p.read_text(encoding=&quot;utf-8&quot;).split(&quot;\n&quot;)</td></tr>
-<tr><td class="ln">13</td><td class="code">        total = len(lines)</td></tr>
-<tr><td class="ln">14</td><td class="code">        start = max(0, offset - 1)</td></tr>
-<tr><td class="ln">15</td><td class="code">        end = min(total, start + limit)</td></tr>
-<tr><td class="ln">16</td><td class="code">        result = []</td></tr>
-<tr><td class="ln">17</td><td class="code">        for i in range(start, end):</td></tr>
-<tr><td class="ln">18</td><td class="code">            result.append(f&quot;{i+1}|{lines[i]}&quot;)</td></tr>
-<tr><td class="ln">19</td><td class="code">        header = f&quot;文件 {path}（第 {start+1}-{end} 行 / 共 {total} 行）\n&quot;</td></tr>
-<tr><td class="ln">20</td><td class="code">        return header + &quot;\n&quot;.join(result)</td></tr>
-<tr><td class="ln">21</td><td class="code">    except Exception as e:</td></tr>
-<tr><td class="ln">22</td><td class="code">        return f&quot;错误：读取失败 {e}&quot;</td></tr>
-<tr><td class="ln">23</td><td class="code"></td></tr>
-<tr><td class="ln">24</td><td class="code"></td></tr>
-<tr><td class="ln">25</td><td class="code">def write_file(path, content):</td></tr>
-<tr><td class="ln">26</td><td class="code">    &quot;&quot;&quot;写入文件内容（覆盖）。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">27</td><td class="code">    p = Path(path).expanduser().resolve()</td></tr>
-<tr><td class="ln">28</td><td class="code">    try:</td></tr>
-<tr><td class="ln">29</td><td class="code">        p.parent.mkdir(parents=True, exist_ok=True)</td></tr>
-<tr><td class="ln">30</td><td class="code">        p.write_text(content, encoding=&quot;utf-8&quot;)</td></tr>
-<tr><td class="ln">31</td><td class="code">        return f&quot;已写入 {path}（{len(content)} 字符）&quot;</td></tr>
-<tr><td class="ln">32</td><td class="code">    except Exception as e:</td></tr>
-<tr><td class="ln">33</td><td class="code">        return f&quot;错误：写入失败 {e}&quot;</td></tr>
-<tr><td class="ln">34</td><td class="code"></td></tr>
-<tr><td class="ln">35</td><td class="code"></td></tr>
-<tr><td class="ln">36</td><td class="code">READ_DEF = {</td></tr>
-<tr><td class="ln">37</td><td class="code">    &quot;type&quot;: &quot;function&quot;,</td></tr>
-<tr><td class="ln">38</td><td class="code">    &quot;function&quot;: {</td></tr>
-<tr><td class="ln">39</td><td class="code">        &quot;name&quot;: &quot;read_file&quot;,</td></tr>
-<tr><td class="ln">40</td><td class="code">        &quot;description&quot;: &quot;读取文件内容，返回带行号的文本&quot;,</td></tr>
-<tr><td class="ln">41</td><td class="code">        &quot;parameters&quot;: {</td></tr>
-<tr><td class="ln">42</td><td class="code">            &quot;type&quot;: &quot;object&quot;,</td></tr>
-<tr><td class="ln">43</td><td class="code">            &quot;properties&quot;: {</td></tr>
-<tr><td class="ln">44</td><td class="code">                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},</td></tr>
-<tr><td class="ln">45</td><td class="code">                &quot;offset&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;起始行号（默认1）&quot;},</td></tr>
-<tr><td class="ln">46</td><td class="code">                &quot;limit&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;读取行数（默认200）&quot;}</td></tr>
-<tr><td class="ln">47</td><td class="code">            },</td></tr>
-<tr><td class="ln">48</td><td class="code">            &quot;required&quot;: [&quot;path&quot;]</td></tr>
-<tr><td class="ln">49</td><td class="code">        }</td></tr>
-<tr><td class="ln">50</td><td class="code">    }</td></tr>
-<tr><td class="ln">51</td><td class="code">}</td></tr>
-<tr><td class="ln">52</td><td class="code"></td></tr>
-<tr><td class="ln">53</td><td class="code">WRITE_DEF = {</td></tr>
-<tr><td class="ln">54</td><td class="code">    &quot;type&quot;: &quot;function&quot;,</td></tr>
-<tr><td class="ln">55</td><td class="code">    &quot;function&quot;: {</td></tr>
-<tr><td class="ln">56</td><td class="code">        &quot;name&quot;: &quot;write_file&quot;,</td></tr>
-<tr><td class="ln">57</td><td class="code">        &quot;description&quot;: &quot;写入文件内容（覆盖模式）&quot;,</td></tr>
-<tr><td class="ln">58</td><td class="code">        &quot;parameters&quot;: {</td></tr>
-<tr><td class="ln">59</td><td class="code">            &quot;type&quot;: &quot;object&quot;,</td></tr>
-<tr><td class="ln">60</td><td class="code">            &quot;properties&quot;: {</td></tr>
-<tr><td class="ln">61</td><td class="code">                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},</td></tr>
-<tr><td class="ln">62</td><td class="code">                &quot;content&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要写入的内容&quot;}</td></tr>
-<tr><td class="ln">63</td><td class="code">            },</td></tr>
-<tr><td class="ln">64</td><td class="code">            &quot;required&quot;: [&quot;path&quot;, &quot;content&quot;]</td></tr>
-<tr><td class="ln">65</td><td class="code">        }</td></tr>
-<tr><td class="ln">66</td><td class="code">    }</td></tr>
-<tr><td class="ln">67</td><td class="code">}</td></tr>
-<tr><td class="ln">68</td><td class="code"></td></tr>
-<tr><td class="ln">69</td><td class="code">register(&quot;read_file&quot;, READ_DEF, read_file)</td></tr>
-<tr><td class="ln">70</td><td class="code">register(&quot;write_file&quot;, WRITE_DEF, write_file)</td></tr>
-<tr><td class="ln">71</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">6-10</span><span class="ann-text"><code>read_file(path, offset, limit)</code> — 三个参数，offset 和 limit 有默认值（1 和 200），所以 LLM 只传 path 也能工作。<code>Path(path).expanduser().resolve()</code> 三步处理：~ 展开 + 相对路径→绝对路径。文件不存在返回错误字符串，不抛异常。</span></div>
-<div class="ann-item"><span class="ann-ln">12-20</span><span class="ann-text">读取逻辑：<code>.read_text()→split("\n")</code> 一次性读入全文按行分割。<code>start = max(0, offset-1)</code> 把 LLM 习惯的 1-indexed 行号转为 0-indexed 数组索引。end 用 min 防越界。结果每行加 <code>行号|内容</code> 前缀，方便 LLM 引用具体行。</span></div>
-<div class="ann-item"><span class="ann-ln">25-33</span><span class="ann-text"><code>write_file(path, content)</code> — <code>p.parent.mkdir(parents=True, exist_ok=True)</code> 自动创建父目录（等同 mkdir -p）。覆盖写入，返回字符数。两个函数都遵循统一模式：返回字符串、不抛异常。</span></div>
-<div class="ann-item"><span class="ann-ln">36-70</span><span class="ann-text">两个 JSON Schema（READ_DEF / WRITE_DEF）+ 两次 register()——一个模块注册两个工具，注册表不限制每文件工具数。</span></div></div>
-</div>
+def chat():
+    &quot;&quot;&quot;交互式 REPL。自动恢复 24h 内会话。&quot;&quot;&quot;
+    sess.init_db()
+    session_id = sess.get_last_session()
 
-<div class="arch-card" id="s4" data-versions="v010,v020">
-<h2>4. tools/terminal_tool.py — 终端执行 <span class="ver-badge ver-mod-badge">MOD</span></h2>
-<div class="meta">
-  <span>v0.1.0: 40行</span>
-  <span>v0.2.0: 40行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>最强大的工具。Agent 通过它执行任意 shell 命令——这是从「只读」到「可执行」的质变。也是安全风险最大的工具（当前无限制，v0.4.0 计划加审批）。</div>
-<div class="code-version"><h4>v0.1.0 (40 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;终端命令执行工具。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">from tools.registry import register</td></tr>
-<tr><td class="ln">3</td><td class="code">import subprocess</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code"></td></tr>
-<tr><td class="ln">6</td><td class="code">def run_command(command, timeout=30):</td></tr>
-<tr><td class="ln">7</td><td class="code">    &quot;&quot;&quot;执行 shell 命令并返回输出。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">8</td><td class="code">    try:</td></tr>
-<tr><td class="ln">9</td><td class="code">        result = subprocess.run(</td></tr>
-<tr><td class="ln">10</td><td class="code">            command, shell=True, capture_output=True,</td></tr>
-<tr><td class="ln">11</td><td class="code">            text=True, timeout=timeout, cwd=&quot;/Users/ns/Projects/AI工程/ns-agent&quot;</td></tr>
-<tr><td class="ln">12</td><td class="code">        )</td></tr>
-<tr><td class="ln">13</td><td class="code">        output = result.stdout</td></tr>
-<tr><td class="ln">14</td><td class="code">        if result.stderr:</td></tr>
-<tr><td class="ln">15</td><td class="code">            output += &quot;\n[stderr]\n&quot; + result.stderr</td></tr>
-<tr><td class="ln">16</td><td class="code">        return output or f&quot;命令执行完毕（退出码 {result.returncode}）&quot;</td></tr>
-<tr><td class="ln">17</td><td class="code">    except subprocess.TimeoutExpired:</td></tr>
-<tr><td class="ln">18</td><td class="code">        return f&quot;错误：命令超时（&gt;{timeout}秒）&quot;</td></tr>
-<tr><td class="ln">19</td><td class="code">    except Exception as e:</td></tr>
-<tr><td class="ln">20</td><td class="code">        return f&quot;错误：{e}&quot;</td></tr>
-<tr><td class="ln">21</td><td class="code"></td></tr>
-<tr><td class="ln">22</td><td class="code"></td></tr>
-<tr><td class="ln">23</td><td class="code">TERMINAL_DEF = {</td></tr>
-<tr><td class="ln">24</td><td class="code">    &quot;type&quot;: &quot;function&quot;,</td></tr>
-<tr><td class="ln">25</td><td class="code">    &quot;function&quot;: {</td></tr>
-<tr><td class="ln">26</td><td class="code">        &quot;name&quot;: &quot;terminal&quot;,</td></tr>
-<tr><td class="ln">27</td><td class="code">        &quot;description&quot;: &quot;在终端执行 shell 命令并返回输出。用来运行代码、安装包、查看文件等。&quot;,</td></tr>
-<tr><td class="ln">28</td><td class="code">        &quot;parameters&quot;: {</td></tr>
-<tr><td class="ln">29</td><td class="code">            &quot;type&quot;: &quot;object&quot;,</td></tr>
-<tr><td class="ln">30</td><td class="code">            &quot;properties&quot;: {</td></tr>
-<tr><td class="ln">31</td><td class="code">                &quot;command&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要执行的命令&quot;},</td></tr>
-<tr><td class="ln">32</td><td class="code">                &quot;timeout&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;超时秒数（默认30）&quot;}</td></tr>
-<tr><td class="ln">33</td><td class="code">            },</td></tr>
-<tr><td class="ln">34</td><td class="code">            &quot;required&quot;: [&quot;command&quot;]</td></tr>
-<tr><td class="ln">35</td><td class="code">        }</td></tr>
-<tr><td class="ln">36</td><td class="code">    }</td></tr>
-<tr><td class="ln">37</td><td class="code">}</td></tr>
-<tr><td class="ln">38</td><td class="code"></td></tr>
-<tr><td class="ln">39</td><td class="code">register(&quot;terminal&quot;, TERMINAL_DEF, run_command)</td></tr>
-<tr><td class="ln">40</td><td class="code"></td></tr>
-</table></div></div><div class="code-version"><h4>v0.2.0 (40 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;终端命令执行工具。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">from tools.registry import register</td></tr>
-<tr><td class="ln">3</td><td class="code">import subprocess</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code"></td></tr>
-<tr><td class="ln">6</td><td class="code">def run_command(command, timeout=30):</td></tr>
-<tr><td class="ln">7</td><td class="code">    &quot;&quot;&quot;执行 shell 命令并返回输出。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">8</td><td class="code">    try:</td></tr>
-<tr><td class="ln">9</td><td class="code">        result = subprocess.run(</td></tr>
-<tr><td class="ln">10</td><td class="code">            command, shell=True, capture_output=True,</td></tr>
-<tr><td class="ln">11</td><td class="code">            text=True, timeout=timeout, cwd=&quot;/Users/ns/Projects/ns-agent&quot;</td></tr>
-<tr><td class="ln">12</td><td class="code">        )</td></tr>
-<tr><td class="ln">13</td><td class="code">        output = result.stdout</td></tr>
-<tr><td class="ln">14</td><td class="code">        if result.stderr:</td></tr>
-<tr><td class="ln">15</td><td class="code">            output += &quot;\n[stderr]\n&quot; + result.stderr</td></tr>
-<tr><td class="ln">16</td><td class="code">        return output or f&quot;命令执行完毕（退出码 {result.returncode}）&quot;</td></tr>
-<tr><td class="ln">17</td><td class="code">    except subprocess.TimeoutExpired:</td></tr>
-<tr><td class="ln">18</td><td class="code">        return f&quot;错误：命令超时（&gt;{timeout}秒）&quot;</td></tr>
-<tr><td class="ln">19</td><td class="code">    except Exception as e:</td></tr>
-<tr><td class="ln">20</td><td class="code">        return f&quot;错误：{e}&quot;</td></tr>
-<tr><td class="ln">21</td><td class="code"></td></tr>
-<tr><td class="ln">22</td><td class="code"></td></tr>
-<tr><td class="ln">23</td><td class="code">TERMINAL_DEF = {</td></tr>
-<tr><td class="ln">24</td><td class="code">    &quot;type&quot;: &quot;function&quot;,</td></tr>
-<tr><td class="ln">25</td><td class="code">    &quot;function&quot;: {</td></tr>
-<tr><td class="ln">26</td><td class="code">        &quot;name&quot;: &quot;terminal&quot;,</td></tr>
-<tr><td class="ln">27</td><td class="code">        &quot;description&quot;: &quot;在终端执行 shell 命令并返回输出。用来运行代码、安装包、查看文件等。&quot;,</td></tr>
-<tr><td class="ln">28</td><td class="code">        &quot;parameters&quot;: {</td></tr>
-<tr><td class="ln">29</td><td class="code">            &quot;type&quot;: &quot;object&quot;,</td></tr>
-<tr><td class="ln">30</td><td class="code">            &quot;properties&quot;: {</td></tr>
-<tr><td class="ln">31</td><td class="code">                &quot;command&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要执行的命令&quot;},</td></tr>
-<tr><td class="ln">32</td><td class="code">                &quot;timeout&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;超时秒数（默认30）&quot;}</td></tr>
-<tr><td class="ln">33</td><td class="code">            },</td></tr>
-<tr><td class="ln">34</td><td class="code">            &quot;required&quot;: [&quot;command&quot;]</td></tr>
-<tr><td class="ln">35</td><td class="code">        }</td></tr>
-<tr><td class="ln">36</td><td class="code">    }</td></tr>
-<tr><td class="ln">37</td><td class="code">}</td></tr>
-<tr><td class="ln">38</td><td class="code"></td></tr>
-<tr><td class="ln">39</td><td class="code">register(&quot;terminal&quot;, TERMINAL_DEF, run_command)</td></tr>
-<tr><td class="ln">40</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">9-12</span><span class="ann-text"><code>subprocess.run()</code> 五个关键参数：① <code>shell=True</code> 允许管道和重定向 ② <code>capture_output=True</code> 捕获 stdout+stderr 到内存 ③ <code>text=True</code> 返回字符串非 bytes ④ <code>timeout</code> 防止命令挂死 ⑤ <code>cwd</code> 固定工作目录在项目下。</span></div>
-<div class="ann-item"><span class="ann-ln">14-16</span><span class="ann-text">合并 stderr：很多 CLI 工具（git、pip）把有用信息打在 stderr。Agent 需要看到完整输出，不是只看 stdout。无输出时返回退出码。</span></div>
-<div class="ann-item"><span class="ann-ln">17-18</span><span class="ann-text"><code>TimeoutExpired</code> 单独 catch——不是笼统的「出错」，而是明确告知「命令跑了超过 N 秒被杀了」。</span></div></div>
-</div>
+    if session_id:
+        old_messages = sess.load_session(session_id)
+        print(f&quot;NsAgent v0.1.0 — 恢复了上次会话（{len(old_messages)} 条消息）&quot;)
+        print(&quot;输入 /new 开始新会话，/exit 退出\n&quot;)
+        messages = old_messages
+    else:
+        messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT}]
+        session_id = sess.create_session()
+        sess.save_message(session_id, messages[0])
+        print(&quot;NsAgent v0.1.0 — 输入 /exit 退出\n&quot;)
 
-<div class="arch-card" id="s5" data-versions="v010,v020">
-<h2>5. knowledge/search.py — 统一多源搜索 <span class="ver-badge ver-mod-badge">MOD</span></h2>
-<div class="meta">
-  <span>v0.1.0: 81行</span>
-  <span>v0.2.0: 81行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>数据层核心。独立于 tools/ 和 core/，是纯粹的检索引擎。v0.1.0 二源（年报+Agent工程=1710块），v0.2.0 三源（+Wiki 262块=1972块）。</div>
-<div class="code-version"><h4>v0.1.0 (81 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;统一多源搜索 — 一个查询并行搜索所有知识库。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">import os</td></tr>
-<tr><td class="ln">3</td><td class="code">from pathlib import Path</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code"># 离线模式，避免 sentence-transformers 直连 huggingface</td></tr>
-<tr><td class="ln">6</td><td class="code">os.environ[&quot;HF_HUB_OFFLINE&quot;] = &quot;1&quot;</td></tr>
-<tr><td class="ln">7</td><td class="code"></td></tr>
-<tr><td class="ln">8</td><td class="code">import chromadb</td></tr>
-<tr><td class="ln">9</td><td class="code">from sentence_transformers import SentenceTransformer</td></tr>
-<tr><td class="ln">10</td><td class="code"></td></tr>
-<tr><td class="ln">11</td><td class="code"></td></tr>
-<tr><td class="ln">12</td><td class="code"># === 初始化 ===</td></tr>
-<tr><td class="ln">13</td><td class="code"></td></tr>
-<tr><td class="ln">14</td><td class="code">CHROMA_PATH = str(Path(__file__).parent.parent.parent / &quot;rag-project/backend/chroma_data&quot;)</td></tr>
-<tr><td class="ln">15</td><td class="code"></td></tr>
-<tr><td class="ln">16</td><td class="code">_client = chromadb.PersistentClient(path=CHROMA_PATH)</td></tr>
-<tr><td class="ln">17</td><td class="code"></td></tr>
-<tr><td class="ln">18</td><td class="code"># 已知的集合（wiki_knowledge 待后续入库后加入）</td></tr>
-<tr><td class="ln">19</td><td class="code">KNOWN_COLLECTIONS = [&quot;annual_reports&quot;, &quot;agent_engineering&quot;]</td></tr>
-<tr><td class="ln">20</td><td class="code"></td></tr>
-<tr><td class="ln">21</td><td class="code"># bge 中文语义模型（384维）</td></tr>
-<tr><td class="ln">22</td><td class="code">_embed_model = SentenceTransformer(</td></tr>
-<tr><td class="ln">23</td><td class="code">    &quot;BAAI/bge-small-zh-v1.5&quot;,</td></tr>
-<tr><td class="ln">24</td><td class="code">    local_files_only=True</td></tr>
-<tr><td class="ln">25</td><td class="code">)</td></tr>
-<tr><td class="ln">26</td><td class="code"></td></tr>
-<tr><td class="ln">27</td><td class="code"></td></tr>
-<tr><td class="ln">28</td><td class="code"># === 核心函数 ===</td></tr>
-<tr><td class="ln">29</td><td class="code"></td></tr>
-<tr><td class="ln">30</td><td class="code">def unified_search(query, top_k=5):</td></tr>
-<tr><td class="ln">31</td><td class="code">    &quot;&quot;&quot;并行搜索所有知识库，按相关度合并返回。</td></tr>
-<tr><td class="ln">32</td><td class="code"></td></tr>
-<tr><td class="ln">33</td><td class="code">    返回格式：</td></tr>
-<tr><td class="ln">34</td><td class="code">    [</td></tr>
-<tr><td class="ln">35</td><td class="code">        {&quot;source&quot;: &quot;annual_reports&quot;, &quot;content&quot;: &quot;...&quot;, &quot;distance&quot;: 0.23},</td></tr>
-<tr><td class="ln">36</td><td class="code">        {&quot;source&quot;: &quot;agent_engineering&quot;, &quot;content&quot;: &quot;...&quot;, &quot;distance&quot;: 0.45},</td></tr>
-<tr><td class="ln">37</td><td class="code">        ...</td></tr>
-<tr><td class="ln">38</td><td class="code">    ]</td></tr>
-<tr><td class="ln">39</td><td class="code">    &quot;&quot;&quot;</td></tr>
-<tr><td class="ln">40</td><td class="code">    query_vec = _embed_model.encode(query).tolist()</td></tr>
-<tr><td class="ln">41</td><td class="code">    all_results = []</td></tr>
-<tr><td class="ln">42</td><td class="code"></td></tr>
-<tr><td class="ln">43</td><td class="code">    for coll_name in KNOWN_COLLECTIONS:</td></tr>
-<tr><td class="ln">44</td><td class="code">        try:</td></tr>
-<tr><td class="ln">45</td><td class="code">            collection = _client.get_collection(coll_name)</td></tr>
-<tr><td class="ln">46</td><td class="code">            results = collection.query(</td></tr>
-<tr><td class="ln">47</td><td class="code">                query_embeddings=[query_vec],</td></tr>
-<tr><td class="ln">48</td><td class="code">                n_results=top_k</td></tr>
-<tr><td class="ln">49</td><td class="code">            )</td></tr>
-<tr><td class="ln">50</td><td class="code">            # results[&quot;documents&quot;][0] 是 top_k 个文档列表</td></tr>
-<tr><td class="ln">51</td><td class="code">            # results[&quot;distances&quot;][0] 是对应的距离列表</td></tr>
-<tr><td class="ln">52</td><td class="code">            for doc, dist in zip(results[&quot;documents&quot;][0], results[&quot;distances&quot;][0]):</td></tr>
-<tr><td class="ln">53</td><td class="code">                all_results.append({</td></tr>
-<tr><td class="ln">54</td><td class="code">                    &quot;source&quot;: coll_name,</td></tr>
-<tr><td class="ln">55</td><td class="code">                    &quot;content&quot;: doc,</td></tr>
-<tr><td class="ln">56</td><td class="code">                    &quot;distance&quot;: round(dist, 4)</td></tr>
-<tr><td class="ln">57</td><td class="code">                })</td></tr>
-<tr><td class="ln">58</td><td class="code">        except Exception as e:</td></tr>
-<tr><td class="ln">59</td><td class="code">            continue  # 集合不存在就跳过</td></tr>
-<tr><td class="ln">60</td><td class="code"></td></tr>
-<tr><td class="ln">61</td><td class="code">    # 按相关度排序（距离越小越相关）</td></tr>
-<tr><td class="ln">62</td><td class="code">    all_results.sort(key=lambda x: x[&quot;distance&quot;])</td></tr>
-<tr><td class="ln">63</td><td class="code">    return all_results</td></tr>
-<tr><td class="ln">64</td><td class="code"></td></tr>
-<tr><td class="ln">65</td><td class="code"></td></tr>
-<tr><td class="ln">66</td><td class="code">def search_formatted(query, top_k=5):</td></tr>
-<tr><td class="ln">67</td><td class="code">    &quot;&quot;&quot;搜索并格式化为 Agent 可读的文本。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">68</td><td class="code">    results = unified_search(query, top_k)</td></tr>
-<tr><td class="ln">69</td><td class="code">    if not results:</td></tr>
-<tr><td class="ln">70</td><td class="code">        return &quot;未找到相关知识。&quot;</td></tr>
-<tr><td class="ln">71</td><td class="code">    </td></tr>
-<tr><td class="ln">72</td><td class="code">    lines = [f&quot;搜索「{query}」找到 {len(results)} 条结果：\n&quot;]</td></tr>
-<tr><td class="ln">73</td><td class="code">    for i, r in enumerate(results, 1):</td></tr>
-<tr><td class="ln">74</td><td class="code">        source_label = {&quot;annual_reports&quot;: &quot;年报&quot;, &quot;agent_engineering&quot;: &quot;Agent工程&quot;}</td></tr>
-<tr><td class="ln">75</td><td class="code">        label = source_label.get(r[&quot;source&quot;], r[&quot;source&quot;])</td></tr>
-<tr><td class="ln">76</td><td class="code">        lines.append(f&quot;[{i}] 来源：{label}（距离 {r[&#x27;distance&#x27;]}）&quot;)</td></tr>
-<tr><td class="ln">77</td><td class="code">        lines.append(f&quot;    {r[&#x27;content&#x27;][:300]}&quot;)</td></tr>
-<tr><td class="ln">78</td><td class="code">        lines.append(&quot;&quot;)</td></tr>
-<tr><td class="ln">79</td><td class="code">    </td></tr>
-<tr><td class="ln">80</td><td class="code">    return &quot;\n&quot;.join(lines)</td></tr>
-<tr><td class="ln">81</td><td class="code"></td></tr>
-</table></div></div><div class="code-version"><h4>v0.2.0 (81 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;统一多源搜索 — 一个查询并行搜索所有知识库。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">import os</td></tr>
-<tr><td class="ln">3</td><td class="code">from pathlib import Path</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code"># 离线模式，避免 sentence-transformers 直连 huggingface</td></tr>
-<tr><td class="ln">6</td><td class="code">os.environ[&quot;HF_HUB_OFFLINE&quot;] = &quot;1&quot;</td></tr>
-<tr><td class="ln">7</td><td class="code"></td></tr>
-<tr><td class="ln">8</td><td class="code">import chromadb</td></tr>
-<tr><td class="ln">9</td><td class="code">from sentence_transformers import SentenceTransformer</td></tr>
-<tr><td class="ln">10</td><td class="code"></td></tr>
-<tr><td class="ln">11</td><td class="code"></td></tr>
-<tr><td class="ln">12</td><td class="code"># === 初始化 ===</td></tr>
-<tr><td class="ln">13</td><td class="code"></td></tr>
-<tr><td class="ln">14</td><td class="code">CHROMA_PATH = str(Path(__file__).parent.parent.parent / &quot;AI工程/rag-project/backend/chroma_data&quot;)</td></tr>
-<tr><td class="ln">15</td><td class="code"></td></tr>
-<tr><td class="ln">16</td><td class="code">_client = chromadb.PersistentClient(path=CHROMA_PATH)</td></tr>
-<tr><td class="ln">17</td><td class="code"></td></tr>
-<tr><td class="ln">18</td><td class="code"># 已知的集合（wiki_knowledge 待后续入库后加入）</td></tr>
-<tr><td class="ln">19</td><td class="code">KNOWN_COLLECTIONS = [&quot;annual_reports&quot;, &quot;agent_engineering&quot;, &quot;wiki_knowledge&quot;]</td></tr>
-<tr><td class="ln">20</td><td class="code"></td></tr>
-<tr><td class="ln">21</td><td class="code"># bge 中文语义模型（384维）</td></tr>
-<tr><td class="ln">22</td><td class="code">_embed_model = SentenceTransformer(</td></tr>
-<tr><td class="ln">23</td><td class="code">    &quot;BAAI/bge-small-zh-v1.5&quot;,</td></tr>
-<tr><td class="ln">24</td><td class="code">    local_files_only=True</td></tr>
-<tr><td class="ln">25</td><td class="code">)</td></tr>
-<tr><td class="ln">26</td><td class="code"></td></tr>
-<tr><td class="ln">27</td><td class="code"></td></tr>
-<tr><td class="ln">28</td><td class="code"># === 核心函数 ===</td></tr>
-<tr><td class="ln">29</td><td class="code"></td></tr>
-<tr><td class="ln">30</td><td class="code">def unified_search(query, top_k=5):</td></tr>
-<tr><td class="ln">31</td><td class="code">    &quot;&quot;&quot;并行搜索所有知识库，按相关度合并返回。</td></tr>
-<tr><td class="ln">32</td><td class="code"></td></tr>
-<tr><td class="ln">33</td><td class="code">    返回格式：</td></tr>
-<tr><td class="ln">34</td><td class="code">    [</td></tr>
-<tr><td class="ln">35</td><td class="code">        {&quot;source&quot;: &quot;annual_reports&quot;, &quot;content&quot;: &quot;...&quot;, &quot;distance&quot;: 0.23},</td></tr>
-<tr><td class="ln">36</td><td class="code">        {&quot;source&quot;: &quot;agent_engineering&quot;, &quot;content&quot;: &quot;...&quot;, &quot;distance&quot;: 0.45},</td></tr>
-<tr><td class="ln">37</td><td class="code">        ...</td></tr>
-<tr><td class="ln">38</td><td class="code">    ]</td></tr>
-<tr><td class="ln">39</td><td class="code">    &quot;&quot;&quot;</td></tr>
-<tr><td class="ln">40</td><td class="code">    query_vec = _embed_model.encode(query).tolist()</td></tr>
-<tr><td class="ln">41</td><td class="code">    all_results = []</td></tr>
-<tr><td class="ln">42</td><td class="code"></td></tr>
-<tr><td class="ln">43</td><td class="code">    for coll_name in KNOWN_COLLECTIONS:</td></tr>
-<tr><td class="ln">44</td><td class="code">        try:</td></tr>
-<tr><td class="ln">45</td><td class="code">            collection = _client.get_collection(coll_name)</td></tr>
-<tr><td class="ln">46</td><td class="code">            results = collection.query(</td></tr>
-<tr><td class="ln">47</td><td class="code">                query_embeddings=[query_vec],</td></tr>
-<tr><td class="ln">48</td><td class="code">                n_results=top_k</td></tr>
-<tr><td class="ln">49</td><td class="code">            )</td></tr>
-<tr><td class="ln">50</td><td class="code">            # results[&quot;documents&quot;][0] 是 top_k 个文档列表</td></tr>
-<tr><td class="ln">51</td><td class="code">            # results[&quot;distances&quot;][0] 是对应的距离列表</td></tr>
-<tr><td class="ln">52</td><td class="code">            for doc, dist in zip(results[&quot;documents&quot;][0], results[&quot;distances&quot;][0]):</td></tr>
-<tr><td class="ln">53</td><td class="code">                all_results.append({</td></tr>
-<tr><td class="ln">54</td><td class="code">                    &quot;source&quot;: coll_name,</td></tr>
-<tr><td class="ln">55</td><td class="code">                    &quot;content&quot;: doc,</td></tr>
-<tr><td class="ln">56</td><td class="code">                    &quot;distance&quot;: round(dist, 4)</td></tr>
-<tr><td class="ln">57</td><td class="code">                })</td></tr>
-<tr><td class="ln">58</td><td class="code">        except Exception as e:</td></tr>
-<tr><td class="ln">59</td><td class="code">            continue  # 集合不存在就跳过</td></tr>
-<tr><td class="ln">60</td><td class="code"></td></tr>
-<tr><td class="ln">61</td><td class="code">    # 按相关度排序（距离越小越相关）</td></tr>
-<tr><td class="ln">62</td><td class="code">    all_results.sort(key=lambda x: x[&quot;distance&quot;])</td></tr>
-<tr><td class="ln">63</td><td class="code">    return all_results</td></tr>
-<tr><td class="ln">64</td><td class="code"></td></tr>
-<tr><td class="ln">65</td><td class="code"></td></tr>
-<tr><td class="ln">66</td><td class="code">def search_formatted(query, top_k=5):</td></tr>
-<tr><td class="ln">67</td><td class="code">    &quot;&quot;&quot;搜索并格式化为 Agent 可读的文本。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">68</td><td class="code">    results = unified_search(query, top_k)</td></tr>
-<tr><td class="ln">69</td><td class="code">    if not results:</td></tr>
-<tr><td class="ln">70</td><td class="code">        return &quot;未找到相关知识。&quot;</td></tr>
-<tr><td class="ln">71</td><td class="code">    </td></tr>
-<tr><td class="ln">72</td><td class="code">    lines = [f&quot;搜索「{query}」找到 {len(results)} 条结果：\n&quot;]</td></tr>
-<tr><td class="ln">73</td><td class="code">    for i, r in enumerate(results, 1):</td></tr>
-<tr><td class="ln">74</td><td class="code">        source_label = {&quot;annual_reports&quot;: &quot;年报&quot;, &quot;agent_engineering&quot;: &quot;Agent工程&quot;, &quot;wiki_knowledge&quot;: &quot;Wiki&quot;}</td></tr>
-<tr><td class="ln">75</td><td class="code">        label = source_label.get(r[&quot;source&quot;], r[&quot;source&quot;])</td></tr>
-<tr><td class="ln">76</td><td class="code">        lines.append(f&quot;[{i}] 来源：{label}（距离 {r[&#x27;distance&#x27;]}）&quot;)</td></tr>
-<tr><td class="ln">77</td><td class="code">        lines.append(f&quot;    {r[&#x27;content&#x27;][:300]}&quot;)</td></tr>
-<tr><td class="ln">78</td><td class="code">        lines.append(&quot;&quot;)</td></tr>
-<tr><td class="ln">79</td><td class="code">    </td></tr>
-<tr><td class="ln">80</td><td class="code">    return &quot;\n&quot;.join(lines)</td></tr>
-<tr><td class="ln">81</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">5-6</span><span class="ann-text"><code>os.environ["HF_HUB_OFFLINE"]="1"</code> — <b>必须在 import sentence_transformers 之前</b>。新版不再尊重 HF_ENDPOINT 变量，这行防止每次启动直连 huggingface.co 做 HEAD 验证（国内必超时）。</span></div>
-<div class="ann-item"><span class="ann-ln">14</span><span class="ann-text"><code>Path(__file__).parent.parent.parent / "AI工程/rag-project/backend/chroma_data"</code> — 三层 parent：search.py→knowledge/→ns-agent/→AI工程/。这是跨项目引用：ns-agent 的 ChromaDB 数据存储在 rag-project 下，共享同一份向量库。</span></div>
-<div class="ann-item"><span class="ann-ln">16</span><span class="ann-text"><code>PersistentClient</code>（非 Ephemeral）——数据落盘，重启不丢。</span></div>
-<div class="ann-item"><span class="ann-ln">19</span><span class="ann-text"><code>KNOWN_COLLECTIONS</code> — v0.1.0 是 <code>["annual_reports","agent_engineering"]</code>，v0.2.0 加了 <code>"wiki_knowledge"</code>。加新知识库只改这一行，unified_search 自动覆盖。</span></div>
-<div class="ann-item"><span class="ann-ln">22-25</span><span class="ann-text"><code>SentenceTransformer("BAAI/bge-small-zh-v1.5", local_files_only=True)</code> — bge 是 BAAI 的中文语义模型，384 维向量，专为中文优化。<code>local_files_only=True</code> 配合 HF_HUB_OFFLINE 确保离线加载。</span></div>
-<div class="ann-item"><span class="ann-ln">30-63</span><span class="ann-text"><code>unified_search()</code> — 核心搜索：① query→384维向量 ② 遍历 KNOWN_COLLECTIONS ③ 每个集合发 query ④ 按 cosine 距离升序合并返回。<code>try/except continue</code> 让某个集合不存在时不影响其他集合搜索。</span></div>
-<div class="ann-item"><span class="ann-ln">66-80</span><span class="ann-text"><code>search_formatted()</code> — 格式化输出，给 Agent 看的。结果标注来源（年报/Agent工程/Wiki）、距离分数、内容截断 300 字。</span></div></div>
-</div>
+    while True:
+        user_input = input(&quot;你: &quot;).strip()
+        if not user_input:
+            continue
+        if user_input == &quot;/exit&quot;:
+            print(f&quot;会话 {session_id} 已保存，再见。&quot;)
+            break
+        if user_input == &quot;/new&quot;:
+            session_id = sess.create_session()
+            messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT}]
+            sess.save_message(session_id, messages[0])
+            print(&quot;新会话已开始。&quot;)
+            continue
 
-<div class="arch-card" id="s6" data-versions="v010,v020">
-<h2>6. tools/search_tool.py — 知识搜索工具 <span class="ver-badge ver-mod-badge">MOD</span></h2>
-<div class="meta">
-  <span>v0.1.0: 27行</span>
-  <span>v0.2.0: 27行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>工具层（给 LLM 看的接口）与知识层（具体搜索逻辑）的<b>分离点</b>。函数体只有一行 return——它不干活，只做路由转发。这种分层让知识层改动（加数据源、换模型）不影响工具层。</div>
-<div class="code-version"><h4>v0.1.0 (27 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;知识库搜索工具 — 调用 knowledge.search 统一搜索。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">from tools.registry import register</td></tr>
-<tr><td class="ln">3</td><td class="code">from knowledge.search import search_formatted</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code"></td></tr>
-<tr><td class="ln">6</td><td class="code">def search_knowledge(query):</td></tr>
-<tr><td class="ln">7</td><td class="code">    &quot;&quot;&quot;搜索知识库（年报 + Agent文档 + Wiki），返回格式化结果。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">8</td><td class="code">    return search_formatted(query)</td></tr>
-<tr><td class="ln">9</td><td class="code"></td></tr>
-<tr><td class="ln">10</td><td class="code"></td></tr>
-<tr><td class="ln">11</td><td class="code">SEARCH_DEF = {</td></tr>
-<tr><td class="ln">12</td><td class="code">    &quot;type&quot;: &quot;function&quot;,</td></tr>
-<tr><td class="ln">13</td><td class="code">    &quot;function&quot;: {</td></tr>
-<tr><td class="ln">14</td><td class="code">        &quot;name&quot;: &quot;search_knowledge&quot;,</td></tr>
-<tr><td class="ln">15</td><td class="code">        &quot;description&quot;: &quot;搜索本地知识库，包括年报、Agent工程文档等。用来查找事实、数据、技术方案。&quot;,</td></tr>
-<tr><td class="ln">16</td><td class="code">        &quot;parameters&quot;: {</td></tr>
-<tr><td class="ln">17</td><td class="code">            &quot;type&quot;: &quot;object&quot;,</td></tr>
-<tr><td class="ln">18</td><td class="code">            &quot;properties&quot;: {</td></tr>
-<tr><td class="ln">19</td><td class="code">                &quot;query&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;搜索关键词或问题&quot;}</td></tr>
-<tr><td class="ln">20</td><td class="code">            },</td></tr>
-<tr><td class="ln">21</td><td class="code">            &quot;required&quot;: [&quot;query&quot;]</td></tr>
-<tr><td class="ln">22</td><td class="code">        }</td></tr>
-<tr><td class="ln">23</td><td class="code">    }</td></tr>
-<tr><td class="ln">24</td><td class="code">}</td></tr>
-<tr><td class="ln">25</td><td class="code"></td></tr>
-<tr><td class="ln">26</td><td class="code">register(&quot;search_knowledge&quot;, SEARCH_DEF, search_knowledge)</td></tr>
-<tr><td class="ln">27</td><td class="code"></td></tr>
-</table></div></div><div class="code-version"><h4>v0.2.0 (27 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;知识库搜索工具 — 调用 knowledge.search 统一搜索。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">from tools.registry import register</td></tr>
-<tr><td class="ln">3</td><td class="code">from knowledge.search import search_formatted</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code"></td></tr>
-<tr><td class="ln">6</td><td class="code">def search_knowledge(query):</td></tr>
-<tr><td class="ln">7</td><td class="code">    &quot;&quot;&quot;搜索知识库(年报 + Agent文档 + Wiki)，返回格式化结果。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">8</td><td class="code">    return search_formatted(query)</td></tr>
-<tr><td class="ln">9</td><td class="code"></td></tr>
-<tr><td class="ln">10</td><td class="code"></td></tr>
-<tr><td class="ln">11</td><td class="code">SEARCH_DEF = {</td></tr>
-<tr><td class="ln">12</td><td class="code">    &quot;type&quot;: &quot;function&quot;,</td></tr>
-<tr><td class="ln">13</td><td class="code">    &quot;function&quot;: {</td></tr>
-<tr><td class="ln">14</td><td class="code">        &quot;name&quot;: &quot;search_knowledge&quot;,</td></tr>
-<tr><td class="ln">15</td><td class="code">        &quot;description&quot;: &quot;搜索本地知识库，包括年报、Agent工程文档等。用来查找事实、数据、技术方案。&quot;,</td></tr>
-<tr><td class="ln">16</td><td class="code">        &quot;parameters&quot;: {</td></tr>
-<tr><td class="ln">17</td><td class="code">            &quot;type&quot;: &quot;object&quot;,</td></tr>
-<tr><td class="ln">18</td><td class="code">            &quot;properties&quot;: {</td></tr>
-<tr><td class="ln">19</td><td class="code">                &quot;query&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;搜索关键词或问题&quot;}</td></tr>
-<tr><td class="ln">20</td><td class="code">            },</td></tr>
-<tr><td class="ln">21</td><td class="code">            &quot;required&quot;: [&quot;query&quot;]</td></tr>
-<tr><td class="ln">22</td><td class="code">        }</td></tr>
-<tr><td class="ln">23</td><td class="code">    }</td></tr>
-<tr><td class="ln">24</td><td class="code">}</td></tr>
-<tr><td class="ln">25</td><td class="code"></td></tr>
-<tr><td class="ln">26</td><td class="code">register(&quot;search_knowledge&quot;, SEARCH_DEF, search_knowledge)</td></tr>
-<tr><td class="ln">27</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">3</span><span class="ann-text"><code>from knowledge.search import search_formatted</code> — 只导入格式化函数，不导入底层 unified_search 或 ChromaDB 连接。工具层对知识层内部实现一无所知。</span></div>
-<div class="ann-item"><span class="ann-ln">6-8</span><span class="ann-text"><code>search_knowledge(query)</code> — <b>整个函数只有一行 return</b>。如果把 return 换成 print，这个函数就是零行逻辑。它的存在意义不是计算，而是「把 LLM 的 function calling 请求路由到正确的知识层函数」。</span></div>
-<div class="ann-item"><span class="ann-ln">11-24</span><span class="ann-text">SEARCH_DEF + register() — 标准的三段式模式：JSON Schema 给 LLM 看 + 函数实际执行 + register 报到注册表。</span></div></div>
-</div>
+        snapshot = len(messages)
+        messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_input})
+        sess.save_message(session_id, messages[-1])
+        try:
+            run(messages=messages, session_id=session_id)
+        except NsAgentError as e:
+            print(f&quot;NsAgent 错误 [{e.code}]: {e.message}&quot;)
+            del messages[snapshot:]
+        except Exception as e:
+            print(f&quot;未预期错误: {type(e).__name__}: {e}&quot;)
+            del messages[snapshot:]
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 135 行 (+2 行)</div><div class="code-block">&quot;&quot;&quot;NsAgent 核心 — Agent Loop。不关心工具有哪些，只从注册表读取。&quot;&quot;&quot;
 
-<div class="arch-card" id="s7" data-versions="v020">
-<h2>7. core/retry.py — API 重试 <span class="ver-badge ver-new-badge">NEW</span></h2>
-<div class="meta">
-  <span>v0.1.0: 0行</span>
-  <span>v0.2.0: 37行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>v0.2.0 新增。agent.py 不再裸调 openai，而是包在 call_with_retry 里。指数退避 1s→2s→4s，最多 3 次。只重试可恢复错误（网络/限流/5xx），400/401 直接穿透。</div>
-<div class="code-version"><h4>v0.2.0 (37 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;API 重试 — 指数退避，可重试错误自动重试。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">import time</td></tr>
-<tr><td class="ln">3</td><td class="code">from openai import (</td></tr>
-<tr><td class="ln">4</td><td class="code">    APIConnectionError,</td></tr>
-<tr><td class="ln">5</td><td class="code">    APITimeoutError,</td></tr>
-<tr><td class="ln">6</td><td class="code">    RateLimitError,</td></tr>
-<tr><td class="ln">7</td><td class="code">    InternalServerError,</td></tr>
-<tr><td class="ln">8</td><td class="code">)</td></tr>
-<tr><td class="ln">9</td><td class="code"></td></tr>
-<tr><td class="ln">10</td><td class="code">MAX_RETRIES = 3</td></tr>
-<tr><td class="ln">11</td><td class="code">BASE_DELAY = 1  # 秒：1 → 2 → 4</td></tr>
-<tr><td class="ln">12</td><td class="code"></td></tr>
-<tr><td class="ln">13</td><td class="code"></td></tr>
-<tr><td class="ln">14</td><td class="code">RETRYABLE = (APIConnectionError, APITimeoutError, RateLimitError, InternalServerError)</td></tr>
-<tr><td class="ln">15</td><td class="code"></td></tr>
-<tr><td class="ln">16</td><td class="code"></td></tr>
-<tr><td class="ln">17</td><td class="code">def call_with_retry(fn, *args, **kwargs):</td></tr>
-<tr><td class="ln">18</td><td class="code">    &quot;&quot;&quot;调用函数，可重试错误自动重试（指数退避）。</td></tr>
-<tr><td class="ln">19</td><td class="code"></td></tr>
-<tr><td class="ln">20</td><td class="code">    不可重试的错误（400/401）直接抛出，不浪费重试次数。</td></tr>
-<tr><td class="ln">21</td><td class="code">    &quot;&quot;&quot;</td></tr>
-<tr><td class="ln">22</td><td class="code">    last_error = None</td></tr>
-<tr><td class="ln">23</td><td class="code">    for attempt in range(1, MAX_RETRIES + 1):</td></tr>
-<tr><td class="ln">24</td><td class="code">        try:</td></tr>
-<tr><td class="ln">25</td><td class="code">            return fn(*args, **kwargs)</td></tr>
-<tr><td class="ln">26</td><td class="code">        except RETRYABLE as e:</td></tr>
-<tr><td class="ln">27</td><td class="code">            last_error = e</td></tr>
-<tr><td class="ln">28</td><td class="code">            if attempt &lt; MAX_RETRIES:</td></tr>
-<tr><td class="ln">29</td><td class="code">                delay = BASE_DELAY * (2 ** (attempt - 1))</td></tr>
-<tr><td class="ln">30</td><td class="code">                print(f&quot;  [重试 {attempt}/{MAX_RETRIES}] {type(e).__name__}，{delay}s 后重试...&quot;)</td></tr>
-<tr><td class="ln">31</td><td class="code">                time.sleep(delay)</td></tr>
-<tr><td class="ln">32</td><td class="code"></td></tr>
-<tr><td class="ln">33</td><td class="code">    # 所有重试耗尽</td></tr>
-<tr><td class="ln">34</td><td class="code">    if last_error:</td></tr>
-<tr><td class="ln">35</td><td class="code">        raise last_error</td></tr>
-<tr><td class="ln">36</td><td class="code">    raise RuntimeError(&quot;retry: unreachable&quot;)  # 理论上不会到这里</td></tr>
-<tr><td class="ln">37</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">10-11</span><span class="ann-text"><code>MAX_RETRIES=3, BASE_DELAY=1</code> — 常量而非硬编码。改重试策略只改这两行。</span></div>
-<div class="ann-item"><span class="ann-ln">14</span><span class="ann-text"><code>RETRYABLE = (APIConnectionError, APITimeoutError, RateLimitError, InternalServerError)</code> — <b>白名单设计</b>。不在元组里的异常（如 BadRequestError 400）直接穿透，不浪费重试次数。</span></div>
-<div class="ann-item"><span class="ann-ln">17-36</span><span class="ann-text"><code>call_with_retry(fn, *args, **kwargs)</code> — 透明包装器。成功路径 <code>return fn(*args, **kwargs)</code> 零开销。失败路径 <code>BASE_DELAY * (2**(attempt-1))</code> 计算等待时间。三次都失败则抛出最后一次异常。</span></div></div>
-</div>
+import json
+import os
+from pathlib import Path
 
-<div class="arch-card" id="s8" data-versions="v020">
-<h2>8. core/errors.py — 统一异常 <span class="ver-badge ver-new-badge">NEW</span></h2>
-<div class="meta">
-  <span>v0.1.0: 0行</span>
-  <span>v0.2.0: 31行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>v0.2.0 新增。替代 v0.1.0 的裸 <code>except Exception</code>，让 chat() 能区分「API 挂了」「工具炸了」「配置错了」三种错误。</div>
-<div class="code-version"><h4>v0.2.0 (31 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;NsAgent 统一异常体系。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code"></td></tr>
-<tr><td class="ln">3</td><td class="code"></td></tr>
-<tr><td class="ln">4</td><td class="code">class NsAgentError(Exception):</td></tr>
-<tr><td class="ln">5</td><td class="code">    &quot;&quot;&quot;NsAgent 异常基类。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">6</td><td class="code">    def __init__(self, message, code=None, details=None):</td></tr>
-<tr><td class="ln">7</td><td class="code">        self.message = message</td></tr>
-<tr><td class="ln">8</td><td class="code">        self.code = code        # 机器可读的错误码</td></tr>
-<tr><td class="ln">9</td><td class="code">        self.details = details  # 额外上下文（dict）</td></tr>
-<tr><td class="ln">10</td><td class="code">        super().__init__(message)</td></tr>
-<tr><td class="ln">11</td><td class="code"></td></tr>
-<tr><td class="ln">12</td><td class="code">    def to_dict(self):</td></tr>
-<tr><td class="ln">13</td><td class="code">        d = {&quot;error&quot;: self.message}</td></tr>
-<tr><td class="ln">14</td><td class="code">        if self.code:</td></tr>
-<tr><td class="ln">15</td><td class="code">            d[&quot;code&quot;] = self.code</td></tr>
-<tr><td class="ln">16</td><td class="code">        if self.details:</td></tr>
-<tr><td class="ln">17</td><td class="code">            d[&quot;details&quot;] = self.details</td></tr>
-<tr><td class="ln">18</td><td class="code">        return d</td></tr>
-<tr><td class="ln">19</td><td class="code"></td></tr>
-<tr><td class="ln">20</td><td class="code"></td></tr>
-<tr><td class="ln">21</td><td class="code">class APIError(NsAgentError):</td></tr>
-<tr><td class="ln">22</td><td class="code">    &quot;&quot;&quot;API 调用失败（网络、限流、服务端错误）。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">23</td><td class="code"></td></tr>
-<tr><td class="ln">24</td><td class="code"></td></tr>
-<tr><td class="ln">25</td><td class="code">class ToolError(NsAgentError):</td></tr>
-<tr><td class="ln">26</td><td class="code">    &quot;&quot;&quot;工具执行失败（文件不存在、命令超时等）。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">27</td><td class="code"></td></tr>
-<tr><td class="ln">28</td><td class="code"></td></tr>
-<tr><td class="ln">29</td><td class="code">class ConfigError(NsAgentError):</td></tr>
-<tr><td class="ln">30</td><td class="code">    &quot;&quot;&quot;配置错误（缺少 API Key 等）。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">31</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">4-10</span><span class="ann-text"><code>NsAgentError(Exception)</code> — 继承 Python 内置 Exception。三个属性：message（人类可读）、code（机器判断，如 "API_TIMEOUT"）、details（额外上下文 dict）。code 和 details 可选。</span></div>
-<div class="ann-item"><span class="ann-ln">12-18</span><span class="ann-text"><code>to_dict()</code> — 统一 JSON 序列化格式 <code>{"error":"...","code":"...","details":{...}}</code>，方便前端或日志系统消费。</span></div>
-<div class="ann-item"><span class="ann-ln">21-30</span><span class="ann-text">三个子类：<code>APIError</code>（DeepSeek 调用失败）、<code>ToolError</code>（文件不存在/命令超时）、<code>ConfigError</code>（缺 API Key）。子类不覆写任何方法，只靠类名区分——Python 的 <code>except APIError</code> 就能精确捕获。</span></div></div>
-</div>
+from dotenv import load_dotenv  # pyright: ignore
+from openai import OpenAI
 
-<div class="arch-card" id="s9" data-versions="v020">
-<h2>9. memory/session.py — 会话持久化 <span class="ver-badge ver-new-badge">NEW</span></h2>
-<div class="meta">
-  <span>v0.1.0: 0行</span>
-  <span>v0.2.0: 120行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>v0.2.0 新增。v0.1.0 的 memory/ 是空占位，v0.2.0 实现完整 CRUD + 24h 自动恢复。agent.py 每次 messages.append() 后同步调 save_message()。</div>
-<div class="code-version"><h4>v0.2.0 (120 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;会话持久化 — SQLite 存储对话历史，启动时恢复。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">import json</td></tr>
-<tr><td class="ln">3</td><td class="code">import sqlite3</td></tr>
-<tr><td class="ln">4</td><td class="code">import uuid</td></tr>
-<tr><td class="ln">5</td><td class="code">from datetime import datetime, timedelta</td></tr>
-<tr><td class="ln">6</td><td class="code">from pathlib import Path</td></tr>
-<tr><td class="ln">7</td><td class="code"></td></tr>
-<tr><td class="ln">8</td><td class="code">DB_PATH = Path(__file__).parent.parent / &quot;data&quot; / &quot;sessions.db&quot;</td></tr>
-<tr><td class="ln">9</td><td class="code"></td></tr>
-<tr><td class="ln">10</td><td class="code"></td></tr>
-<tr><td class="ln">11</td><td class="code">def _connect():</td></tr>
-<tr><td class="ln">12</td><td class="code">    DB_PATH.parent.mkdir(parents=True, exist_ok=True)</td></tr>
-<tr><td class="ln">13</td><td class="code">    conn = sqlite3.connect(str(DB_PATH))</td></tr>
-<tr><td class="ln">14</td><td class="code">    conn.row_factory = sqlite3.Row</td></tr>
-<tr><td class="ln">15</td><td class="code">    return conn</td></tr>
-<tr><td class="ln">16</td><td class="code"></td></tr>
-<tr><td class="ln">17</td><td class="code"></td></tr>
-<tr><td class="ln">18</td><td class="code">def init_db():</td></tr>
-<tr><td class="ln">19</td><td class="code">    &quot;&quot;&quot;建表（幂等）。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">20</td><td class="code">    conn = _connect()</td></tr>
-<tr><td class="ln">21</td><td class="code">    conn.executescript(&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">22</td><td class="code">        CREATE TABLE IF NOT EXISTS sessions (</td></tr>
-<tr><td class="ln">23</td><td class="code">            id TEXT PRIMARY KEY,</td></tr>
-<tr><td class="ln">24</td><td class="code">            created_at TEXT NOT NULL,</td></tr>
-<tr><td class="ln">25</td><td class="code">            updated_at TEXT NOT NULL</td></tr>
-<tr><td class="ln">26</td><td class="code">        );</td></tr>
-<tr><td class="ln">27</td><td class="code">        CREATE TABLE IF NOT EXISTS messages (</td></tr>
-<tr><td class="ln">28</td><td class="code">            id INTEGER PRIMARY KEY AUTOINCREMENT,</td></tr>
-<tr><td class="ln">29</td><td class="code">            session_id TEXT NOT NULL,</td></tr>
-<tr><td class="ln">30</td><td class="code">            role TEXT NOT NULL,</td></tr>
-<tr><td class="ln">31</td><td class="code">            content TEXT,</td></tr>
-<tr><td class="ln">32</td><td class="code">            tool_calls TEXT,</td></tr>
-<tr><td class="ln">33</td><td class="code">            tool_call_id TEXT,</td></tr>
-<tr><td class="ln">34</td><td class="code">            created_at TEXT NOT NULL,</td></tr>
-<tr><td class="ln">35</td><td class="code">            FOREIGN KEY (session_id) REFERENCES sessions(id)</td></tr>
-<tr><td class="ln">36</td><td class="code">        );</td></tr>
-<tr><td class="ln">37</td><td class="code">    &quot;&quot;&quot;)</td></tr>
-<tr><td class="ln">38</td><td class="code">    conn.commit()</td></tr>
-<tr><td class="ln">39</td><td class="code">    conn.close()</td></tr>
-<tr><td class="ln">40</td><td class="code"></td></tr>
-<tr><td class="ln">41</td><td class="code"></td></tr>
-<tr><td class="ln">42</td><td class="code">def create_session():</td></tr>
-<tr><td class="ln">43</td><td class="code">    &quot;&quot;&quot;新建会话，返回 session_id。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">44</td><td class="code">    sid = uuid.uuid4().hex[:12]</td></tr>
-<tr><td class="ln">45</td><td class="code">    now = datetime.now().isoformat()</td></tr>
-<tr><td class="ln">46</td><td class="code">    conn = _connect()</td></tr>
-<tr><td class="ln">47</td><td class="code">    conn.execute(</td></tr>
-<tr><td class="ln">48</td><td class="code">        &quot;INSERT INTO sessions (id, created_at, updated_at) VALUES (?, ?, ?)&quot;,</td></tr>
-<tr><td class="ln">49</td><td class="code">        (sid, now, now)</td></tr>
-<tr><td class="ln">50</td><td class="code">    )</td></tr>
-<tr><td class="ln">51</td><td class="code">    conn.commit()</td></tr>
-<tr><td class="ln">52</td><td class="code">    conn.close()</td></tr>
-<tr><td class="ln">53</td><td class="code">    return sid</td></tr>
-<tr><td class="ln">54</td><td class="code"></td></tr>
-<tr><td class="ln">55</td><td class="code"></td></tr>
-<tr><td class="ln">56</td><td class="code">def save_message(session_id, msg):</td></tr>
-<tr><td class="ln">57</td><td class="code">    &quot;&quot;&quot;保存一条消息。</td></tr>
-<tr><td class="ln">58</td><td class="code"></td></tr>
-<tr><td class="ln">59</td><td class="code">    msg 格式（OpenAI messages 列表中的一条）：</td></tr>
-<tr><td class="ln">60</td><td class="code">      {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;你好&quot;}</td></tr>
-<tr><td class="ln">61</td><td class="code">      {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;你好！&quot;, &quot;tool_calls&quot;: null}</td></tr>
-<tr><td class="ln">62</td><td class="code">      {&quot;role&quot;: &quot;tool&quot;, &quot;tool_call_id&quot;: &quot;xxx&quot;, &quot;content&quot;: &quot;...&quot;}</td></tr>
-<tr><td class="ln">63</td><td class="code">    &quot;&quot;&quot;</td></tr>
-<tr><td class="ln">64</td><td class="code">    now = datetime.now().isoformat()</td></tr>
-<tr><td class="ln">65</td><td class="code">    conn = _connect()</td></tr>
-<tr><td class="ln">66</td><td class="code">    conn.execute(</td></tr>
-<tr><td class="ln">67</td><td class="code">        &quot;&quot;&quot;INSERT INTO messages (session_id, role, content, tool_calls, tool_call_id, created_at)</td></tr>
-<tr><td class="ln">68</td><td class="code">           VALUES (?, ?, ?, ?, ?, ?)&quot;&quot;&quot;,</td></tr>
-<tr><td class="ln">69</td><td class="code">        (</td></tr>
-<tr><td class="ln">70</td><td class="code">            session_id,</td></tr>
-<tr><td class="ln">71</td><td class="code">            msg.get(&quot;role&quot;),</td></tr>
-<tr><td class="ln">72</td><td class="code">            msg.get(&quot;content&quot;),</td></tr>
-<tr><td class="ln">73</td><td class="code">            json.dumps(msg.get(&quot;tool_calls&quot;)) if msg.get(&quot;tool_calls&quot;) else None,</td></tr>
-<tr><td class="ln">74</td><td class="code">            msg.get(&quot;tool_call_id&quot;),</td></tr>
-<tr><td class="ln">75</td><td class="code">            now</td></tr>
-<tr><td class="ln">76</td><td class="code">        )</td></tr>
-<tr><td class="ln">77</td><td class="code">    )</td></tr>
-<tr><td class="ln">78</td><td class="code">    conn.execute(</td></tr>
-<tr><td class="ln">79</td><td class="code">        &quot;UPDATE sessions SET updated_at = ? WHERE id = ?&quot;,</td></tr>
-<tr><td class="ln">80</td><td class="code">        (now, session_id)</td></tr>
-<tr><td class="ln">81</td><td class="code">    )</td></tr>
-<tr><td class="ln">82</td><td class="code">    conn.commit()</td></tr>
-<tr><td class="ln">83</td><td class="code">    conn.close()</td></tr>
-<tr><td class="ln">84</td><td class="code"></td></tr>
-<tr><td class="ln">85</td><td class="code"></td></tr>
-<tr><td class="ln">86</td><td class="code">def load_session(session_id):</td></tr>
-<tr><td class="ln">87</td><td class="code">    &quot;&quot;&quot;从数据库恢复消息列表。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">88</td><td class="code">    conn = _connect()</td></tr>
-<tr><td class="ln">89</td><td class="code">    rows = conn.execute(</td></tr>
-<tr><td class="ln">90</td><td class="code">        &quot;SELECT role, content, tool_calls, tool_call_id FROM messages &quot;</td></tr>
-<tr><td class="ln">91</td><td class="code">        &quot;WHERE session_id = ? ORDER BY id&quot;,</td></tr>
-<tr><td class="ln">92</td><td class="code">        (session_id,)</td></tr>
-<tr><td class="ln">93</td><td class="code">    ).fetchall()</td></tr>
-<tr><td class="ln">94</td><td class="code">    conn.close()</td></tr>
-<tr><td class="ln">95</td><td class="code"></td></tr>
-<tr><td class="ln">96</td><td class="code">    messages = []</td></tr>
-<tr><td class="ln">97</td><td class="code">    for row in rows:</td></tr>
-<tr><td class="ln">98</td><td class="code">        msg = {&quot;role&quot;: row[&quot;role&quot;]}</td></tr>
-<tr><td class="ln">99</td><td class="code">        if row[&quot;content&quot;] is not None:</td></tr>
-<tr><td class="ln">100</td><td class="code">            msg[&quot;content&quot;] = row[&quot;content&quot;]</td></tr>
-<tr><td class="ln">101</td><td class="code">        if row[&quot;tool_calls&quot;]:</td></tr>
-<tr><td class="ln">102</td><td class="code">            msg[&quot;tool_calls&quot;] = json.loads(row[&quot;tool_calls&quot;])</td></tr>
-<tr><td class="ln">103</td><td class="code">            msg[&quot;content&quot;] = None  # OpenAI 格式要求</td></tr>
-<tr><td class="ln">104</td><td class="code">        if row[&quot;tool_call_id&quot;]:</td></tr>
-<tr><td class="ln">105</td><td class="code">            msg[&quot;tool_call_id&quot;] = row[&quot;tool_call_id&quot;]</td></tr>
-<tr><td class="ln">106</td><td class="code">        messages.append(msg)</td></tr>
-<tr><td class="ln">107</td><td class="code">    return messages</td></tr>
-<tr><td class="ln">108</td><td class="code"></td></tr>
-<tr><td class="ln">109</td><td class="code"></td></tr>
-<tr><td class="ln">110</td><td class="code">def get_last_session():</td></tr>
-<tr><td class="ln">111</td><td class="code">    &quot;&quot;&quot;获取最近 24 小时内的最新会话 ID，没有则返回 None。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">112</td><td class="code">    cutoff = (datetime.now() - timedelta(hours=24)).isoformat()</td></tr>
-<tr><td class="ln">113</td><td class="code">    conn = _connect()</td></tr>
-<tr><td class="ln">114</td><td class="code">    row = conn.execute(</td></tr>
-<tr><td class="ln">115</td><td class="code">        &quot;SELECT id FROM sessions WHERE updated_at &gt;= ? ORDER BY updated_at DESC LIMIT 1&quot;,</td></tr>
-<tr><td class="ln">116</td><td class="code">        (cutoff,)</td></tr>
-<tr><td class="ln">117</td><td class="code">    ).fetchone()</td></tr>
-<tr><td class="ln">118</td><td class="code">    conn.close()</td></tr>
-<tr><td class="ln">119</td><td class="code">    return row[&quot;id&quot;] if row else None</td></tr>
-<tr><td class="ln">120</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">8</span><span class="ann-text"><code>DB_PATH = Path(__file__).parent.parent / "data" / "sessions.db"</code> — 数据目录在 ns-agent/data/，.gitignore 已排除，不入仓库。</span></div>
-<div class="ann-item"><span class="ann-ln">11-15</span><span class="ann-text"><code>_connect()</code> — 私有辅助函数。自动创建 data/ 目录，设置 <code>row_factory=sqlite3.Row</code> 让查询结果可用列名访问（而非索引）。每个调用创建新连接用完关闭，不保持长连接——适合 Agent 这种低频写入场景。</span></div>
-<div class="ann-item"><span class="ann-ln">18-39</span><span class="ann-text"><code>init_db()</code> — <b>幂等建表</b>。sessions 表：id（12位hex主键）+ created_at + updated_at。messages 表：自增 id + session_id（外键）+ role（system|user|assistant|tool）+ content（可空——assistant 发 tool_calls 时 content 为 None）+ tool_calls（JSON 字符串）+ tool_call_id（tool 消息关联）+ created_at。</span></div>
-<div class="ann-item"><span class="ann-ln">42-53</span><span class="ann-text"><code>create_session()</code> — <code>uuid.uuid4().hex[:12]</code> 生成 12 位唯一会话 ID，碰撞概率极低，足够简单。</span></div>
-<div class="ann-item"><span class="ann-ln">56-83</span><span class="ann-text"><code>save_message()</code> — <b>兼容四种消息格式</b>：system/user 只有 role+content，assistant 可能带 tool_calls（json.dumps 序列化），tool 消息有 tool_call_id。同时更新 sessions.updated_at 供 get_last_session 判断活跃性。</span></div>
-<div class="ann-item"><span class="ann-ln">86-107</span><span class="ann-text"><code>load_session()</code> — 从 DB 重建消息列表。tool_calls JSON 反序列化，<code>content=None</code> 的处理（OpenAI 格式要求 assistant+tool_calls 的 content 为 None）。</span></div>
-<div class="ann-item"><span class="ann-ln">110-119</span><span class="ann-text"><code>get_last_session()</code> — 24 小时窗口 SQL 查询。如果用户 10 分钟前退出现在重启，自动恢复；如果是昨天，返回 None 触发创建新会话。</span></div></div>
-</div>
+from core.context import compress, count_messages_tokens
+from core.errors import NsAgentError
+from core.prompt import build_prompt
+from core.retry import call_with_retry
+from memory import session as sess
+from skills.registry import inject_skills, match_skills
+from tools.registry import execute, get_tool_definitions
 
-<div class="arch-card" id="s10" data-versions="v010,v020">
-<h2>10. core/agent.py — Agent Loop <span class="ver-badge ver-mod-badge">MOD</span></h2>
-<div class="meta">
-  <span>v0.1.0: 104行</span>
-  <span>v0.2.0: 134行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>消费者。整个框架唯一的「循环」——while True→LLM→工具→LLM→输出。不关心工具有哪些，只从 registry 读、只调 registry 执行。v0.2.0 接入 retry+session+errors。</div>
-<div class="code-version"><h4>v0.1.0 (104 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;NsAgent 核心 — Agent Loop。不关心工具有哪些，只从注册表读取。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">import json</td></tr>
-<tr><td class="ln">3</td><td class="code">import os</td></tr>
-<tr><td class="ln">4</td><td class="code">from pathlib import Path</td></tr>
-<tr><td class="ln">5</td><td class="code">from dotenv import load_dotenv</td></tr>
-<tr><td class="ln">6</td><td class="code">from openai import OpenAI</td></tr>
-<tr><td class="ln">7</td><td class="code"></td></tr>
-<tr><td class="ln">8</td><td class="code">from tools.registry import get_tool_definitions, execute</td></tr>
-<tr><td class="ln">9</td><td class="code"></td></tr>
-<tr><td class="ln">10</td><td class="code"># 加载 .env（agent.py 在 core/ 下，.env 在项目根目录）</td></tr>
-<tr><td class="ln">11</td><td class="code">load_dotenv(Path(__file__).parent.parent / &quot;.env&quot;)</td></tr>
-<tr><td class="ln">12</td><td class="code"></td></tr>
-<tr><td class="ln">13</td><td class="code">client = OpenAI(</td></tr>
-<tr><td class="ln">14</td><td class="code">    api_key=os.getenv(&quot;DEEPSEEK_API_KEY&quot;),</td></tr>
-<tr><td class="ln">15</td><td class="code">    base_url=&quot;https://api.deepseek.com&quot;</td></tr>
-<tr><td class="ln">16</td><td class="code">)</td></tr>
-<tr><td class="ln">17</td><td class="code"></td></tr>
-<tr><td class="ln">18</td><td class="code">SYSTEM_PROMPT = &quot;&quot;&quot;你是 NsAgent，一个本地 AI 助手。</td></tr>
-<tr><td class="ln">19</td><td class="code"></td></tr>
-<tr><td class="ln">20</td><td class="code">你有以下工具可以使用：</td></tr>
-<tr><td class="ln">21</td><td class="code">- read_file: 读取文件</td></tr>
-<tr><td class="ln">22</td><td class="code">- write_file: 写入文件</td></tr>
-<tr><td class="ln">23</td><td class="code">- terminal: 执行终端命令</td></tr>
-<tr><td class="ln">24</td><td class="code">- search_knowledge: 搜索本地知识库（年报、技术文档）</td></tr>
-<tr><td class="ln">25</td><td class="code">- get_current_time: 获取当前时间</td></tr>
-<tr><td class="ln">26</td><td class="code"></td></tr>
-<tr><td class="ln">27</td><td class="code">工作原则：</td></tr>
-<tr><td class="ln">28</td><td class="code">1. 先搜索知识库再回答</td></tr>
-<tr><td class="ln">29</td><td class="code">2. 修改文件前先 read_file 确认内容</td></tr>
-<tr><td class="ln">30</td><td class="code">3. 用中文回复&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">31</td><td class="code"></td></tr>
-<tr><td class="ln">32</td><td class="code"></td></tr>
-<tr><td class="ln">33</td><td class="code">def run(messages=None):</td></tr>
-<tr><td class="ln">34</td><td class="code">    &quot;&quot;&quot;启动 Agent Loop。messages 为初始消息列表。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">35</td><td class="code">    if messages is None:</td></tr>
-<tr><td class="ln">36</td><td class="code">        messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT}]</td></tr>
-<tr><td class="ln">37</td><td class="code">    </td></tr>
-<tr><td class="ln">38</td><td class="code">    # 获取已注册的工具列表</td></tr>
-<tr><td class="ln">39</td><td class="code">    tools = get_tool_definitions()</td></tr>
-<tr><td class="ln">40</td><td class="code">    print(f&quot;[NsAgent] 已加载 {len(tools)} 个工具\n&quot;)</td></tr>
-<tr><td class="ln">41</td><td class="code">    </td></tr>
-<tr><td class="ln">42</td><td class="code">    while True:</td></tr>
-<tr><td class="ln">43</td><td class="code">        print(f&quot;&gt;&gt;&gt; 发送请求（{len(messages)} 条消息）...&quot;)</td></tr>
-<tr><td class="ln">44</td><td class="code">        </td></tr>
-<tr><td class="ln">45</td><td class="code">        response = client.chat.completions.create(</td></tr>
-<tr><td class="ln">46</td><td class="code">            model=&quot;deepseek-chat&quot;,</td></tr>
-<tr><td class="ln">47</td><td class="code">            messages=messages,</td></tr>
-<tr><td class="ln">48</td><td class="code">            tools=tools if tools else None,</td></tr>
-<tr><td class="ln">49</td><td class="code">            temperature=0.7</td></tr>
-<tr><td class="ln">50</td><td class="code">        )</td></tr>
-<tr><td class="ln">51</td><td class="code">        </td></tr>
-<tr><td class="ln">52</td><td class="code">        msg = response.choices[0].message</td></tr>
-<tr><td class="ln">53</td><td class="code">        </td></tr>
-<tr><td class="ln">54</td><td class="code">        # 没有工具调用 → 输出回复 → 结束</td></tr>
-<tr><td class="ln">55</td><td class="code">        if not msg.tool_calls:</td></tr>
-<tr><td class="ln">56</td><td class="code">            print(f&quot;\n{msg.content}\n&quot;)</td></tr>
-<tr><td class="ln">57</td><td class="code">            break</td></tr>
-<tr><td class="ln">58</td><td class="code">        </td></tr>
-<tr><td class="ln">59</td><td class="code">        # 处理工具调用</td></tr>
-<tr><td class="ln">60</td><td class="code">        for tc in msg.tool_calls:</td></tr>
-<tr><td class="ln">61</td><td class="code">            name = tc.function.name</td></tr>
-<tr><td class="ln">62</td><td class="code">            args = json.loads(tc.function.arguments)</td></tr>
-<tr><td class="ln">63</td><td class="code">            print(f&quot;  🔧 {name}({json.dumps(args, ensure_ascii=False)})&quot;)</td></tr>
-<tr><td class="ln">64</td><td class="code">            </td></tr>
-<tr><td class="ln">65</td><td class="code">            result = execute(name, args)</td></tr>
-<tr><td class="ln">66</td><td class="code">            print(f&quot;     → {result[:100]}...&quot;)</td></tr>
-<tr><td class="ln">67</td><td class="code">            </td></tr>
-<tr><td class="ln">68</td><td class="code">            # 把工具调用和结果加入消息历史</td></tr>
-<tr><td class="ln">69</td><td class="code">            messages.append({</td></tr>
-<tr><td class="ln">70</td><td class="code">                &quot;role&quot;: &quot;assistant&quot;,</td></tr>
-<tr><td class="ln">71</td><td class="code">                &quot;content&quot;: None,</td></tr>
-<tr><td class="ln">72</td><td class="code">                &quot;tool_calls&quot;: [{</td></tr>
-<tr><td class="ln">73</td><td class="code">                    &quot;id&quot;: tc.id,</td></tr>
-<tr><td class="ln">74</td><td class="code">                    &quot;type&quot;: &quot;function&quot;,</td></tr>
-<tr><td class="ln">75</td><td class="code">                    &quot;function&quot;: {&quot;name&quot;: name, &quot;arguments&quot;: tc.function.arguments}</td></tr>
-<tr><td class="ln">76</td><td class="code">                }]</td></tr>
-<tr><td class="ln">77</td><td class="code">            })</td></tr>
-<tr><td class="ln">78</td><td class="code">            messages.append({</td></tr>
-<tr><td class="ln">79</td><td class="code">                &quot;role&quot;: &quot;tool&quot;,</td></tr>
-<tr><td class="ln">80</td><td class="code">                &quot;tool_call_id&quot;: tc.id,</td></tr>
-<tr><td class="ln">81</td><td class="code">                &quot;content&quot;: str(result)</td></tr>
-<tr><td class="ln">82</td><td class="code">            })</td></tr>
-<tr><td class="ln">83</td><td class="code"></td></tr>
-<tr><td class="ln">84</td><td class="code"></td></tr>
-<tr><td class="ln">85</td><td class="code">def chat():</td></tr>
-<tr><td class="ln">86</td><td class="code">    &quot;&quot;&quot;交互式 REPL。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">87</td><td class="code">    messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT}]</td></tr>
-<tr><td class="ln">88</td><td class="code">    print(&quot;NsAgent v0.1.0 — 输入 /exit 退出\n&quot;)</td></tr>
-<tr><td class="ln">89</td><td class="code">    </td></tr>
-<tr><td class="ln">90</td><td class="code">    while True:</td></tr>
-<tr><td class="ln">91</td><td class="code">        user_input = input(&quot;你: &quot;).strip()</td></tr>
-<tr><td class="ln">92</td><td class="code">        if not user_input:</td></tr>
-<tr><td class="ln">93</td><td class="code">            continue</td></tr>
-<tr><td class="ln">94</td><td class="code">        if user_input == &quot;/exit&quot;:</td></tr>
-<tr><td class="ln">95</td><td class="code">            print(&quot;再见。&quot;)</td></tr>
-<tr><td class="ln">96</td><td class="code">            break</td></tr>
-<tr><td class="ln">97</td><td class="code">        </td></tr>
-<tr><td class="ln">98</td><td class="code">        messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_input})</td></tr>
-<tr><td class="ln">99</td><td class="code">        try:</td></tr>
-<tr><td class="ln">100</td><td class="code">            run(messages=messages)</td></tr>
-<tr><td class="ln">101</td><td class="code">        except Exception as e:</td></tr>
-<tr><td class="ln">102</td><td class="code">            print(f&quot;错误: {e}&quot;)</td></tr>
-<tr><td class="ln">103</td><td class="code">            messages.pop()  # 移除失败的用户消息</td></tr>
-<tr><td class="ln">104</td><td class="code"></td></tr>
-</table></div></div><div class="code-version"><h4>v0.2.0 (134 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;NsAgent 核心 — Agent Loop。不关心工具有哪些，只从注册表读取。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">import json</td></tr>
-<tr><td class="ln">3</td><td class="code">import os</td></tr>
-<tr><td class="ln">4</td><td class="code">from pathlib import Path</td></tr>
-<tr><td class="ln">5</td><td class="code">from dotenv import load_dotenv</td></tr>
-<tr><td class="ln">6</td><td class="code">from openai import OpenAI</td></tr>
-<tr><td class="ln">7</td><td class="code"></td></tr>
-<tr><td class="ln">8</td><td class="code">from tools.registry import get_tool_definitions, execute</td></tr>
-<tr><td class="ln">9</td><td class="code">from memory import session as sess</td></tr>
-<tr><td class="ln">10</td><td class="code">from core.retry import call_with_retry</td></tr>
-<tr><td class="ln">11</td><td class="code">from core.errors import NsAgentError</td></tr>
-<tr><td class="ln">12</td><td class="code"></td></tr>
-<tr><td class="ln">13</td><td class="code"># 加载 .env（agent.py 在 core/ 下，.env 在项目根目录）</td></tr>
-<tr><td class="ln">14</td><td class="code">load_dotenv(Path(__file__).parent.parent / &quot;.env&quot;)</td></tr>
-<tr><td class="ln">15</td><td class="code"></td></tr>
-<tr><td class="ln">16</td><td class="code">client = OpenAI(</td></tr>
-<tr><td class="ln">17</td><td class="code">    api_key=os.getenv(&quot;DEEPSEEK_API_KEY&quot;),</td></tr>
-<tr><td class="ln">18</td><td class="code">    base_url=&quot;https://api.deepseek.com&quot;</td></tr>
-<tr><td class="ln">19</td><td class="code">)</td></tr>
-<tr><td class="ln">20</td><td class="code"></td></tr>
-<tr><td class="ln">21</td><td class="code">SYSTEM_PROMPT = &quot;&quot;&quot;你是 NsAgent，一个本地 AI 助手。</td></tr>
-<tr><td class="ln">22</td><td class="code"></td></tr>
-<tr><td class="ln">23</td><td class="code">你有以下工具可以使用：</td></tr>
-<tr><td class="ln">24</td><td class="code">- read_file: 读取文件</td></tr>
-<tr><td class="ln">25</td><td class="code">- write_file: 写入文件</td></tr>
-<tr><td class="ln">26</td><td class="code">- terminal: 执行终端命令</td></tr>
-<tr><td class="ln">27</td><td class="code">- search_knowledge: 搜索本地知识库（年报、技术文档）</td></tr>
-<tr><td class="ln">28</td><td class="code">- get_current_time: 获取当前时间</td></tr>
-<tr><td class="ln">29</td><td class="code"></td></tr>
-<tr><td class="ln">30</td><td class="code">工作原则：</td></tr>
-<tr><td class="ln">31</td><td class="code">1. 先搜索知识库再回答</td></tr>
-<tr><td class="ln">32</td><td class="code">2. 修改文件前先 read_file 确认内容</td></tr>
-<tr><td class="ln">33</td><td class="code">3. 用中文回复&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">34</td><td class="code"></td></tr>
-<tr><td class="ln">35</td><td class="code"></td></tr>
-<tr><td class="ln">36</td><td class="code">def run(messages=None, session_id=None):</td></tr>
-<tr><td class="ln">37</td><td class="code">    &quot;&quot;&quot;启动 Agent Loop。messages 为初始消息列表。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">38</td><td class="code">    if messages is None:</td></tr>
-<tr><td class="ln">39</td><td class="code">        messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT}]</td></tr>
-<tr><td class="ln">40</td><td class="code">    </td></tr>
-<tr><td class="ln">41</td><td class="code">    # 获取已注册的工具列表</td></tr>
-<tr><td class="ln">42</td><td class="code">    tools = get_tool_definitions()</td></tr>
-<tr><td class="ln">43</td><td class="code">    print(f&quot;[NsAgent] 已加载 {len(tools)} 个工具\n&quot;)</td></tr>
-<tr><td class="ln">44</td><td class="code">    </td></tr>
-<tr><td class="ln">45</td><td class="code">    while True:</td></tr>
-<tr><td class="ln">46</td><td class="code">        print(f&quot;&gt;&gt;&gt; 发送请求（{len(messages)} 条消息）...&quot;)</td></tr>
-<tr><td class="ln">47</td><td class="code">        </td></tr>
-<tr><td class="ln">48</td><td class="code">        response = call_with_retry(</td></tr>
-<tr><td class="ln">49</td><td class="code">            client.chat.completions.create,</td></tr>
-<tr><td class="ln">50</td><td class="code">            model=&quot;deepseek-chat&quot;,</td></tr>
-<tr><td class="ln">51</td><td class="code">            messages=messages,</td></tr>
-<tr><td class="ln">52</td><td class="code">            tools=tools if tools else None,</td></tr>
-<tr><td class="ln">53</td><td class="code">            temperature=0.7</td></tr>
-<tr><td class="ln">54</td><td class="code">        )</td></tr>
-<tr><td class="ln">55</td><td class="code">        </td></tr>
-<tr><td class="ln">56</td><td class="code">        msg = response.choices[0].message</td></tr>
-<tr><td class="ln">57</td><td class="code">        </td></tr>
-<tr><td class="ln">58</td><td class="code">        # 没有工具调用 → 输出回复 → 结束</td></tr>
-<tr><td class="ln">59</td><td class="code">        if not msg.tool_calls:</td></tr>
-<tr><td class="ln">60</td><td class="code">            print(f&quot;\n{msg.content}\n&quot;)</td></tr>
-<tr><td class="ln">61</td><td class="code">            break</td></tr>
-<tr><td class="ln">62</td><td class="code">        </td></tr>
-<tr><td class="ln">63</td><td class="code">        # 处理工具调用</td></tr>
-<tr><td class="ln">64</td><td class="code">        for tc in msg.tool_calls:</td></tr>
-<tr><td class="ln">65</td><td class="code">            name = tc.function.name</td></tr>
-<tr><td class="ln">66</td><td class="code">            args = json.loads(tc.function.arguments)</td></tr>
-<tr><td class="ln">67</td><td class="code">            print(f&quot;  🔧 {name}({json.dumps(args, ensure_ascii=False)})&quot;)</td></tr>
-<tr><td class="ln">68</td><td class="code">            </td></tr>
-<tr><td class="ln">69</td><td class="code">            result = execute(name, args)</td></tr>
-<tr><td class="ln">70</td><td class="code">            print(f&quot;     → {result[:100]}...&quot;)</td></tr>
-<tr><td class="ln">71</td><td class="code">            </td></tr>
-<tr><td class="ln">72</td><td class="code">            # 把工具调用和结果加入消息历史</td></tr>
-<tr><td class="ln">73</td><td class="code">            messages.append({</td></tr>
-<tr><td class="ln">74</td><td class="code">                &quot;role&quot;: &quot;assistant&quot;,</td></tr>
-<tr><td class="ln">75</td><td class="code">                &quot;content&quot;: None,</td></tr>
-<tr><td class="ln">76</td><td class="code">                &quot;tool_calls&quot;: [{</td></tr>
-<tr><td class="ln">77</td><td class="code">                    &quot;id&quot;: tc.id,</td></tr>
-<tr><td class="ln">78</td><td class="code">                    &quot;type&quot;: &quot;function&quot;,</td></tr>
-<tr><td class="ln">79</td><td class="code">                    &quot;function&quot;: {&quot;name&quot;: name, &quot;arguments&quot;: tc.function.arguments}</td></tr>
-<tr><td class="ln">80</td><td class="code">                }]</td></tr>
-<tr><td class="ln">81</td><td class="code">            })</td></tr>
-<tr><td class="ln">82</td><td class="code">            if session_id:</td></tr>
-<tr><td class="ln">83</td><td class="code">                sess.save_message(session_id, messages[-1])</td></tr>
-<tr><td class="ln">84</td><td class="code">            messages.append({</td></tr>
-<tr><td class="ln">85</td><td class="code">                &quot;role&quot;: &quot;tool&quot;,</td></tr>
-<tr><td class="ln">86</td><td class="code">                &quot;tool_call_id&quot;: tc.id,</td></tr>
-<tr><td class="ln">87</td><td class="code">                &quot;content&quot;: str(result)</td></tr>
-<tr><td class="ln">88</td><td class="code">            })</td></tr>
-<tr><td class="ln">89</td><td class="code">            if session_id:</td></tr>
-<tr><td class="ln">90</td><td class="code">                sess.save_message(session_id, messages[-1])</td></tr>
-<tr><td class="ln">91</td><td class="code"></td></tr>
-<tr><td class="ln">92</td><td class="code"></td></tr>
-<tr><td class="ln">93</td><td class="code">def chat():</td></tr>
-<tr><td class="ln">94</td><td class="code">    &quot;&quot;&quot;交互式 REPL。自动恢复 24h 内会话。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">95</td><td class="code">    sess.init_db()</td></tr>
-<tr><td class="ln">96</td><td class="code">    session_id = sess.get_last_session()</td></tr>
-<tr><td class="ln">97</td><td class="code"></td></tr>
-<tr><td class="ln">98</td><td class="code">    if session_id:</td></tr>
-<tr><td class="ln">99</td><td class="code">        old_messages = sess.load_session(session_id)</td></tr>
-<tr><td class="ln">100</td><td class="code">        print(f&quot;NsAgent v0.1.0 — 恢复了上次会话（{len(old_messages)} 条消息）&quot;)</td></tr>
-<tr><td class="ln">101</td><td class="code">        print(&quot;输入 /new 开始新会话，/exit 退出\n&quot;)</td></tr>
-<tr><td class="ln">102</td><td class="code">        messages = old_messages</td></tr>
-<tr><td class="ln">103</td><td class="code">    else:</td></tr>
-<tr><td class="ln">104</td><td class="code">        messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT}]</td></tr>
-<tr><td class="ln">105</td><td class="code">        session_id = sess.create_session()</td></tr>
-<tr><td class="ln">106</td><td class="code">        sess.save_message(session_id, messages[0])</td></tr>
-<tr><td class="ln">107</td><td class="code">        print(&quot;NsAgent v0.1.0 — 输入 /exit 退出\n&quot;)</td></tr>
-<tr><td class="ln">108</td><td class="code"></td></tr>
-<tr><td class="ln">109</td><td class="code">    while True:</td></tr>
-<tr><td class="ln">110</td><td class="code">        user_input = input(&quot;你: &quot;).strip()</td></tr>
-<tr><td class="ln">111</td><td class="code">        if not user_input:</td></tr>
-<tr><td class="ln">112</td><td class="code">            continue</td></tr>
-<tr><td class="ln">113</td><td class="code">        if user_input == &quot;/exit&quot;:</td></tr>
-<tr><td class="ln">114</td><td class="code">            print(f&quot;会话 {session_id} 已保存，再见。&quot;)</td></tr>
-<tr><td class="ln">115</td><td class="code">            break</td></tr>
-<tr><td class="ln">116</td><td class="code">        if user_input == &quot;/new&quot;:</td></tr>
-<tr><td class="ln">117</td><td class="code">            session_id = sess.create_session()</td></tr>
-<tr><td class="ln">118</td><td class="code">            messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT}]</td></tr>
-<tr><td class="ln">119</td><td class="code">            sess.save_message(session_id, messages[0])</td></tr>
-<tr><td class="ln">120</td><td class="code">            print(&quot;新会话已开始。&quot;)</td></tr>
-<tr><td class="ln">121</td><td class="code">            continue</td></tr>
-<tr><td class="ln">122</td><td class="code"></td></tr>
-<tr><td class="ln">123</td><td class="code">        snapshot = len(messages)</td></tr>
-<tr><td class="ln">124</td><td class="code">        messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_input})</td></tr>
-<tr><td class="ln">125</td><td class="code">        sess.save_message(session_id, messages[-1])</td></tr>
-<tr><td class="ln">126</td><td class="code">        try:</td></tr>
-<tr><td class="ln">127</td><td class="code">            run(messages=messages, session_id=session_id)</td></tr>
-<tr><td class="ln">128</td><td class="code">        except NsAgentError as e:</td></tr>
-<tr><td class="ln">129</td><td class="code">            print(f&quot;NsAgent 错误 [{e.code}]: {e.message}&quot;)</td></tr>
-<tr><td class="ln">130</td><td class="code">            del messages[snapshot:]</td></tr>
-<tr><td class="ln">131</td><td class="code">        except Exception as e:</td></tr>
-<tr><td class="ln">132</td><td class="code">            print(f&quot;未预期错误: {type(e).__name__}: {e}&quot;)</td></tr>
-<tr><td class="ln">133</td><td class="code">            del messages[snapshot:]</td></tr>
-<tr><td class="ln">134</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">8-11</span><span class="ann-text">v0.1.0 只 import registry。v0.2.0 新增三行：<code>from memory import session as sess</code>（别名避免与参数名冲突）、<code>from core.retry import call_with_retry</code>（替换裸 create）、<code>from core.errors import NsAgentError</code>（替换裸 except）。</span></div>
-<div class="ann-item"><span class="ann-ln">14-19</span><span class="ann-text"><code>load_dotenv(Path(__file__).parent.parent / ".env")</code> — 两层 parent 找到项目根目录的 .env。<code>OpenAI(api_key=..., base_url="https://api.deepseek.com")</code> — 用 openai 库调 DeepSeek API（兼容接口）。</span></div>
-<div class="ann-item"><span class="ann-ln">21-33</span><span class="ann-text"><code>SYSTEM_PROMPT</code> — 静态文本，告诉 LLM 它有哪些工具。v0.1.0 只有 5 个工具，v0.2.0 一直保持 5 个（新工具在 core/ 和 memory/，不是 tools/）。</span></div>
-<div class="ann-item"><span class="ann-ln">36-90</span><span class="ann-text"><code>run(messages, session_id)</code> — <b>Agent Loop 核心</b>。while True 的每一步：① 调 LLM（v0.2.0 用 call_with_retry 包裹）② LLM 返回 tool_calls 或文本 ③ 有 tool_calls？执行工具 + 结果塞回 messages + 继续 ④ 无 tool_calls？输出 + break。messages 越滚越大——这是 Agent 的「记忆」机制。v0.2.0 每次 append 后同步 save_message()。</span></div>
-<div class="ann-item"><span class="ann-ln">93-134</span><span class="ann-text"><code>chat()</code> — <b>v0.2.0 大幅重写</b>：启动时 init_db()+get_last_session() 自动恢复 24h 会话；新增 /new 命令；/exit 输出 session_id。<code>snapshot=len(messages)</code>+<code>del messages[snapshot:]</code> 实现异常时精确回滚——不残留半条消息破坏对话状态。</span></div></div>
-</div>
+# 加载 .env（agent.py 在 core/ 下，.env 在项目根目录）
+load_dotenv(Path(__file__).parent.parent / &quot;.env&quot;)
 
-<div class="arch-card" id="s11" data-versions="v010,v020">
-<h2>11. main.py — 入口</h2>
-<div class="meta">
-  <span>v0.1.0: 12行</span>
-  <span>v0.2.0: 12行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>最简入口，只有 11 行。Python 的 import 就是初始化机制——4 个工具 import 触发 5 个 register()。chat() 启动时注册表已就绪。</div>
-<div class="code-version"><h4>v0.2.0 (12 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;NsAgent 入口 — 加载工具 → 启动 Agent。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code"># 导入工具模块 = 触发 register() 报到</td></tr>
-<tr><td class="ln">3</td><td class="code">import tools.time_tool      # noqa: F401</td></tr>
-<tr><td class="ln">4</td><td class="code">import tools.file_tools     # noqa: F401</td></tr>
-<tr><td class="ln">5</td><td class="code">import tools.terminal_tool  # noqa: F401</td></tr>
-<tr><td class="ln">6</td><td class="code">import tools.search_tool    # noqa: F401</td></tr>
-<tr><td class="ln">7</td><td class="code"></td></tr>
-<tr><td class="ln">8</td><td class="code">from core.agent import chat</td></tr>
-<tr><td class="ln">9</td><td class="code"></td></tr>
-<tr><td class="ln">10</td><td class="code">if __name__ == &quot;__main__&quot;:</td></tr>
-<tr><td class="ln">11</td><td class="code">    chat()</td></tr>
-<tr><td class="ln">12</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">3-6</span><span class="ann-text"><code>import tools.xxx</code> — <b>这 4 行是整个框架的初始化</b>。Python import 会执行被导入模块的顶层代码——每个工具文件的最后一行 <code>register()</code> 就在此时执行。<code># noqa: F401</code> 抑制 linter 的「imported but unused」警告——这些 import 确实没被本文件直接使用，但它们的<b>副作用</b>（register）是必需的。</span></div>
-<div class="ann-item"><span class="ann-ln">8-11</span><span class="ann-text"><code>from core.agent import chat</code> + <code>if __name__=="__main__": chat()</code> — 标准 Python 入口保护。直接 <code>python main.py</code> 才启动 REPL，被 import 时不启动。</span></div></div>
-</div>
+client = OpenAI(api_key=os.getenv(&quot;DEEPSEEK_API_KEY&quot;), base_url=&quot;https://api.deepseek.com&quot;)
 
-<div class="arch-card" id="s12" data-versions="v020">
-<h2>12. knowledge/ingest_wiki.py — Wiki入库 <span class="ver-badge ver-new-badge">NEW</span></h2>
-<div class="meta">
-  <span>v0.1.0: 0行</span>
-  <span>v0.2.0: 88行</span>
-</div>
-<div class="purpose"><strong>位置：</strong>v0.2.0 新增。独立脚本（不 import 到 Agent 循环）。运行一次将 Wiki 46 篇 .md 分块向量化写入 ChromaDB wiki_knowledge（262块），之后 unified_search 自动覆盖三源。</div>
-<div class="code-version"><h4>v0.2.0 (88 行)</h4><div class="code-block"><table>
-<tr><td class="ln">1</td><td class="code">&quot;&quot;&quot;Wiki 入库 — 扫描 Wiki 目录 → 分块 → 向量化 → ChromaDB collection wiki_knowledge。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">2</td><td class="code">import re</td></tr>
-<tr><td class="ln">3</td><td class="code">from pathlib import Path</td></tr>
-<tr><td class="ln">4</td><td class="code"></td></tr>
-<tr><td class="ln">5</td><td class="code">from knowledge.search import _client, _embed_model  # 复用已有连接</td></tr>
-<tr><td class="ln">6</td><td class="code"></td></tr>
-<tr><td class="ln">7</td><td class="code">WIKI_ROOT = Path(&quot;/Users/ns/Wiki&quot;)</td></tr>
-<tr><td class="ln">8</td><td class="code">EXCLUDE_DIRS = {&quot;00.配置 Config&quot;, &quot;.obsidian&quot;, &quot;.git&quot;, &quot;.trash&quot;}</td></tr>
-<tr><td class="ln">9</td><td class="code">COLLECTION_NAME = &quot;wiki_knowledge&quot;</td></tr>
-<tr><td class="ln">10</td><td class="code"></td></tr>
-<tr><td class="ln">11</td><td class="code"></td></tr>
-<tr><td class="ln">12</td><td class="code">def list_md_files(root):</td></tr>
-<tr><td class="ln">13</td><td class="code">    &quot;&quot;&quot;递归收集所有 .md 文件，排除配置目录。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">14</td><td class="code">    files = []</td></tr>
-<tr><td class="ln">15</td><td class="code">    for path in root.rglob(&quot;*.md&quot;):</td></tr>
-<tr><td class="ln">16</td><td class="code">        # 跳过排除目录</td></tr>
-<tr><td class="ln">17</td><td class="code">        parts = set(path.relative_to(root).parts)</td></tr>
-<tr><td class="ln">18</td><td class="code">        if parts &amp; EXCLUDE_DIRS:</td></tr>
-<tr><td class="ln">19</td><td class="code">            continue</td></tr>
-<tr><td class="ln">20</td><td class="code">        files.append(path)</td></tr>
-<tr><td class="ln">21</td><td class="code">    return sorted(files)</td></tr>
-<tr><td class="ln">22</td><td class="code"></td></tr>
-<tr><td class="ln">23</td><td class="code"></td></tr>
-<tr><td class="ln">24</td><td class="code">def chunk_by_headers(text, source_path):</td></tr>
-<tr><td class="ln">25</td><td class="code">    &quot;&quot;&quot;按 ## 标题分块。没有标题的短文章整体作为一个块。</td></tr>
-<tr><td class="ln">26</td><td class="code"></td></tr>
-<tr><td class="ln">27</td><td class="code">    Yields: (chunk_text, metadata_dict)</td></tr>
-<tr><td class="ln">28</td><td class="code">    &quot;&quot;&quot;</td></tr>
-<tr><td class="ln">29</td><td class="code">    relative = str(source_path.relative_to(WIKI_ROOT))</td></tr>
-<tr><td class="ln">30</td><td class="code">    # 匹配二级标题（允许前后空格）</td></tr>
-<tr><td class="ln">31</td><td class="code">    sections = re.split(r&quot;\n(?=## )&quot;, text)</td></tr>
-<tr><td class="ln">32</td><td class="code"></td></tr>
-<tr><td class="ln">33</td><td class="code">    # 第一个 section 是 ## 之前的部分（如果有内容）</td></tr>
-<tr><td class="ln">34</td><td class="code">    intro = sections[0].strip()</td></tr>
-<tr><td class="ln">35</td><td class="code">    if intro:</td></tr>
-<tr><td class="ln">36</td><td class="code">        yield intro, {&quot;source&quot;: relative, &quot;section&quot;: &quot;(前言)&quot;}</td></tr>
-<tr><td class="ln">37</td><td class="code"></td></tr>
-<tr><td class="ln">38</td><td class="code">    for sec in sections[1:]:</td></tr>
-<tr><td class="ln">39</td><td class="code">        sec = sec.strip()</td></tr>
-<tr><td class="ln">40</td><td class="code">        if not sec:</td></tr>
-<tr><td class="ln">41</td><td class="code">            continue</td></tr>
-<tr><td class="ln">42</td><td class="code">        # 提取标题</td></tr>
-<tr><td class="ln">43</td><td class="code">        header_match = re.match(r&quot;## (.+)&quot;, sec)</td></tr>
-<tr><td class="ln">44</td><td class="code">        section_title = header_match.group(1).strip() if header_match else &quot;(无标题)&quot;</td></tr>
-<tr><td class="ln">45</td><td class="code">        yield sec, {&quot;source&quot;: relative, &quot;section&quot;: section_title}</td></tr>
-<tr><td class="ln">46</td><td class="code"></td></tr>
-<tr><td class="ln">47</td><td class="code"></td></tr>
-<tr><td class="ln">48</td><td class="code">def ingest():</td></tr>
-<tr><td class="ln">49</td><td class="code">    &quot;&quot;&quot;主流程：扫描 → 分块 → 向量化 → 入库。&quot;&quot;&quot;</td></tr>
-<tr><td class="ln">50</td><td class="code">    files = list_md_files(WIKI_ROOT)</td></tr>
-<tr><td class="ln">51</td><td class="code">    print(f&quot;扫描到 {len(files)} 个 .md 文件&quot;)</td></tr>
-<tr><td class="ln">52</td><td class="code"></td></tr>
-<tr><td class="ln">53</td><td class="code">    # 获取或创建 collection</td></tr>
-<tr><td class="ln">54</td><td class="code">    coll = _client.get_or_create_collection(COLLECTION_NAME)</td></tr>
-<tr><td class="ln">55</td><td class="code"></td></tr>
-<tr><td class="ln">56</td><td class="code">    total_chunks = 0</td></tr>
-<tr><td class="ln">57</td><td class="code">    for fpath in files:</td></tr>
-<tr><td class="ln">58</td><td class="code">        try:</td></tr>
-<tr><td class="ln">59</td><td class="code">            text = fpath.read_text(encoding=&quot;utf-8&quot;)</td></tr>
-<tr><td class="ln">60</td><td class="code">        except Exception as e:</td></tr>
-<tr><td class="ln">61</td><td class="code">            print(f&quot;  跳过 {fpath.name}：{e}&quot;)</td></tr>
-<tr><td class="ln">62</td><td class="code">            continue</td></tr>
-<tr><td class="ln">63</td><td class="code"></td></tr>
-<tr><td class="ln">64</td><td class="code">        chunks = list(chunk_by_headers(text, fpath))</td></tr>
-<tr><td class="ln">65</td><td class="code">        if not chunks:</td></tr>
-<tr><td class="ln">66</td><td class="code">            continue</td></tr>
-<tr><td class="ln">67</td><td class="code"></td></tr>
-<tr><td class="ln">68</td><td class="code">        documents = []</td></tr>
-<tr><td class="ln">69</td><td class="code">        metadatas = []</td></tr>
-<tr><td class="ln">70</td><td class="code">        ids = []</td></tr>
-<tr><td class="ln">71</td><td class="code">        for i, (chunk_text, meta) in enumerate(chunks):</td></tr>
-<tr><td class="ln">72</td><td class="code">            documents.append(chunk_text)</td></tr>
-<tr><td class="ln">73</td><td class="code">            metadatas.append(meta)</td></tr>
-<tr><td class="ln">74</td><td class="code">            ids.append(f&quot;{fpath.stem}_{i}&quot;)</td></tr>
-<tr><td class="ln">75</td><td class="code"></td></tr>
-<tr><td class="ln">76</td><td class="code">        # 向量化 + 入库（分批避免内存爆）</td></tr>
-<tr><td class="ln">77</td><td class="code">        embeddings = _embed_model.encode(documents, show_progress_bar=False).tolist()</td></tr>
-<tr><td class="ln">78</td><td class="code">        coll.add(documents=documents, embeddings=embeddings, metadatas=metadatas, ids=ids)</td></tr>
-<tr><td class="ln">79</td><td class="code"></td></tr>
-<tr><td class="ln">80</td><td class="code">        total_chunks += len(chunks)</td></tr>
-<tr><td class="ln">81</td><td class="code">        print(f&quot;  {fpath.relative_to(WIKI_ROOT)} → {len(chunks)} 块&quot;)</td></tr>
-<tr><td class="ln">82</td><td class="code"></td></tr>
-<tr><td class="ln">83</td><td class="code">    print(f&quot;\n完成：{len(files)} 文件 → {total_chunks} 块 → collection &#x27;{COLLECTION_NAME}&#x27;&quot;)</td></tr>
-<tr><td class="ln">84</td><td class="code"></td></tr>
-<tr><td class="ln">85</td><td class="code"></td></tr>
-<tr><td class="ln">86</td><td class="code">if __name__ == &quot;__main__&quot;:</td></tr>
-<tr><td class="ln">87</td><td class="code">    ingest()</td></tr>
-<tr><td class="ln">88</td><td class="code"></td></tr>
-</table></div></div>
-<div class="annotations"><h3>逐段详解</h3><div class="ann-item"><span class="ann-ln">5</span><span class="ann-text"><code>from knowledge.search import _client, _embed_model</code> — <b>复用</b> search.py 的 ChromaDB 连接和 bge 模型，保证写入的 collection 和 unified_search 读取的是同一个。</span></div>
-<div class="ann-item"><span class="ann-ln">8</span><span class="ann-text"><code>EXCLUDE_DIRS</code> — 排除 00.配置 Config（含敏感信息）和工具目录。安全设计。</span></div>
-<div class="ann-item"><span class="ann-ln">12-21</span><span class="ann-text"><code>list_md_files()</code> — rglob 递归扫描，<code>parts & EXCLUDE_DIRS</code> 用集合交集判断路径中任一部分命中排除集就跳过。</span></div>
-<div class="ann-item"><span class="ann-ln">24-45</span><span class="ann-text"><code>chunk_by_headers()</code> — <b>按 ## 标题分块</b>。正则 <code>r"\n(?=## )"</code> 在标题前分割但保留标题在 chunk 内。第一个 section（## 之前）作为「前言」。每个 chunk 携带 source（相对路径）和 section（标题名）元数据。</span></div>
-<div class="ann-item"><span class="ann-ln">48-87</span><span class="ann-text"><code>ingest()</code> — 主流程。每文件一批处理（减少 ChromaDB 交互次数），<code>show_progress_bar=False</code> 避免干扰终端输出。最终 46→262 块。</span></div></div>
-</div>
 
-<div class="arch-card" data-versions="v010">
-<h2>依赖关系总图 — v0.1.0</h2>
-<div class="call-graph">
-<div class="call-row"><span class="call-from">main.py</span><span class="call-arrow">──import──></span><span class="call-to">tools/*</span><span style="color:#94a3b8;font-size:11px">（触发5个register()）</span></div>
-<div class="call-row"><span class="call-from">main.py</span><span class="call-arrow">──调用──></span><span class="call-to">core/agent.py chat()</span></div>
-<div class="call-row"><span class="call-from">agent.py</span><span class="call-arrow">──调用──></span><span class="call-to">tools/registry.py</span><span style="color:#94a3b8;font-size:11px">get_tool_definitions()+execute()</span></div>
-<div class="call-row"><span class="call-from">各工具文件</span><span class="call-arrow">──register──></span><span class="call-to">tools/registry.py</span></div>
-<div class="call-row"><span class="call-from">search_tool.py</span><span class="call-arrow">──调用──></span><span class="call-to">knowledge/search.py</span><span style="color:#94a3b8;font-size:11px">search_formatted()</span></div>
-<div class="call-row"><span class="call-from">search.py</span><span class="call-arrow">──读──></span><span class="call-to">ChromaDB</span><span style="color:#94a3b8;font-size:11px">2个collection 1710块</span></div>
-</div>
-</div>
+def run(messages=None, session_id=None):
+    &quot;&quot;&quot;启动 Agent Loop。messages 为初始消息列表。&quot;&quot;&quot;
+    if messages is None:
+        messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: build_prompt()}]
 
-<div class="arch-card hidden-version" data-versions="v020">
-<h2>依赖关系总图 — v0.2.0</h2>
-<div class="call-graph">
-<div class="call-row"><span class="call-from">main.py</span><span class="call-arrow">──import──></span><span class="call-to">tools/*</span><span style="color:#94a3b8;font-size:11px">（触发5个register()）</span></div>
-<div class="call-row"><span class="call-from">main.py</span><span class="call-arrow">──调用──></span><span class="call-to">core/agent.py chat()</span></div>
-<div class="call-row"><span class="call-from">agent.py</span><span class="call-arrow">──调用──></span><span class="call-to">tools/registry.py</span></div>
-<div class="call-row"><span class="call-from">agent.py</span><span class="call-arrow">──调用──></span><span class="call-to">core/retry.py</span><span style="color:#94a3b8;font-size:11px">call_with_retry()</span></div>
-<div class="call-row"><span class="call-from">agent.py</span><span class="call-arrow">──except──></span><span class="call-to">core/errors.py</span><span style="color:#94a3b8;font-size:11px">NsAgentError</span></div>
-<div class="call-row"><span class="call-from">agent.py</span><span class="call-arrow">──调用──></span><span class="call-to">memory/session.py</span></div>
-<div class="call-row"><span class="call-from">各工具文件</span><span class="call-arrow">──register──></span><span class="call-to">tools/registry.py</span></div>
-<div class="call-row"><span class="call-from">search_tool.py</span><span class="call-arrow">──调用──></span><span class="call-to">knowledge/search.py</span></div>
-<div class="call-row"><span class="call-from">ingest_wiki.py</span><span class="call-arrow">──复用──></span><span class="call-to">knowledge/search.py</span><span style="color:#94a3b8;font-size:11px">_client+_embed_model</span></div>
-<div class="call-row"><span class="call-from">search.py</span><span class="call-arrow">──读──></span><span class="call-to">ChromaDB</span><span style="color:#94a3b8;font-size:11px">3个collection 1972块</span></div>
-<div class="call-row"><span class="call-from">session.py</span><span class="call-arrow">──读写──></span><span class="call-to">SQLite</span><span style="color:#94a3b8;font-size:11px">data/sessions.db</span></div>
-</div>
-</div>
+    # 获取已注册的工具列表
+    tools = get_tool_definitions()
+    print(f&quot;[NsAgent] 已加载 {len(tools)} 个工具\n&quot;)
 
+    while True:
+        # 上下文压缩：超过阈值时自动总结旧消息
+        token_count = count_messages_tokens(messages)
+        if token_count &gt; 4000:
+            messages, summary = compress(messages)
+            if summary:
+                print(f&quot;  [压缩] {token_count} → {count_messages_tokens(messages)} tokens&quot;)
+
+        print(f&quot;&gt;&gt;&gt; 发送请求（{len(messages)} 条消息）...&quot;)
+
+        response = call_with_retry(
+            client.chat.completions.create,
+            model=&quot;deepseek-chat&quot;,
+            messages=messages,
+            tools=tools if tools else None,
+            temperature=0.7,
+        )
+
+        msg = response.choices[0].message
+
+        # 没有工具调用 → 输出回复 → 结束
+        if not msg.tool_calls:
+            print(f&quot;\n{msg.content}\n&quot;)
+            break
+
+        # 处理工具调用
+        for tc in msg.tool_calls:
+            name = tc.function.name
+            args = json.loads(tc.function.arguments)
+            print(f&quot;  🔧 {name}({json.dumps(args, ensure_ascii=False)})&quot;)
+
+            result = execute(name, args)
+            print(f&quot;     → {result[:100]}...&quot;)
+
+            # 把工具调用和结果加入消息历史
+            messages.append(
+                {
+                    &quot;role&quot;: &quot;assistant&quot;,
+                    &quot;content&quot;: None,
+                    &quot;tool_calls&quot;: [
+                        {
+                            &quot;id&quot;: tc.id,
+                            &quot;type&quot;: &quot;function&quot;,
+                            &quot;function&quot;: {&quot;name&quot;: name, &quot;arguments&quot;: tc.function.arguments},
+                        }
+                    ],
+                }
+            )
+            if session_id:
+                sess.save_message(session_id, messages[-1])
+            messages.append({&quot;role&quot;: &quot;tool&quot;, &quot;tool_call_id&quot;: tc.id, &quot;content&quot;: str(result)})
+            if session_id:
+                sess.save_message(session_id, messages[-1])
+
+
+def chat():
+    &quot;&quot;&quot;交互式 REPL。自动恢复 24h 内会话。&quot;&quot;&quot;
+    sess.init_db()
+    session_id = sess.get_last_session()
+
+    if session_id:
+        old_messages = sess.load_session(session_id)
+        print(f&quot;NsAgent v0.1.0 — 恢复了上次会话（{len(old_messages)} 条消息）&quot;)
+        print(&quot;输入 /new 开始新会话，/exit 退出\n&quot;)
+        messages = old_messages
+    else:
+        messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: build_prompt()}]
+        session_id = sess.create_session()
+        sess.save_message(session_id, messages[0])
+        print(&quot;NsAgent v0.1.0 — 输入 /exit 退出\n&quot;)
+
+    while True:
+        user_input = input(&quot;你: &quot;).strip()
+        if not user_input:
+            continue
+        if user_input == &quot;/exit&quot;:
+            print(f&quot;会话 {session_id} 已保存，再见。&quot;)
+            break
+        if user_input == &quot;/new&quot;:
+            session_id = sess.create_session()
+            messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: build_prompt()}]
+            sess.save_message(session_id, messages[0])
+            print(&quot;新会话已开始。&quot;)
+            continue
+
+        snapshot = len(messages)
+        messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_input})
+        sess.save_message(session_id, messages[-1])
+
+        # 技能匹配：如果用户输入触发了技能，注入 System Prompt
+        matched = match_skills(user_input)
+        if matched:
+            print(f&quot;  [技能] 激活了 {len(matched)} 个技能&quot;)
+            messages = inject_skills(messages, matched)
+
+        try:
+            run(messages=messages, session_id=session_id)
+        except NsAgentError as e:
+            print(f&quot;NsAgent 错误 [{e.code}]: {e.message}&quot;)
+            del messages[snapshot:]
+        except Exception as e:
+            print(f&quot;未预期错误: {type(e).__name__}: {e}&quot;)
+            del messages[snapshot:]
+</div></div>
+</div>
+<div class="card" id="core-context-py" data-versions="v030">
+<div class="card-title">core/context.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">上下文压缩 — Token 计数 + 超限自动总结</div>
+<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;上下文压缩 — Token 计数 + 超限自动总结。&quot;&quot;&quot;
+
+import json
+
+
+def count_tokens(text: str) -&gt; int:
+    &quot;&quot;&quot;粗略估算 token 数。
+
+    中文约 2 字符/token，英文约 4 字符/token。
+    用于判断是否触发压缩，不要求精确。
+    &quot;&quot;&quot;
+    chinese = sum(1 for c in text if &quot;\u4e00&quot; &lt;= c &lt;= &quot;\u9fff&quot;)
+    other = len(text) - chinese
+    return chinese // 2 + other // 4
+
+
+def count_messages_tokens(messages: list[dict]) -&gt; int:
+    &quot;&quot;&quot;估算消息列表的总 token 数。&quot;&quot;&quot;
+    total = 0
+    for msg in messages:
+        content = msg.get(&quot;content&quot;) or &quot;&quot;
+        if isinstance(content, str):
+            total += count_tokens(content)
+        if msg.get(&quot;tool_calls&quot;):
+            total += count_tokens(json.dumps(msg[&quot;tool_calls&quot;], ensure_ascii=False))
+    return total
+
+
+def compress(
+    messages: list[dict],
+    max_tokens: int = 4000,
+    keep_last: int = 6,
+) -&gt; tuple[list[dict], str | None]:
+    &quot;&quot;&quot;超过 max_tokens 时，压缩中间消息为摘要。
+
+    策略：
+    1. 保留 system 消息（第 0 条）
+    2. 保留最后 keep_last 条消息
+    3. 中间部分生成一段摘要，替换为一条 user 消息
+
+    返回：(压缩后的消息列表, 摘要文本或 None)
+    &quot;&quot;&quot;
+    total = count_messages_tokens(messages)
+    if total &lt;= max_tokens or len(messages) &lt;= keep_last + 2:
+        return messages, None
+
+    # 中间部分：从 system 之后到倒数 keep_last 之前
+    middle = messages[1:-keep_last]
+    middle_text = _format_for_summary(middle)
+    summary = f&quot;[上下文摘要] 以下为之前对话的关键信息：\n{middle_text[:2000]}&quot;
+
+    # 重建消息列表
+    compressed = [
+        messages[0],  # system
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: summary},
+        *messages[-keep_last:],
+    ]
+    return compressed, summary
+
+
+def _format_for_summary(messages: list[dict]) -&gt; str:
+    &quot;&quot;&quot;将消息列表格式化为可总结的文本。&quot;&quot;&quot;
+    lines = []
+    for msg in messages:
+        role = msg.get(&quot;role&quot;, &quot;unknown&quot;)
+        content = msg.get(&quot;content&quot;) or &quot;&quot;
+        if isinstance(content, str) and content.strip():
+            # 截断过长内容
+            short = content[:500] + &quot;...&quot; if len(content) &gt; 500 else content
+            lines.append(f&quot;[{role}] {short}&quot;)
+    return &quot;\n&quot;.join(lines)
+</div></div>
+</div>
+<div class="card" id="core-errors-py" data-versions="v020 v030">
+<div class="card-title">core/errors.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">统一异常 — NsAgentError → APIError/ToolError/ConfigError</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 30 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 统一异常体系。&quot;&quot;&quot;
+
+
+class NsAgentError(Exception):
+    &quot;&quot;&quot;NsAgent 异常基类。&quot;&quot;&quot;
+    def __init__(self, message, code=None, details=None):
+        self.message = message
+        self.code = code        # 机器可读的错误码
+        self.details = details  # 额外上下文（dict）
+        super().__init__(message)
+
+    def to_dict(self):
+        d = {&quot;error&quot;: self.message}
+        if self.code:
+            d[&quot;code&quot;] = self.code
+        if self.details:
+            d[&quot;details&quot;] = self.details
+        return d
+
+
+class APIError(NsAgentError):
+    &quot;&quot;&quot;API 调用失败（网络、限流、服务端错误）。&quot;&quot;&quot;
+
+
+class ToolError(NsAgentError):
+    &quot;&quot;&quot;工具执行失败（文件不存在、命令超时等）。&quot;&quot;&quot;
+
+
+class ConfigError(NsAgentError):
+    &quot;&quot;&quot;配置错误（缺少 API Key 等）。&quot;&quot;&quot;
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 31 行 (+1 行)</div><div class="code-block">&quot;&quot;&quot;NsAgent 统一异常体系。&quot;&quot;&quot;
+
+
+class NsAgentError(Exception):
+    &quot;&quot;&quot;NsAgent 异常基类。&quot;&quot;&quot;
+
+    def __init__(self, message, code=None, details=None):
+        self.message = message
+        self.code = code  # 机器可读的错误码
+        self.details = details  # 额外上下文（dict）
+        super().__init__(message)
+
+    def to_dict(self):
+        d = {&quot;error&quot;: self.message}
+        if self.code:
+            d[&quot;code&quot;] = self.code
+        if self.details:
+            d[&quot;details&quot;] = self.details
+        return d
+
+
+class APIError(NsAgentError):
+    &quot;&quot;&quot;API 调用失败（网络、限流、服务端错误）。&quot;&quot;&quot;
+
+
+class ToolError(NsAgentError):
+    &quot;&quot;&quot;工具执行失败（文件不存在、命令超时等）。&quot;&quot;&quot;
+
+
+class ConfigError(NsAgentError):
+    &quot;&quot;&quot;配置错误（缺少 API Key 等）。&quot;&quot;&quot;
+</div></div>
+</div>
+<div class="card" id="core-prompt-py" data-versions="v030">
+<div class="card-title">core/prompt.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">Prompt 分层 — 身份/工具/规则/安全四层可组装</div>
+<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;System Prompt 分层构建器 — 身份/工具/规则/安全四层可组合。&quot;&quot;&quot;
+
+IDENTITY = &quot;&quot;&quot;你是 NsAgent，一个本地 AI 助手。
+你的知识库包含 A 股上市公司年报、Agent 工程文档和技术 Wiki。&quot;&quot;&quot;
+
+TOOLS_LAYER = &quot;&quot;&quot;你有以下工具可以使用：
+- read_file: 读取文件
+- write_file: 写入文件
+- terminal: 执行终端命令
+- search_knowledge: 搜索本地知识库（年报、技术文档、Wiki）
+- get_current_time: 获取当前时间
+- get_stock_price: 查询 A 股实时行情
+- financial_report: 查询上市公司年报财务数据&quot;&quot;&quot;
+
+RULES = &quot;&quot;&quot;工作原则：
+1. 先搜索知识库再回答，不要凭记忆编造数据
+2. 修改文件前先 read_file 确认内容
+3. 财务数据必须注明来源（年报/实时行情）
+4. 用中文回复，输出清晰有条理&quot;&quot;&quot;
+
+SAFETY = &quot;&quot;&quot;安全规则：
+1. 不提供投资建议，财务数据仅供参考
+2. terminal 执行命令前确认无害
+3. 不修改系统文件或 .env&quot;&quot;&quot;
+
+
+def build_prompt(skills_text: str = &quot;&quot;) -&gt; str:
+    &quot;&quot;&quot;组装分层 System Prompt。
+
+    skills_text: 技能注入的额外内容（由 skills.registry 提供）。
+    &quot;&quot;&quot;
+    layers = [IDENTITY, TOOLS_LAYER, RULES, SAFETY]
+    if skills_text:
+        layers.append(skills_text)
+    return &quot;\n\n&quot;.join(layers)
+</div></div>
+</div>
+<div class="card" id="core-retry-py" data-versions="v020 v030">
+<div class="card-title">core/retry.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">API 重试 — 指数退避，只重试可恢复错误</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 36 行</div><div class="code-block">&quot;&quot;&quot;API 重试 — 指数退避，可重试错误自动重试。&quot;&quot;&quot;
+import time
+from openai import (
+    APIConnectionError,
+    APITimeoutError,
+    RateLimitError,
+    InternalServerError,
+)
+
+MAX_RETRIES = 3
+BASE_DELAY = 1  # 秒：1 → 2 → 4
+
+
+RETRYABLE = (APIConnectionError, APITimeoutError, RateLimitError, InternalServerError)
+
+
+def call_with_retry(fn, *args, **kwargs):
+    &quot;&quot;&quot;调用函数，可重试错误自动重试（指数退避）。
+
+    不可重试的错误（400/401）直接抛出，不浪费重试次数。
+    &quot;&quot;&quot;
+    last_error = None
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            return fn(*args, **kwargs)
+        except RETRYABLE as e:
+            last_error = e
+            if attempt &lt; MAX_RETRIES:
+                delay = BASE_DELAY * (2 ** (attempt - 1))
+                print(f&quot;  [重试 {attempt}/{MAX_RETRIES}] {type(e).__name__}，{delay}s 后重试...&quot;)
+                time.sleep(delay)
+
+    # 所有重试耗尽
+    if last_error:
+        raise last_error
+    raise RuntimeError(&quot;retry: unreachable&quot;)  # 理论上不会到这里
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 38 行 (+2 行)</div><div class="code-block">&quot;&quot;&quot;API 重试 — 指数退避，可重试错误自动重试。&quot;&quot;&quot;
+
+import time
+
+from openai import (
+    APIConnectionError,
+    APITimeoutError,
+    InternalServerError,
+    RateLimitError,
+)
+
+MAX_RETRIES = 3
+BASE_DELAY = 1  # 秒：1 → 2 → 4
+
+
+RETRYABLE = (APIConnectionError, APITimeoutError, RateLimitError, InternalServerError)
+
+
+def call_with_retry(fn, *args, **kwargs):
+    &quot;&quot;&quot;调用函数，可重试错误自动重试（指数退避）。
+
+    不可重试的错误（400/401）直接抛出，不浪费重试次数。
+    &quot;&quot;&quot;
+    last_error = None
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            return fn(*args, **kwargs)
+        except RETRYABLE as e:
+            last_error = e
+            if attempt &lt; MAX_RETRIES:
+                delay = BASE_DELAY * (2 ** (attempt - 1))
+                print(f&quot;  [重试 {attempt}/{MAX_RETRIES}] {type(e).__name__}，{delay}s 后重试...&quot;)
+                time.sleep(delay)
+
+    # 所有重试耗尽
+    if last_error:
+        raise last_error
+    raise RuntimeError(&quot;retry: unreachable&quot;)  # 理论上不会到这里
+</div></div>
+</div>
+</div>
+<div class="pkg-section"><div class="pkg-title">tools/ — 9 个文件</div>
+<div class="card" id="tools-__init__-py" data-versions="v020 v030">
+<div class="card-title">tools/__init__.py </div>
+<div class="card-desc">tools 包占位（空文件）</div>
+</div>
+<div class="card" id="tools-file_tools-py" data-versions="v020 v030">
+<div class="card-title">tools/file_tools.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">文件读写 — read_file + write_file</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 70 行</div><div class="code-block">&quot;&quot;&quot;文件读写工具 — read_file 和 write_file。&quot;&quot;&quot;
+from tools.registry import register
+from pathlib import Path
+
+
+def read_file(path, offset=1, limit=200):
+    &quot;&quot;&quot;读取文件内容。offset 和 limit 控制读取范围。&quot;&quot;&quot;
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        return f&quot;错误：文件不存在 {path}&quot;
+    try:
+        lines = p.read_text(encoding=&quot;utf-8&quot;).split(&quot;\n&quot;)
+        total = len(lines)
+        start = max(0, offset - 1)
+        end = min(total, start + limit)
+        result = []
+        for i in range(start, end):
+            result.append(f&quot;{i+1}|{lines[i]}&quot;)
+        header = f&quot;文件 {path}（第 {start+1}-{end} 行 / 共 {total} 行）\n&quot;
+        return header + &quot;\n&quot;.join(result)
+    except Exception as e:
+        return f&quot;错误：读取失败 {e}&quot;
+
+
+def write_file(path, content):
+    &quot;&quot;&quot;写入文件内容（覆盖）。&quot;&quot;&quot;
+    p = Path(path).expanduser().resolve()
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content, encoding=&quot;utf-8&quot;)
+        return f&quot;已写入 {path}（{len(content)} 字符）&quot;
+    except Exception as e:
+        return f&quot;错误：写入失败 {e}&quot;
+
+
+READ_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;read_file&quot;,
+        &quot;description&quot;: &quot;读取文件内容，返回带行号的文本&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
+                &quot;offset&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;起始行号（默认1）&quot;},
+                &quot;limit&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;读取行数（默认200）&quot;}
+            },
+            &quot;required&quot;: [&quot;path&quot;]
+        }
+    }
+}
+
+WRITE_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;write_file&quot;,
+        &quot;description&quot;: &quot;写入文件内容（覆盖模式）&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
+                &quot;content&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要写入的内容&quot;}
+            },
+            &quot;required&quot;: [&quot;path&quot;, &quot;content&quot;]
+        }
+    }
+}
+
+register(&quot;read_file&quot;, READ_DEF, read_file)
+register(&quot;write_file&quot;, WRITE_DEF, write_file)
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 72 行 (+2 行)</div><div class="code-block">&quot;&quot;&quot;文件读写工具 — read_file 和 write_file。&quot;&quot;&quot;
+
+from pathlib import Path
+
+from tools.registry import register
+
+
+def read_file(path, offset=1, limit=200):
+    &quot;&quot;&quot;读取文件内容。offset 和 limit 控制读取范围。&quot;&quot;&quot;
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        return f&quot;错误：文件不存在 {path}&quot;
+    try:
+        lines = p.read_text(encoding=&quot;utf-8&quot;).split(&quot;\n&quot;)
+        total = len(lines)
+        start = max(0, offset - 1)
+        end = min(total, start + limit)
+        result = []
+        for i in range(start, end):
+            result.append(f&quot;{i + 1}|{lines[i]}&quot;)
+        header = f&quot;文件 {path}（第 {start + 1}-{end} 行 / 共 {total} 行）\n&quot;
+        return header + &quot;\n&quot;.join(result)
+    except Exception as e:
+        return f&quot;错误：读取失败 {e}&quot;
+
+
+def write_file(path, content):
+    &quot;&quot;&quot;写入文件内容（覆盖）。&quot;&quot;&quot;
+    p = Path(path).expanduser().resolve()
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content, encoding=&quot;utf-8&quot;)
+        return f&quot;已写入 {path}（{len(content)} 字符）&quot;
+    except Exception as e:
+        return f&quot;错误：写入失败 {e}&quot;
+
+
+READ_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;read_file&quot;,
+        &quot;description&quot;: &quot;读取文件内容，返回带行号的文本&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
+                &quot;offset&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;起始行号（默认1）&quot;},
+                &quot;limit&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;读取行数（默认200）&quot;},
+            },
+            &quot;required&quot;: [&quot;path&quot;],
+        },
+    },
+}
+
+WRITE_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;write_file&quot;,
+        &quot;description&quot;: &quot;写入文件内容（覆盖模式）&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
+                &quot;content&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要写入的内容&quot;},
+            },
+            &quot;required&quot;: [&quot;path&quot;, &quot;content&quot;],
+        },
+    },
+}
+
+register(&quot;read_file&quot;, READ_DEF, read_file)
+register(&quot;write_file&quot;, WRITE_DEF, write_file)
+</div></div>
+</div>
+<div class="card" id="tools-finance-__init__-py" data-versions="v030">
+<div class="card-title">tools/finance/__init__.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">finance 包占位（空文件）</div>
+<div data-versions="v030"><div class="code-block"></div></div>
+</div>
+<div class="card" id="tools-finance-financial_report-py" data-versions="v030">
+<div class="card-title">tools/finance/financial_report.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">年报结构化报告 — 多指标并行搜索 + 去重</div>
+<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;年报结构化报告工具 — 多指标并行搜索 → 整理文本 → 交 LLM 分析。&quot;&quot;&quot;
+
+from knowledge.search import unified_search
+from tools.registry import register
+
+
+def financial_report(stock_name):
+    &quot;&quot;&quot;搜索指定公司的关键财务指标，返回整理后的年报数据。
+
+    搜索营收、净利润、增长率等核心指标，合并去重后返回结构化文本。
+    LLM 拿到整理好的数据后自行做分析和格式化。
+    &quot;&quot;&quot;
+    try:
+        metrics = [
+            &quot;营业收入 2024年&quot;,
+            &quot;归属于上市公司股东的净利润&quot;,
+            &quot;营业收入 同比增长&quot;,
+            &quot;基本每股收益&quot;,
+        ]
+
+        all_chunks = []
+        seen = set()
+        for metric in metrics:
+            results = unified_search(
+                f&quot;{stock_name} {metric}&quot;, top_k=3, collections=[&quot;annual_reports&quot;]
+            )
+            for r in results:
+                # 去重：同一段文本不重复
+                key = r[&quot;content&quot;][:80]
+                if key not in seen and r[&quot;content&quot;].strip():
+                    seen.add(key)
+                    all_chunks.append(r)
+
+        if not all_chunks:
+            return f&quot;年报库中未找到 {stock_name} 的财务数据&quot;
+
+        # 按相关度排序
+        all_chunks.sort(key=lambda x: x[&quot;distance&quot;])
+
+        lines = [f&quot;{stock_name} 年报财务数据\n&quot;]
+        for i, r in enumerate(all_chunks, 1):
+            lines.append(f&quot;## 数据块 {i}（距离 {r[&#x27;distance&#x27;]}）&quot;)
+            lines.append(r[&quot;content&quot;])
+            lines.append(&quot;---&quot;)
+
+        return &quot;\n&quot;.join(lines)
+
+    except Exception as e:
+        return f&quot;查询失败: {e}&quot;
+
+
+REPORT_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;financial_report&quot;,
+        &quot;description&quot;: &quot;查询上市公司年报，搜索营业收入、净利润、增长率等核心财务指标，返回整理后的年报原文供分析&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;stock_name&quot;: {
+                    &quot;type&quot;: &quot;string&quot;,
+                    &quot;description&quot;: &quot;公司名称，如 贵州茅台、比亚迪&quot;,
+                },
+            },
+            &quot;required&quot;: [&quot;stock_name&quot;],
+        },
+    },
+}
+
+register(&quot;financial_report&quot;, REPORT_DEF, financial_report)
+</div></div>
+</div>
+<div class="card" id="tools-finance-market_data-py" data-versions="v030">
+<div class="card-title">tools/finance/market_data.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">实时行情 — 调用 akshare 查 A 股价格</div>
+<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;A 股实时行情查询工具。&quot;&quot;&quot;
+
+import akshare as ak
+
+from tools.registry import register
+
+
+def get_stock_price(code):
+    &quot;&quot;&quot;查询 A 股实时价格&quot;&quot;&quot;
+    try:
+        df = ak.stock_zh_a_spot_em()
+        row = df[df[&quot;代码&quot;] == code]
+        if row.empty:
+            return f&quot;未找到股票代码 {code}&quot;
+        r = row.iloc[0]
+        return (
+            f&quot;{r[&#x27;名称&#x27;]}({code})\n&quot;
+            f&quot;最新价: {r[&#x27;最新价&#x27;]}\n&quot;
+            f&quot;涨跌幅: {r[&#x27;涨跌幅&#x27;]}%\n&quot;
+            f&quot;成交量: {r[&#x27;成交量&#x27;]}\n&quot;
+            f&quot;成交额: {r[&#x27;成交额&#x27;]}&quot;
+        )
+    except Exception as e:
+        return f&quot;查询失败: {e}&quot;
+
+
+PRICE_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;get_stock_price&quot;,
+        &quot;description&quot;: &quot;查询 A 股实时行情，返回最新价、涨跌幅、成交量、成交额&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;code&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;股票代码，如 600519（茅台）&quot;}
+            },
+            &quot;required&quot;: [&quot;code&quot;],
+        },
+    },
+}
+
+register(&quot;get_stock_price&quot;, PRICE_DEF, get_stock_price)
+</div></div>
+</div>
+<div class="card" id="tools-registry-py" data-versions="v020 v030">
+<div class="card-title">tools/registry.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">工具注册表 — register/get/execute 中心枢纽</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 36 行</div><div class="code-block">&quot;&quot;&quot;工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。&quot;&quot;&quot;
+
+_registry = {}  # {工具名: {&quot;definition&quot;: {...}, &quot;handler&quot;: 函数}}
+
+# 调用工具时,会自动来这报道.在tools里调用该函数
+def register(name, definition, handler):
+    &quot;&quot;&quot;注册一个工具。definition 是给 LLM 看的 JSON Schema。&quot;&quot;&quot;
+    _registry[name] = {&quot;definition&quot;: definition, &quot;handler&quot;: handler}
+
+# 让LLM知道有哪些工具(main函数开具就调用了工具,所以可以直接让LLM知悉)
+def get_tool_definitions():
+    &quot;&quot;&quot;返回所有工具的 definition 列表（给 LLM 的 tools 参数）。&quot;&quot;&quot;
+    return [item[&quot;definition&quot;] for item in _registry.values()]
+
+# 执行工具
+def execute(name, args):
+    &quot;&quot;&quot;根据工具名执行对应函数。&quot;&quot;&quot;
+    if name not in _registry:
+        return f&quot;错误：未知工具 {name}&quot;
+    return _registry[name][&quot;handler&quot;](**args)
+
+
+
+
+
+&quot;&quot;&quot;
+示例
+     _registry = {
+         &quot;read_file&quot;:   {&quot;definition&quot;: {...给LLM看的JSON...}, &quot;handler&quot;: &lt;read_file函数&gt;},
+         &quot;write_file&quot;:  {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;write_file函数&gt;},
+         &quot;terminal&quot;:    {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;run_command函数&gt;},
+         ...
+     }
+
+ Agent Loop 只需要知道 get_tool_definitions() 和 execute() 两个入口，不关心注册表里有什么。
+
+&quot;&quot;&quot;</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 37 行 (+1 行)</div><div class="code-block">&quot;&quot;&quot;工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。&quot;&quot;&quot;
+
+_registry = {}  # {工具名: {&quot;definition&quot;: {...}, &quot;handler&quot;: 函数}}
+
+
+# 调用工具时,会自动来这报道.在tools里调用该函数
+def register(name, definition, handler):
+    &quot;&quot;&quot;注册一个工具。definition 是给 LLM 看的 JSON Schema。&quot;&quot;&quot;
+    _registry[name] = {&quot;definition&quot;: definition, &quot;handler&quot;: handler}
+
+
+# 让LLM知道有哪些工具(main函数开具就调用了工具,所以可以直接让LLM知悉)
+def get_tool_definitions():
+    &quot;&quot;&quot;返回所有工具的 definition 列表（给 LLM 的 tools 参数）。&quot;&quot;&quot;
+    return [item[&quot;definition&quot;] for item in _registry.values()]
+
+
+# 执行工具
+def execute(name, args):
+    &quot;&quot;&quot;根据工具名执行对应函数。&quot;&quot;&quot;
+    if name not in _registry:
+        return f&quot;错误：未知工具 {name}&quot;
+    return _registry[name][&quot;handler&quot;](**args)
+
+
+&quot;&quot;&quot;
+示例
+     _registry = {
+         &quot;read_file&quot;:   {&quot;definition&quot;: {...给LLM看的JSON...}, &quot;handler&quot;: &lt;read_file函数&gt;},
+         &quot;write_file&quot;:  {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;write_file函数&gt;},
+         &quot;terminal&quot;:    {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;run_command函数&gt;},
+         ...
+     }
+
+ Agent Loop 只需要知道 get_tool_definitions() 和 execute() 两个入口，不关心注册表里有什么。
+
+&quot;&quot;&quot;
+</div></div>
+</div>
+<div class="card" id="tools-search_tool-py" data-versions="v020 v030">
+<div class="card-title">tools/search_tool.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">知识搜索 — 调 knowledge.search 格式化返回</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 26 行</div><div class="code-block">&quot;&quot;&quot;知识库搜索工具 — 调用 knowledge.search 统一搜索。&quot;&quot;&quot;
+from tools.registry import register
+from knowledge.search import search_formatted
+
+
+def search_knowledge(query):
+    &quot;&quot;&quot;搜索知识库(年报 + Agent文档 + Wiki)，返回格式化结果。&quot;&quot;&quot;
+    return search_formatted(query)
+
+
+SEARCH_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;search_knowledge&quot;,
+        &quot;description&quot;: &quot;搜索本地知识库，包括年报、Agent工程文档等。用来查找事实、数据、技术方案。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;query&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;搜索关键词或问题&quot;}
+            },
+            &quot;required&quot;: [&quot;query&quot;]
+        }
+    }
+}
+
+register(&quot;search_knowledge&quot;, SEARCH_DEF, search_knowledge)
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 25 行 (-1 行)</div><div class="code-block">&quot;&quot;&quot;知识库搜索工具 — 调用 knowledge.search 统一搜索。&quot;&quot;&quot;
+
+from knowledge.search import search_formatted
+from tools.registry import register
+
+
+def search_knowledge(query):
+    &quot;&quot;&quot;搜索知识库(年报 + Agent文档 + Wiki)，返回格式化结果。&quot;&quot;&quot;
+    return search_formatted(query)
+
+
+SEARCH_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;search_knowledge&quot;,
+        &quot;description&quot;: &quot;搜索本地知识库，包括年报、Agent工程文档等。用来查找事实、数据、技术方案。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {&quot;query&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;搜索关键词或问题&quot;}},
+            &quot;required&quot;: [&quot;query&quot;],
+        },
+    },
+}
+
+register(&quot;search_knowledge&quot;, SEARCH_DEF, search_knowledge)
+</div></div>
+</div>
+<div class="card" id="tools-terminal_tool-py" data-versions="v020 v030">
+<div class="card-title">tools/terminal_tool.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">终端执行 — subprocess.run 封装</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 39 行</div><div class="code-block">&quot;&quot;&quot;终端命令执行工具。&quot;&quot;&quot;
+from tools.registry import register
+import subprocess
+
+
+def run_command(command, timeout=30):
+    &quot;&quot;&quot;执行 shell 命令并返回输出。&quot;&quot;&quot;
+    try:
+        result = subprocess.run(
+            command, shell=True, capture_output=True,
+            text=True, timeout=timeout, cwd=&quot;/Users/ns/Projects/ns-agent&quot;
+        )
+        output = result.stdout
+        if result.stderr:
+            output += &quot;\n[stderr]\n&quot; + result.stderr
+        return output or f&quot;命令执行完毕（退出码 {result.returncode}）&quot;
+    except subprocess.TimeoutExpired:
+        return f&quot;错误：命令超时（&gt;{timeout}秒）&quot;
+    except Exception as e:
+        return f&quot;错误：{e}&quot;
+
+
+TERMINAL_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;terminal&quot;,
+        &quot;description&quot;: &quot;在终端执行 shell 命令并返回输出。用来运行代码、安装包、查看文件等。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;command&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要执行的命令&quot;},
+                &quot;timeout&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;超时秒数（默认30）&quot;}
+            },
+            &quot;required&quot;: [&quot;command&quot;]
+        }
+    }
+}
+
+register(&quot;terminal&quot;, TERMINAL_DEF, run_command)
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 45 行 (+6 行)</div><div class="code-block">&quot;&quot;&quot;终端命令执行工具。&quot;&quot;&quot;
+
+import subprocess
+
+from tools.registry import register
+
+
+def run_command(command, timeout=30):
+    &quot;&quot;&quot;执行 shell 命令并返回输出。&quot;&quot;&quot;
+    try:
+        result = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=&quot;/Users/ns/Projects/ns-agent&quot;,
+        )
+        output = result.stdout
+        if result.stderr:
+            output += &quot;\n[stderr]\n&quot; + result.stderr
+        return output or f&quot;命令执行完毕（退出码 {result.returncode}）&quot;
+    except subprocess.TimeoutExpired:
+        return f&quot;错误：命令超时（&gt;{timeout}秒）&quot;
+    except Exception as e:
+        return f&quot;错误：{e}&quot;
+
+
+TERMINAL_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;terminal&quot;,
+        &quot;description&quot;: &quot;在终端执行 shell 命令并返回输出。用来运行代码、安装包、查看文件等。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;command&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要执行的命令&quot;},
+                &quot;timeout&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;超时秒数（默认30）&quot;},
+            },
+            &quot;required&quot;: [&quot;command&quot;],
+        },
+    },
+}
+
+register(&quot;terminal&quot;, TERMINAL_DEF, run_command)
+</div></div>
+</div>
+<div class="card" id="tools-time_tool-py" data-versions="v020 v030">
+<div class="card-title">tools/time_tool.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">时间工具 — datetime.now()</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 20 行</div><div class="code-block">&quot;&quot;&quot;获取当前时间的工具。&quot;&quot;&quot;
+from tools.registry import register
+from datetime import datetime
+
+
+def get_current_time():
+    &quot;&quot;&quot;返回当前日期时间字符串。&quot;&quot;&quot;
+    return datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+
+
+TOOL_DEFINITION = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;get_current_time&quot;,
+        &quot;description&quot;: &quot;获取当前日期和时间&quot;,
+        &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {}}
+    }
+}
+
+register(&quot;get_current_time&quot;, TOOL_DEFINITION, get_current_time)
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 22 行 (+2 行)</div><div class="code-block">&quot;&quot;&quot;获取当前时间的工具。&quot;&quot;&quot;
+
+from datetime import datetime
+
+from tools.registry import register
+
+
+def get_current_time():
+    &quot;&quot;&quot;返回当前日期时间字符串。&quot;&quot;&quot;
+    return datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+
+
+TOOL_DEFINITION = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;get_current_time&quot;,
+        &quot;description&quot;: &quot;获取当前日期和时间&quot;,
+        &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {}},
+    },
+}
+
+register(&quot;get_current_time&quot;, TOOL_DEFINITION, get_current_time)
+</div></div>
+</div>
+</div>
+<div class="pkg-section"><div class="pkg-title">skills/ — 3 个文件</div>
+<div class="card" id="skills-__init__-py" data-versions="v030">
+<div class="card-title">skills/__init__.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">skills 包占位（空文件）</div>
+<div data-versions="v030"><div class="code-block"></div></div>
+</div>
+<div class="card" id="skills-finance-py" data-versions="v030">
+<div class="card-title">skills/finance.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">财报分析技能 — 触发词匹配后注入专业知识</div>
+<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;财报分析技能 — 当用户查询财务数据时自动激活。&quot;&quot;&quot;
+
+from skills.registry import register_skill
+
+FINANCE_CONTENT = &quot;&quot;&quot;你是财报分析专家。当用户查询财务数据时，遵循以下规范：
+
+1. **数据来源优先**：优先从 search_knowledge 或 search_financial 获取年报数据
+2. **结构化展示**：用表格展示关键指标（营收、净利润、毛利率、同比增长率）
+3. **单位统一**：年报数据通常是&quot;千元&quot;或&quot;元&quot;，换算为&quot;亿元&quot;展示
+4. **对比分析**：如有同比数据，自动计算增长率
+5. **归因分析**：解释数据变化的原因（行业趋势、公司战略、季节性因素）
+6. **风险提示**：最后加一句免责声明，数据仅供参考&quot;&quot;&quot;
+
+register_skill(
+    name=&quot;financial_analysis&quot;,
+    trigger=&quot;营收|利润|财报|年报|净利润|毛利率|资产负债|现金流&quot;,
+    description=&quot;财报分析&quot;,
+    content=FINANCE_CONTENT,
+)
+</div></div>
+</div>
+<div class="card" id="skills-registry-py" data-versions="v030">
+<div class="card-title">skills/registry.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">技能注册表 — register/match/inject 三件套</div>
+<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;技能注册表 — 知识模块的注册、匹配、注入。
+
+工具 = LLM 调用的函数（function calling）
+技能 = 注入 System Prompt 的知识模块（关键词触发）
+&quot;&quot;&quot;
+
+from typing import Any
+
+_skills: dict[str, dict[str, Any]] = {}
+
+
+def register_skill(name: str, trigger: str, description: str, content: str) -&gt; None:
+    &quot;&quot;&quot;注册一个技能。
+
+    name: 技能名（唯一标识）
+    trigger: 触发关键词（匹配用户输入）
+    description: 一句话描述（给开发者看的）
+    content: 注入到 System Prompt 的知识内容
+    &quot;&quot;&quot;
+    _skills[name] = {
+        &quot;trigger&quot;: trigger,
+        &quot;description&quot;: description,
+        &quot;content&quot;: content,
+    }
+
+
+def match_skills(user_input: str) -&gt; list[dict[str, Any]]:
+    &quot;&quot;&quot;根据用户输入匹配已注册的技能。
+
+    匹配规则：trigger 中的任一关键词出现在用户输入中（不区分大小写）。
+    trigger 可用 `|` 分隔多个关键词。
+    &quot;&quot;&quot;
+    matched = []
+    user_lower = user_input.lower()
+    for _name, skill in _skills.items():
+        keywords = skill[&quot;trigger&quot;].split(&quot;|&quot;)
+        if any(kw.strip().lower() in user_lower for kw in keywords):
+            matched.append(skill)
+    return matched
+
+
+def inject_skills(
+    messages: list[dict[str, Any]], matched: list[dict[str, Any]]
+) -&gt; list[dict[str, Any]]:
+    &quot;&quot;&quot;将匹配到的技能内容注入 System Prompt。
+
+    在第一条 system 消息末尾追加技能内容。
+    &quot;&quot;&quot;
+    if not matched:
+        return messages
+
+    skill_text = &quot;\n\n&quot;.join(f&quot;## {s[&#x27;description&#x27;]}\n{s[&#x27;content&#x27;]}&quot; for s in matched)
+    messages[0][&quot;content&quot;] += f&quot;\n\n---\n## 已激活的知识模块\n{skill_text}&quot;
+    return messages
+
+
+def list_skills() -&gt; list[dict[str, str]]:
+    &quot;&quot;&quot;列出所有已注册的技能（名称 + 描述）。&quot;&quot;&quot;
+    return [{&quot;name&quot;: name, &quot;description&quot;: s[&quot;description&quot;]} for name, s in _skills.items()]
+</div></div>
+</div>
+</div>
+<div class="pkg-section"><div class="pkg-title">knowledge/ — 3 个文件</div>
+<div class="card" id="knowledge-__init__-py" data-versions="v020 v030">
+<div class="card-title">knowledge/__init__.py </div>
+<div class="card-desc">knowledge 包占位（空文件）</div>
+</div>
+<div class="card" id="knowledge-ingest_wiki-py" data-versions="v020 v030">
+<div class="card-title">knowledge/ingest_wiki.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">Wiki 入库 — 扫描 → 分块 → 向量化 → ChromaDB</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 87 行</div><div class="code-block">&quot;&quot;&quot;Wiki 入库 — 扫描 Wiki 目录 → 分块 → 向量化 → ChromaDB collection wiki_knowledge。&quot;&quot;&quot;
+import re
+from pathlib import Path
+
+from knowledge.search import _client, _embed_model  # 复用已有连接
+
+WIKI_ROOT = Path(&quot;/Users/ns/Wiki&quot;)
+EXCLUDE_DIRS = {&quot;00.配置 Config&quot;, &quot;.obsidian&quot;, &quot;.git&quot;, &quot;.trash&quot;}
+COLLECTION_NAME = &quot;wiki_knowledge&quot;
+
+
+def list_md_files(root):
+    &quot;&quot;&quot;递归收集所有 .md 文件，排除配置目录。&quot;&quot;&quot;
+    files = []
+    for path in root.rglob(&quot;*.md&quot;):
+        # 跳过排除目录
+        parts = set(path.relative_to(root).parts)
+        if parts &amp; EXCLUDE_DIRS:
+            continue
+        files.append(path)
+    return sorted(files)
+
+
+def chunk_by_headers(text, source_path):
+    &quot;&quot;&quot;按 ## 标题分块。没有标题的短文章整体作为一个块。
+
+    Yields: (chunk_text, metadata_dict)
+    &quot;&quot;&quot;
+    relative = str(source_path.relative_to(WIKI_ROOT))
+    # 匹配二级标题（允许前后空格）
+    sections = re.split(r&quot;\n(?=## )&quot;, text)
+
+    # 第一个 section 是 ## 之前的部分（如果有内容）
+    intro = sections[0].strip()
+    if intro:
+        yield intro, {&quot;source&quot;: relative, &quot;section&quot;: &quot;(前言)&quot;}
+
+    for sec in sections[1:]:
+        sec = sec.strip()
+        if not sec:
+            continue
+        # 提取标题
+        header_match = re.match(r&quot;## (.+)&quot;, sec)
+        section_title = header_match.group(1).strip() if header_match else &quot;(无标题)&quot;
+        yield sec, {&quot;source&quot;: relative, &quot;section&quot;: section_title}
+
+
+def ingest():
+    &quot;&quot;&quot;主流程：扫描 → 分块 → 向量化 → 入库。&quot;&quot;&quot;
+    files = list_md_files(WIKI_ROOT)
+    print(f&quot;扫描到 {len(files)} 个 .md 文件&quot;)
+
+    # 获取或创建 collection
+    coll = _client.get_or_create_collection(COLLECTION_NAME)
+
+    total_chunks = 0
+    for fpath in files:
+        try:
+            text = fpath.read_text(encoding=&quot;utf-8&quot;)
+        except Exception as e:
+            print(f&quot;  跳过 {fpath.name}：{e}&quot;)
+            continue
+
+        chunks = list(chunk_by_headers(text, fpath))
+        if not chunks:
+            continue
+
+        documents = []
+        metadatas = []
+        ids = []
+        for i, (chunk_text, meta) in enumerate(chunks):
+            documents.append(chunk_text)
+            metadatas.append(meta)
+            ids.append(f&quot;{fpath.stem}_{i}&quot;)
+
+        # 向量化 + 入库（分批避免内存爆）
+        embeddings = _embed_model.encode(documents, show_progress_bar=False).tolist()
+        coll.add(documents=documents, embeddings=embeddings, metadatas=metadatas, ids=ids)
+
+        total_chunks += len(chunks)
+        print(f&quot;  {fpath.relative_to(WIKI_ROOT)} → {len(chunks)} 块&quot;)
+
+    print(f&quot;\n完成：{len(files)} 文件 → {total_chunks} 块 → collection &#x27;{COLLECTION_NAME}&#x27;&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    ingest()
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 88 行 (+1 行)</div><div class="code-block">&quot;&quot;&quot;Wiki 入库 — 扫描 Wiki 目录 → 分块 → 向量化 → ChromaDB collection wiki_knowledge。&quot;&quot;&quot;
+
+from pathlib import Path
+import re
+
+from knowledge.search import _client, _embed_model  # 复用已有连接
+
+WIKI_ROOT = Path(&quot;/Users/ns/Wiki&quot;)
+EXCLUDE_DIRS = {&quot;00.配置 Config&quot;, &quot;.obsidian&quot;, &quot;.git&quot;, &quot;.trash&quot;}
+COLLECTION_NAME = &quot;wiki_knowledge&quot;
+
+
+def list_md_files(root):
+    &quot;&quot;&quot;递归收集所有 .md 文件，排除配置目录。&quot;&quot;&quot;
+    files = []
+    for path in root.rglob(&quot;*.md&quot;):
+        # 跳过排除目录
+        parts = set(path.relative_to(root).parts)
+        if parts &amp; EXCLUDE_DIRS:
+            continue
+        files.append(path)
+    return sorted(files)
+
+
+def chunk_by_headers(text, source_path):
+    &quot;&quot;&quot;按 ## 标题分块。没有标题的短文章整体作为一个块。
+
+    Yields: (chunk_text, metadata_dict)
+    &quot;&quot;&quot;
+    relative = str(source_path.relative_to(WIKI_ROOT))
+    # 匹配二级标题（允许前后空格）
+    sections = re.split(r&quot;\n(?=## )&quot;, text)
+
+    # 第一个 section 是 ## 之前的部分（如果有内容）
+    intro = sections[0].strip()
+    if intro:
+        yield intro, {&quot;source&quot;: relative, &quot;section&quot;: &quot;(前言)&quot;}
+
+    for sec in sections[1:]:
+        sec = sec.strip()
+        if not sec:
+            continue
+        # 提取标题
+        header_match = re.match(r&quot;## (.+)&quot;, sec)
+        section_title = header_match.group(1).strip() if header_match else &quot;(无标题)&quot;
+        yield sec, {&quot;source&quot;: relative, &quot;section&quot;: section_title}
+
+
+def ingest():
+    &quot;&quot;&quot;主流程：扫描 → 分块 → 向量化 → 入库。&quot;&quot;&quot;
+    files = list_md_files(WIKI_ROOT)
+    print(f&quot;扫描到 {len(files)} 个 .md 文件&quot;)
+
+    # 获取或创建 collection
+    coll = _client.get_or_create_collection(COLLECTION_NAME)
+
+    total_chunks = 0
+    for fpath in files:
+        try:
+            text = fpath.read_text(encoding=&quot;utf-8&quot;)
+        except Exception as e:
+            print(f&quot;  跳过 {fpath.name}：{e}&quot;)
+            continue
+
+        chunks = list(chunk_by_headers(text, fpath))
+        if not chunks:
+            continue
+
+        documents = []
+        metadatas = []
+        ids = []
+        for i, (chunk_text, meta) in enumerate(chunks):
+            documents.append(chunk_text)
+            metadatas.append(meta)
+            ids.append(f&quot;{fpath.stem}_{i}&quot;)
+
+        # 向量化 + 入库（分批避免内存爆）
+        embeddings = _embed_model.encode(documents, show_progress_bar=False).tolist()
+        coll.add(documents=documents, embeddings=embeddings, metadatas=metadatas, ids=ids)
+
+        total_chunks += len(chunks)
+        print(f&quot;  {fpath.relative_to(WIKI_ROOT)} → {len(chunks)} 块&quot;)
+
+    print(f&quot;\n完成：{len(files)} 文件 → {total_chunks} 块 → collection &#x27;{COLLECTION_NAME}&#x27;&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    ingest()
+</div></div>
+</div>
+<div class="card" id="knowledge-search-py" data-versions="v020 v030">
+<div class="card-title">knowledge/search.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">统一多源搜索 — 并行搜索年报+Agent工程+Wiki</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 80 行</div><div class="code-block">&quot;&quot;&quot;统一多源搜索 — 一个查询并行搜索所有知识库。&quot;&quot;&quot;
+import os
+from pathlib import Path
+
+# 离线模式，避免 sentence-transformers 直连 huggingface
+os.environ[&quot;HF_HUB_OFFLINE&quot;] = &quot;1&quot;
+
+import chromadb
+from sentence_transformers import SentenceTransformer
+
+
+# === 初始化 ===
+
+CHROMA_PATH = str(Path(__file__).parent.parent.parent / &quot;AI工程/rag-project/backend/chroma_data&quot;)
+
+_client = chromadb.PersistentClient(path=CHROMA_PATH)
+
+# 已知的集合（wiki_knowledge 待后续入库后加入）
+KNOWN_COLLECTIONS = [&quot;annual_reports&quot;, &quot;agent_engineering&quot;, &quot;wiki_knowledge&quot;]
+
+# bge 中文语义模型（384维）
+_embed_model = SentenceTransformer(
+    &quot;BAAI/bge-small-zh-v1.5&quot;,
+    local_files_only=True
+)
+
+
+# === 核心函数 ===
+
+def unified_search(query, top_k=5):
+    &quot;&quot;&quot;并行搜索所有知识库，按相关度合并返回。
+
+    返回格式：
+    [
+        {&quot;source&quot;: &quot;annual_reports&quot;, &quot;content&quot;: &quot;...&quot;, &quot;distance&quot;: 0.23},
+        {&quot;source&quot;: &quot;agent_engineering&quot;, &quot;content&quot;: &quot;...&quot;, &quot;distance&quot;: 0.45},
+        ...
+    ]
+    &quot;&quot;&quot;
+    query_vec = _embed_model.encode(query).tolist()
+    all_results = []
+
+    for coll_name in KNOWN_COLLECTIONS:
+        try:
+            collection = _client.get_collection(coll_name)
+            results = collection.query(
+                query_embeddings=[query_vec],
+                n_results=top_k
+            )
+            # results[&quot;documents&quot;][0] 是 top_k 个文档列表
+            # results[&quot;distances&quot;][0] 是对应的距离列表
+            for doc, dist in zip(results[&quot;documents&quot;][0], results[&quot;distances&quot;][0]):
+                all_results.append({
+                    &quot;source&quot;: coll_name,
+                    &quot;content&quot;: doc,
+                    &quot;distance&quot;: round(dist, 4)
+                })
+        except Exception as e:
+            continue  # 集合不存在就跳过
+
+    # 按相关度排序（距离越小越相关）
+    all_results.sort(key=lambda x: x[&quot;distance&quot;])
+    return all_results
+
+
+def search_formatted(query, top_k=5):
+    &quot;&quot;&quot;搜索并格式化为 Agent 可读的文本。&quot;&quot;&quot;
+    results = unified_search(query, top_k)
+    if not results:
+        return &quot;未找到相关知识。&quot;
+    
+    lines = [f&quot;搜索「{query}」找到 {len(results)} 条结果：\n&quot;]
+    for i, r in enumerate(results, 1):
+        source_label = {&quot;annual_reports&quot;: &quot;年报&quot;, &quot;agent_engineering&quot;: &quot;Agent工程&quot;, &quot;wiki_knowledge&quot;: &quot;Wiki&quot;}
+        label = source_label.get(r[&quot;source&quot;], r[&quot;source&quot;])
+        lines.append(f&quot;[{i}] 来源：{label}（距离 {r[&#x27;distance&#x27;]}）&quot;)
+        lines.append(f&quot;    {r[&#x27;content&#x27;][:300]}&quot;)
+        lines.append(&quot;&quot;)
+    
+    return &quot;\n&quot;.join(lines)
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 75 行 (-5 行)</div><div class="code-block">&quot;&quot;&quot;统一多源搜索 — 一个查询并行搜索所有知识库。&quot;&quot;&quot;
+
+import os
+from pathlib import Path
+
+# 离线模式，避免 sentence-transformers 直连 huggingface
+os.environ[&quot;HF_HUB_OFFLINE&quot;] = &quot;1&quot;
+
+import chromadb
+from sentence_transformers import SentenceTransformer
+
+# === 初始化 ===
+
+CHROMA_PATH = str(Path(__file__).parent.parent.parent / &quot;AI工程/rag-project/backend/chroma_data&quot;)
+
+_client = chromadb.PersistentClient(path=CHROMA_PATH)
+
+# 已知的集合（wiki_knowledge 待后续入库后加入）
+KNOWN_COLLECTIONS = [&quot;annual_reports&quot;, &quot;agent_engineering&quot;, &quot;wiki_knowledge&quot;]
+
+# bge 中文语义模型（384维）
+_embed_model = SentenceTransformer(&quot;BAAI/bge-small-zh-v1.5&quot;, local_files_only=True)
+
+
+# === 核心函数 ===
+
+
+def unified_search(query, top_k=5, collections=None):
+    &quot;&quot;&quot;并行搜索知识库，按相关度合并返回。
+
+    collections: 要搜索的集合列表，默认搜全部。
+    &quot;&quot;&quot;
+    if collections is None:
+        collections = KNOWN_COLLECTIONS
+
+    query_vec = _embed_model.encode(query).tolist()
+    all_results = []
+
+    for coll_name in collections:
+        try:
+            collection = _client.get_collection(coll_name)
+            results = collection.query(query_embeddings=[query_vec], n_results=top_k)
+            # results[&quot;documents&quot;][0] 是 top_k 个文档列表
+            # results[&quot;distances&quot;][0] 是对应的距离列表
+            for doc, dist in zip(results[&quot;documents&quot;][0], results[&quot;distances&quot;][0], strict=False):
+                all_results.append(
+                    {&quot;source&quot;: coll_name, &quot;content&quot;: doc, &quot;distance&quot;: round(dist, 4)}
+                )
+        except Exception:
+            continue  # 集合不存在就跳过
+
+    # 按相关度排序（距离越小越相关）
+    all_results.sort(key=lambda x: x[&quot;distance&quot;])
+    return all_results
+
+
+def search_formatted(query, top_k=5):
+    &quot;&quot;&quot;搜索并格式化为 Agent 可读的文本。&quot;&quot;&quot;
+    results = unified_search(query, top_k)
+    if not results:
+        return &quot;未找到相关知识。&quot;
+
+    lines = [f&quot;搜索「{query}」找到 {len(results)} 条结果：\n&quot;]
+    for i, r in enumerate(results, 1):
+        source_label = {
+            &quot;annual_reports&quot;: &quot;年报&quot;,
+            &quot;agent_engineering&quot;: &quot;Agent工程&quot;,
+            &quot;wiki_knowledge&quot;: &quot;Wiki&quot;,
+        }
+        label = source_label.get(r[&quot;source&quot;], r[&quot;source&quot;])
+        lines.append(f&quot;[{i}] 来源：{label}（距离 {r[&#x27;distance&#x27;]}）&quot;)
+        lines.append(f&quot;    {r[&#x27;content&#x27;][:300]}&quot;)
+        lines.append(&quot;&quot;)
+
+    return &quot;\n&quot;.join(lines)
+</div></div>
+</div>
+</div>
+<div class="pkg-section"><div class="pkg-title">memory/ — 2 个文件</div>
+<div class="card" id="memory-__init__-py" data-versions="v020 v030">
+<div class="card-title">memory/__init__.py </div>
+<div class="card-desc">memory 包占位（空文件）</div>
+</div>
+<div class="card" id="memory-session-py" data-versions="v020 v030">
+<div class="card-title">memory/session.py <span class="ver-badge badge-mod">MOD</span></div>
+<div class="card-desc">会话持久化 — SQLite 存储 + 24h 恢复</div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 119 行</div><div class="code-block">&quot;&quot;&quot;会话持久化 — SQLite 存储对话历史，启动时恢复。&quot;&quot;&quot;
+import json
+import sqlite3
+import uuid
+from datetime import datetime, timedelta
+from pathlib import Path
+
+DB_PATH = Path(__file__).parent.parent / &quot;data&quot; / &quot;sessions.db&quot;
+
+
+def _connect():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    &quot;&quot;&quot;建表（幂等）。&quot;&quot;&quot;
+    conn = _connect()
+    conn.executescript(&quot;&quot;&quot;
+        CREATE TABLE IF NOT EXISTS sessions (
+            id TEXT PRIMARY KEY,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL,
+            role TEXT NOT NULL,
+            content TEXT,
+            tool_calls TEXT,
+            tool_call_id TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (session_id) REFERENCES sessions(id)
+        );
+    &quot;&quot;&quot;)
+    conn.commit()
+    conn.close()
+
+
+def create_session():
+    &quot;&quot;&quot;新建会话，返回 session_id。&quot;&quot;&quot;
+    sid = uuid.uuid4().hex[:12]
+    now = datetime.now().isoformat()
+    conn = _connect()
+    conn.execute(
+        &quot;INSERT INTO sessions (id, created_at, updated_at) VALUES (?, ?, ?)&quot;,
+        (sid, now, now)
+    )
+    conn.commit()
+    conn.close()
+    return sid
+
+
+def save_message(session_id, msg):
+    &quot;&quot;&quot;保存一条消息。
+
+    msg 格式（OpenAI messages 列表中的一条）：
+      {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;你好&quot;}
+      {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;你好！&quot;, &quot;tool_calls&quot;: null}
+      {&quot;role&quot;: &quot;tool&quot;, &quot;tool_call_id&quot;: &quot;xxx&quot;, &quot;content&quot;: &quot;...&quot;}
+    &quot;&quot;&quot;
+    now = datetime.now().isoformat()
+    conn = _connect()
+    conn.execute(
+        &quot;&quot;&quot;INSERT INTO messages (session_id, role, content, tool_calls, tool_call_id, created_at)
+           VALUES (?, ?, ?, ?, ?, ?)&quot;&quot;&quot;,
+        (
+            session_id,
+            msg.get(&quot;role&quot;),
+            msg.get(&quot;content&quot;),
+            json.dumps(msg.get(&quot;tool_calls&quot;)) if msg.get(&quot;tool_calls&quot;) else None,
+            msg.get(&quot;tool_call_id&quot;),
+            now
+        )
+    )
+    conn.execute(
+        &quot;UPDATE sessions SET updated_at = ? WHERE id = ?&quot;,
+        (now, session_id)
+    )
+    conn.commit()
+    conn.close()
+
+
+def load_session(session_id):
+    &quot;&quot;&quot;从数据库恢复消息列表。&quot;&quot;&quot;
+    conn = _connect()
+    rows = conn.execute(
+        &quot;SELECT role, content, tool_calls, tool_call_id FROM messages &quot;
+        &quot;WHERE session_id = ? ORDER BY id&quot;,
+        (session_id,)
+    ).fetchall()
+    conn.close()
+
+    messages = []
+    for row in rows:
+        msg = {&quot;role&quot;: row[&quot;role&quot;]}
+        if row[&quot;content&quot;] is not None:
+            msg[&quot;content&quot;] = row[&quot;content&quot;]
+        if row[&quot;tool_calls&quot;]:
+            msg[&quot;tool_calls&quot;] = json.loads(row[&quot;tool_calls&quot;])
+            msg[&quot;content&quot;] = None  # OpenAI 格式要求
+        if row[&quot;tool_call_id&quot;]:
+            msg[&quot;tool_call_id&quot;] = row[&quot;tool_call_id&quot;]
+        messages.append(msg)
+    return messages
+
+
+def get_last_session():
+    &quot;&quot;&quot;获取最近 24 小时内的最新会话 ID，没有则返回 None。&quot;&quot;&quot;
+    cutoff = (datetime.now() - timedelta(hours=24)).isoformat()
+    conn = _connect()
+    row = conn.execute(
+        &quot;SELECT id FROM sessions WHERE updated_at &gt;= ? ORDER BY updated_at DESC LIMIT 1&quot;,
+        (cutoff,)
+    ).fetchone()
+    conn.close()
+    return row[&quot;id&quot;] if row else None
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 115 行 (-4 行)</div><div class="code-block">&quot;&quot;&quot;会话持久化 — SQLite 存储对话历史，启动时恢复。&quot;&quot;&quot;
+
+from datetime import datetime, timedelta
+import json
+from pathlib import Path
+import sqlite3
+import uuid
+
+DB_PATH = Path(__file__).parent.parent / &quot;data&quot; / &quot;sessions.db&quot;
+
+
+def _connect():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    &quot;&quot;&quot;建表（幂等）。&quot;&quot;&quot;
+    conn = _connect()
+    conn.executescript(&quot;&quot;&quot;
+        CREATE TABLE IF NOT EXISTS sessions (
+            id TEXT PRIMARY KEY,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL,
+            role TEXT NOT NULL,
+            content TEXT,
+            tool_calls TEXT,
+            tool_call_id TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (session_id) REFERENCES sessions(id)
+        );
+    &quot;&quot;&quot;)
+    conn.commit()
+    conn.close()
+
+
+def create_session():
+    &quot;&quot;&quot;新建会话，返回 session_id。&quot;&quot;&quot;
+    sid = uuid.uuid4().hex[:12]
+    now = datetime.now().isoformat()
+    conn = _connect()
+    conn.execute(
+        &quot;INSERT INTO sessions (id, created_at, updated_at) VALUES (?, ?, ?)&quot;, (sid, now, now)
+    )
+    conn.commit()
+    conn.close()
+    return sid
+
+
+def save_message(session_id, msg):
+    &quot;&quot;&quot;保存一条消息。
+
+    msg 格式（OpenAI messages 列表中的一条）：
+      {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;你好&quot;}
+      {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;你好！&quot;, &quot;tool_calls&quot;: null}
+      {&quot;role&quot;: &quot;tool&quot;, &quot;tool_call_id&quot;: &quot;xxx&quot;, &quot;content&quot;: &quot;...&quot;}
+    &quot;&quot;&quot;
+    now = datetime.now().isoformat()
+    conn = _connect()
+    conn.execute(
+        &quot;&quot;&quot;INSERT INTO messages (session_id, role, content, tool_calls, tool_call_id, created_at)
+           VALUES (?, ?, ?, ?, ?, ?)&quot;&quot;&quot;,
+        (
+            session_id,
+            msg.get(&quot;role&quot;),
+            msg.get(&quot;content&quot;),
+            json.dumps(msg.get(&quot;tool_calls&quot;)) if msg.get(&quot;tool_calls&quot;) else None,
+            msg.get(&quot;tool_call_id&quot;),
+            now,
+        ),
+    )
+    conn.execute(&quot;UPDATE sessions SET updated_at = ? WHERE id = ?&quot;, (now, session_id))
+    conn.commit()
+    conn.close()
+
+
+def load_session(session_id):
+    &quot;&quot;&quot;从数据库恢复消息列表。&quot;&quot;&quot;
+    conn = _connect()
+    rows = conn.execute(
+        &quot;SELECT role, content, tool_calls, tool_call_id FROM messages &quot;
+        &quot;WHERE session_id = ? ORDER BY id&quot;,
+        (session_id,),
+    ).fetchall()
+    conn.close()
+
+    messages = []
+    for row in rows:
+        msg = {&quot;role&quot;: row[&quot;role&quot;]}
+        if row[&quot;content&quot;] is not None:
+            msg[&quot;content&quot;] = row[&quot;content&quot;]
+        if row[&quot;tool_calls&quot;]:
+            msg[&quot;tool_calls&quot;] = json.loads(row[&quot;tool_calls&quot;])
+            msg[&quot;content&quot;] = None  # OpenAI 格式要求
+        if row[&quot;tool_call_id&quot;]:
+            msg[&quot;tool_call_id&quot;] = row[&quot;tool_call_id&quot;]
+        messages.append(msg)
+    return messages
+
+
+def get_last_session():
+    &quot;&quot;&quot;获取最近 24 小时内的最新会话 ID，没有则返回 None。&quot;&quot;&quot;
+    cutoff = (datetime.now() - timedelta(hours=24)).isoformat()
+    conn = _connect()
+    row = conn.execute(
+        &quot;SELECT id FROM sessions WHERE updated_at &gt;= ? ORDER BY updated_at DESC LIMIT 1&quot;, (cutoff,)
+    ).fetchone()
+    conn.close()
+    return row[&quot;id&quot;] if row else None
+</div></div>
+</div>
+</div>
+<div class="card" data-versions="v030"><div class="card-title">v0.3.0 依赖关系 <span class="ver-badge badge-new">NEW</span></div><div class="dep-grid">
+<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ core/context.py</div></div>
+<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ core/errors.py</div></div>
+<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ core/prompt.py</div></div>
+<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ core/retry.py</div></div>
+<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ memory/__init__.py</div></div>
+<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ memory/session.py</div></div>
+<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ skills/registry.py</div></div>
+<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ tools/registry.py</div></div>
+<div class="dep-item"><div class="from">core/retry.py</div><div class="to">→ tools/time_tool.py</div></div>
+<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/__init__.py</div></div>
+<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/agent.py</div></div>
+<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/context.py</div></div>
+<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/errors.py</div></div>
+<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/prompt.py</div></div>
+<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/retry.py</div></div>
+<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ skills/registry.py</div></div>
+<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ tools/finance/financial_report.py</div></div>
+<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ tools/registry.py</div></div>
+<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ knowledge/search.py</div></div>
+<div class="dep-item"><div class="from">main.py</div><div class="to">→ core/agent.py</div></div>
+<div class="dep-item"><div class="from">main.py</div><div class="to">→ skills/finance.py</div></div>
+<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/file_tools.py</div></div>
+<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/finance/financial_report.py</div></div>
+<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/finance/market_data.py</div></div>
+<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/search_tool.py</div></div>
+<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/terminal_tool.py</div></div>
+<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/time_tool.py</div></div>
+<div class="dep-item"><div class="from">skills/finance.py</div><div class="to">→ skills/registry.py</div></div>
+<div class="dep-item"><div class="from">tools/file_tools.py</div><div class="to">→ tools/registry.py</div></div>
+<div class="dep-item"><div class="from">tools/finance/financial_report.py</div><div class="to">→ knowledge/search.py</div></div>
+<div class="dep-item"><div class="from">tools/finance/financial_report.py</div><div class="to">→ tools/registry.py</div></div>
+<div class="dep-item"><div class="from">tools/finance/market_data.py</div><div class="to">→ tools/registry.py</div></div>
+<div class="dep-item"><div class="from">tools/search_tool.py</div><div class="to">→ knowledge/search.py</div></div>
+<div class="dep-item"><div class="from">tools/search_tool.py</div><div class="to">→ tools/registry.py</div></div>
+<div class="dep-item"><div class="from">tools/terminal_tool.py</div><div class="to">→ tools/registry.py</div></div>
+<div class="dep-item"><div class="from">tools/time_tool.py</div><div class="to">→ tools/registry.py</div></div>
+</div></div>
 </div>
 <script>
-function switchVersion(version){
-  document.getElementById("btn-v010").classList.toggle("active",version==="v010");
-  document.getElementById("btn-v020").classList.toggle("active",version==="v020");
-  var vn=version==="v010"?"v0.1.0":"v0.2.0";
-  var st=version==="v010"?"8 文件":"12 文件";
-  document.getElementById("ver-info").innerHTML="当前 <b>"+vn+"</b> — "+st;
-  document.querySelectorAll("[data-versions]").forEach(function(el){
-    var vs=el.getAttribute("data-versions");
-    if(vs.indexOf(version)===-1)el.classList.add("hidden-version");
+function switchVersion(version) {
+  document.getElementById("btn-v020").classList.toggle("active", version==="v020");
+  document.getElementById("btn-v030").classList.toggle("active", version==="v030");
+  var vn = version==="v020" ? "v0.2.0" : "v0.3.0";
+  var st = version==="v020" ? "16 文件" : "24 文件";
+  document.getElementById("ver-info").innerHTML = "当前 <b>" + vn + "</b> — " + st;
+  document.querySelectorAll("[data-versions]").forEach(function(el) {
+    var vs = el.getAttribute("data-versions");
+    if (vs.indexOf(version) === -1) el.classList.add("hidden-version");
     else el.classList.remove("hidden-version");
   });
-  // 切换 body 类控制角标显示
-  document.body.className = version+"-view";
+  document.body.className = version + "-view";
 }
-switchVersion("v020");
+switchVersion("v030");
 </script>
-</body>
-</html>
+</body></html>
