@@ -3,162 +3,220 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NsAgent 架构全景逐行注释 — v0.2.0 / v0.3.0</title>
+<title>NsAgent 架构全景 — v0.1.0 / v0.2.0 / v0.3.0</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;background:#f1f5f9;color:#334155;line-height:1.8}
-body.v020-view .ver-badge{display:none}
-body.v030-view .ver-badge{display:inline-block}
+body.v030-view .ver-badge{display:inline-block} body.v020-view .ver-badge{display:none} body.v010-view .ver-badge{display:none}
 .hidden-version{display:none!important}
 .container{max-width:1100px;margin:0 auto;padding:20px}
-.header{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10}
+.header{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
 .header h1{font-size:18px;color:#0f172a}
 .ver-switch{display:flex;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden}
-.ver-switch button{padding:4px 16px;font-size:12px;border:none;cursor:pointer;background:#f8fafc;color:#64748b;font-family:inherit}
+.ver-switch button{padding:4px 14px;font-size:12px;border:none;cursor:pointer;background:#f8fafc;color:#64748b;font-family:inherit}
 .ver-switch button.active{background:#3b6df0;color:#fff}
 .ver-info{font-size:12px;color:#94a3b8;margin-left:auto}
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin:20px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .card-title{font-size:16px;font-weight:700;color:#1e293b;margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .card-desc{font-size:13px;color:#64748b;margin-bottom:16px}
 .badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;color:#fff}
-.badge-new{background:#10b981}
-.badge-mod{background:#f59e0b}
-.badge-keep{background:#94a3b8}
+.badge-new{background:#10b981}.badge-mod{background:#f59e0b}
 .code-block{background:#1e293b;color:#e2e8f0;border-radius:8px;padding:16px;margin:12px 0;overflow-x:auto;font-family:"SF Mono","Fira Code",monospace;font-size:13px;line-height:1.6;white-space:pre}
 .code-label{font-size:11px;color:#94a3b8;margin-bottom:4px;font-weight:600}
-.annot{background:#f8fafc;border-left:3px solid #3b6df0;padding:10px 14px;margin:8px 0;font-size:13px;color:#475569;border-radius:0 6px 6px 0}
-.annot b{color:#1e293b}
-.annot code{background:#e2e8f0;padding:1px 4px;border-radius:3px;font-size:12px}
 .arch{background:#1e293b;color:#e2e8f0;padding:20px;border-radius:8px;font-family:monospace;font-size:12px;line-height:1.5;white-space:pre;margin:12px 0}
 .toc{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
-.toc-item{background:#f1f5f9;padding:4px 12px;border-radius:12px;font-size:12px;color:#475569;cursor:pointer;text-decoration:none}
-.toc-item:hover{background:#e2e8f0}
-.dep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;font-size:12px}
-.dep-item{background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:6px}
-.dep-item .from{color:#94a3b8;font-size:11px}
-.dep-item .to{color:#3b6df0;font-weight:600}
-.pkg-section{margin:24px 0}
-.pkg-title{font-size:14px;font-weight:700;color:#475569;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #e2e8f0}
+.toc-item{background:#f1f5f9;padding:4px 12px;border-radius:12px;font-size:12px;color:#475569;text-decoration:none}
+.ver-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;color:#fff}
 </style>
 </head>
 <body class="v030-view">
-<div class="header">
-<h1>NsAgent 架构全景逐行注释</h1>
-<div class="ver-switch">
-<button id="btn-v020" onclick="switchVersion('v020')">v0.2.0</button>
-<button id="btn-v030" class="active" onclick="switchVersion('v030')">v0.3.0</button>
-</div>
-<span class="ver-info" id="ver-info">当前 <b>v0.3.0</b> — 24 文件</span>
-</div>
+<div class="header"><h1>NsAgent 架构全景逐行注释</h1><div class="ver-switch"><button id="btn-v010" onclick="switchVersion('v010')">v0.1.0</button><button id="btn-v020" onclick="switchVersion('v020')">v0.2.0</button><button id="btn-v030" class="active" onclick="switchVersion('v030')">v0.3.0</button></div><span class="ver-info" id="ver-info">当前 <b>v0.3.0</b> — 24 文件</span></div>
 <div class="container">
-
-<div class="card" data-versions="v020 v030">
-<div class="card-title">架构全景</div>
-<div class="arch" data-versions="v020">ns-agent/ (v0.2.0 · 16 文件)
-├── main.py                    入口
+<div class="card" data-versions="v010 v020 v030"><div class="card-title">架构全景</div>
+<div class="arch" data-versions="v010">ns-agent/ (v0.1.0 · 9 文件)
+├── main.py
 ├── core/
-│   ├── agent.py               Agent Loop
-│   ├── retry.py               API 重试
-│   └── errors.py              统一异常
+│   └── agent.py
 ├── tools/
-│   ├── registry.py            工具注册表
+│   ├── registry.py
+│   └── time/file/terminal/search
+└── knowledge/
+    └── search.py</div>
+<div class="arch" data-versions="v020">ns-agent/ (v0.2.0 · 16 文件)
+├── main.py
+├── core/
+│   ├── agent.py
+│   ├── retry.py
+│   └── errors.py
+├── tools/
+│   ├── registry.py
 │   └── time/file/terminal/search
 ├── knowledge/
-│   ├── search.py              多源搜索
-│   └── ingest_wiki.py         Wiki 入库
+│   ├── search.py
+│   └── ingest_wiki.py
 └── memory/
-    └── session.py             会话持久化</div>
+    └── session.py</div>
 <div class="arch" data-versions="v030">ns-agent/ (v0.3.0 · 24 文件)
-├── main.py                    入口
+├── main.py
 ├── core/
-│   ├── agent.py               Agent Loop (+技能+压缩)
-│   ├── prompt.py           <span class="ver-badge badge-new">NEW</span> Prompt 分层
-│   ├── context.py          <span class="ver-badge badge-new">NEW</span> Token 计数+压缩
-│   ├── retry.py               API 重试
-│   └── errors.py              统一异常
+│   ├── agent.py (+技能+压缩)
+│   ├── prompt.py    <span class="ver-badge badge-new">NEW</span>
+│   ├── context.py   <span class="ver-badge badge-new">NEW</span>
+│   ├── retry.py
+│   └── errors.py
 ├── tools/
-│   ├── registry.py            工具注册表
+│   ├── registry.py
 │   ├── time/file/terminal/search
-│   └── finance/            <span class="ver-badge badge-new">NEW</span>
-│       ├── market_data.py     实时行情
-│       └── financial_report   年报结构化报告
-├── skills/                 <span class="ver-badge badge-new">NEW</span>
-│   ├── registry.py            技能注册表
-│   └── finance.py             财报分析技能
+│   └── finance/     <span class="ver-badge badge-new">NEW</span>
+│       ├── market_data.py
+│       └── financial_report.py
+├── skills/          <span class="ver-badge badge-new">NEW</span>
+│   ├── registry.py
+│   └── finance.py
 ├── knowledge/
-│   ├── search.py              多源搜索(+定向)
-│   └── ingest_wiki.py         Wiki 入库
-├── memory/
-│   └── session.py             会话持久化
-├── pyproject.toml          <span class="ver-badge badge-new">NEW</span> 依赖+配置
-└── CONVENTIONS.md          <span class="ver-badge badge-new">NEW</span> 编码规范</div>
+│   ├── search.py (+定向)
+│   └── ingest_wiki.py
+├── memory/session.py
+├── pyproject.toml   <span class="ver-badge badge-new">NEW</span>
+└── CONVENTIONS.md   <span class="ver-badge badge-new">NEW</span></div>
 </div>
-<div class="card" data-versions="v020 v030"><div class="card-title">文件目录</div><div class="toc">
-<a class="toc-item" data-versions="v020 v030" href="#core-__init__-py">core/__init__.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#core-agent-py">core/agent.py</a>
+<div class="card" data-versions="v010 v020 v030"><div class="card-title">文件目录</div><div class="toc">
+<a class="toc-item" data-versions="v010 v020 v030" href="#core-__init__-py">core/__init__.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#core-agent-py">core/agent.py</a>
 <a class="toc-item" data-versions="v030" href="#core-context-py">core/context.py</a>
 <a class="toc-item" data-versions="v020 v030" href="#core-errors-py">core/errors.py</a>
 <a class="toc-item" data-versions="v030" href="#core-prompt-py">core/prompt.py</a>
 <a class="toc-item" data-versions="v020 v030" href="#core-retry-py">core/retry.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#knowledge-__init__-py">knowledge/__init__.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#knowledge-__init__-py">knowledge/__init__.py</a>
 <a class="toc-item" data-versions="v020 v030" href="#knowledge-ingest_wiki-py">knowledge/ingest_wiki.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#knowledge-search-py">knowledge/search.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#main-py">main.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#memory-__init__-py">memory/__init__.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#knowledge-search-py">knowledge/search.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#main-py">main.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#memory-__init__-py">memory/__init__.py</a>
 <a class="toc-item" data-versions="v020 v030" href="#memory-session-py">memory/session.py</a>
 <a class="toc-item" data-versions="v030" href="#skills-__init__-py">skills/__init__.py</a>
 <a class="toc-item" data-versions="v030" href="#skills-finance-py">skills/finance.py</a>
 <a class="toc-item" data-versions="v030" href="#skills-registry-py">skills/registry.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#tools-__init__-py">tools/__init__.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#tools-file_tools-py">tools/file_tools.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#tools-__init__-py">tools/__init__.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#tools-file_tools-py">tools/file_tools.py</a>
 <a class="toc-item" data-versions="v030" href="#tools-finance-__init__-py">tools/finance/__init__.py</a>
 <a class="toc-item" data-versions="v030" href="#tools-finance-financial_report-py">tools/finance/financial_report.py</a>
 <a class="toc-item" data-versions="v030" href="#tools-finance-market_data-py">tools/finance/market_data.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#tools-registry-py">tools/registry.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#tools-search_tool-py">tools/search_tool.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#tools-terminal_tool-py">tools/terminal_tool.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#tools-time_tool-py">tools/time_tool.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#tools-registry-py">tools/registry.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#tools-search_tool-py">tools/search_tool.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#tools-terminal_tool-py">tools/terminal_tool.py</a>
+<a class="toc-item" data-versions="v010 v020 v030" href="#tools-time_tool-py">tools/time_tool.py</a>
 </div></div>
-<div class="pkg-section"><div class="pkg-title">入口</div>
-<div class="card" id="main-py" data-versions="v020 v030">
-<div class="card-title">main.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">入口脚本 — import 所有工具模块触发 register()</div>
-<div data-versions="v020"><div class="code-label">v0.2.0 — 11 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 入口 — 加载工具 → 启动 Agent。&quot;&quot;&quot;
-# 导入工具模块 = 触发 register() 报到
-import tools.time_tool      # noqa: F401
-import tools.file_tools     # noqa: F401
-import tools.terminal_tool  # noqa: F401
-import tools.search_tool    # noqa: F401
-
-from core.agent import chat
-
-if __name__ == &quot;__main__&quot;:
-    chat()
-</div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 14 行 (+3 行)</div><div class="code-block">&quot;&quot;&quot;NsAgent 入口 — 加载工具 → 启动 Agent。&quot;&quot;&quot;
-
-# 导入工具模块 = 触发 register() 报到
-from core.agent import chat
-import skills.finance  # noqa: F401
-import tools.file_tools  # noqa: F401
-import tools.finance.financial_report  # noqa: F401
-import tools.finance.market_data  # noqa: F401
-import tools.search_tool  # noqa: F401
-import tools.terminal_tool  # noqa: F401
-import tools.time_tool  # noqa: F401
-
-if __name__ == &quot;__main__&quot;:
-    chat()
-</div></div>
-</div>
-<div class="pkg-section"><div class="pkg-title">core/ — 6 个文件</div>
-<div class="card" id="core-__init__-py" data-versions="v020 v030">
+<div class="card" id="core-__init__-py" data-versions="v010 v020 v030">
 <div class="card-title">core/__init__.py </div>
-<div class="card-desc">core 包占位（空文件）</div>
+<div class="card-desc"></div>
 </div>
-<div class="card" id="core-agent-py" data-versions="v020 v030">
-<div class="card-title">core/agent.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">Agent Loop — 消息循环 + 工具调用 + 技能注入 + 上下文压缩</div>
+<div class="card" id="core-agent-py" data-versions="v010 v020 v030">
+<div class="card-title">core/agent.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
+<div class="card-desc">Agent Loop — 消息循环 + 工具调用</div>
+<div data-versions="v010"><div class="code-label">v0.1.0 — 103 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 核心 — Agent Loop。不关心工具有哪些，只从注册表读取。&quot;&quot;&quot;
+import json
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+from openai import OpenAI
+
+from tools.registry import get_tool_definitions, execute
+
+# 加载 .env（agent.py 在 core/ 下，.env 在项目根目录）
+load_dotenv(Path(__file__).parent.parent / &quot;.env&quot;)
+
+client = OpenAI(
+    api_key=os.getenv(&quot;DEEPSEEK_API_KEY&quot;),
+    base_url=&quot;https://api.deepseek.com&quot;
+)
+
+SYSTEM_PROMPT = &quot;&quot;&quot;你是 NsAgent，一个本地 AI 助手。
+
+你有以下工具可以使用：
+- read_file: 读取文件
+- write_file: 写入文件
+- terminal: 执行终端命令
+- search_knowledge: 搜索本地知识库（年报、技术文档）
+- get_current_time: 获取当前时间
+
+工作原则：
+1. 先搜索知识库再回答
+2. 修改文件前先 read_file 确认内容
+3. 用中文回复&quot;&quot;&quot;
+
+
+def run(messages=None):
+    &quot;&quot;&quot;启动 Agent Loop。messages 为初始消息列表。&quot;&quot;&quot;
+    if messages is None:
+        messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT}]
+    
+    # 获取已注册的工具列表
+    tools = get_tool_definitions()
+    print(f&quot;[NsAgent] 已加载 {len(tools)} 个工具\n&quot;)
+    
+    while True:
+        print(f&quot;&gt;&gt;&gt; 发送请求（{len(messages)} 条消息）...&quot;)
+        
+        response = client.chat.completions.create(
+            model=&quot;deepseek-chat&quot;,
+            messages=messages,
+            tools=tools if tools else None,
+            temperature=0.7
+        )
+        
+        msg = response.choices[0].message
+        
+        # 没有工具调用 → 输出回复 → 结束
+        if not msg.tool_calls:
+            print(f&quot;\n{msg.content}\n&quot;)
+            break
+        
+        # 处理工具调用
+        for tc in msg.tool_calls:
+            name = tc.function.name
+            args = json.loads(tc.function.arguments)
+            print(f&quot;  🔧 {name}({json.dumps(args, ensure_ascii=False)})&quot;)
+            
+            result = execute(name, args)
+            print(f&quot;     → {result[:100]}...&quot;)
+            
+            # 把工具调用和结果加入消息历史
+            messages.append({
+                &quot;role&quot;: &quot;assistant&quot;,
+                &quot;content&quot;: None,
+                &quot;tool_calls&quot;: [{
+                    &quot;id&quot;: tc.id,
+                    &quot;type&quot;: &quot;function&quot;,
+                    &quot;function&quot;: {&quot;name&quot;: name, &quot;arguments&quot;: tc.function.arguments}
+                }]
+            })
+            messages.append({
+                &quot;role&quot;: &quot;tool&quot;,
+                &quot;tool_call_id&quot;: tc.id,
+                &quot;content&quot;: str(result)
+            })
+
+
+def chat():
+    &quot;&quot;&quot;交互式 REPL。&quot;&quot;&quot;
+    messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT}]
+    print(&quot;NsAgent v0.1.0 — 输入 /exit 退出\n&quot;)
+    
+    while True:
+        user_input = input(&quot;你: &quot;).strip()
+        if not user_input:
+            continue
+        if user_input == &quot;/exit&quot;:
+            print(&quot;再见。&quot;)
+            break
+        
+        messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_input})
+        try:
+            run(messages=messages)
+        except Exception as e:
+            print(f&quot;错误: {e}&quot;)
+            messages.pop()  # 移除失败的用户消息
+</div></div>
 <div data-versions="v020"><div class="code-label">v0.2.0 — 133 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 核心 — Agent Loop。不关心工具有哪些，只从注册表读取。&quot;&quot;&quot;
 import json
 import os
@@ -293,7 +351,7 @@ def chat():
             print(f&quot;未预期错误: {type(e).__name__}: {e}&quot;)
             del messages[snapshot:]
 </div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 135 行 (+2 行)</div><div class="code-block">&quot;&quot;&quot;NsAgent 核心 — Agent Loop。不关心工具有哪些，只从注册表读取。&quot;&quot;&quot;
+<div data-versions="v030"><div class="code-label">v0.3.0 — 135 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 核心 — Agent Loop。不关心工具有哪些，只从注册表读取。&quot;&quot;&quot;
 
 import json
 import os
@@ -431,9 +489,9 @@ def chat():
 </div></div>
 </div>
 <div class="card" id="core-context-py" data-versions="v030">
-<div class="card-title">core/context.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-title">core/context.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
 <div class="card-desc">上下文压缩 — Token 计数 + 超限自动总结</div>
-<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;上下文压缩 — Token 计数 + 超限自动总结。&quot;&quot;&quot;
+<div data-versions="v030"><div class="code-label">v0.3.0 — 71 行</div><div class="code-block">&quot;&quot;&quot;上下文压缩 — Token 计数 + 超限自动总结。&quot;&quot;&quot;
 
 import json
 
@@ -507,8 +565,8 @@ def _format_for_summary(messages: list[dict]) -&gt; str:
 </div></div>
 </div>
 <div class="card" id="core-errors-py" data-versions="v020 v030">
-<div class="card-title">core/errors.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">统一异常 — NsAgentError → APIError/ToolError/ConfigError</div>
+<div class="card-title">core/errors.py <span class="ver-badge badge-new" data-versions="v020">NEW v0.2.0</span></div>
+<div class="card-desc">统一异常 — NsAgentError 体系</div>
 <div data-versions="v020"><div class="code-label">v0.2.0 — 30 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 统一异常体系。&quot;&quot;&quot;
 
 
@@ -540,7 +598,7 @@ class ToolError(NsAgentError):
 class ConfigError(NsAgentError):
     &quot;&quot;&quot;配置错误（缺少 API Key 等）。&quot;&quot;&quot;
 </div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 31 行 (+1 行)</div><div class="code-block">&quot;&quot;&quot;NsAgent 统一异常体系。&quot;&quot;&quot;
+<div data-versions="v030"><div class="code-label">v0.3.0 — 31 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 统一异常体系。&quot;&quot;&quot;
 
 
 class NsAgentError(Exception):
@@ -574,9 +632,9 @@ class ConfigError(NsAgentError):
 </div></div>
 </div>
 <div class="card" id="core-prompt-py" data-versions="v030">
-<div class="card-title">core/prompt.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-title">core/prompt.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
 <div class="card-desc">Prompt 分层 — 身份/工具/规则/安全四层可组装</div>
-<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;System Prompt 分层构建器 — 身份/工具/规则/安全四层可组合。&quot;&quot;&quot;
+<div data-versions="v030"><div class="code-label">v0.3.0 — 35 行</div><div class="code-block">&quot;&quot;&quot;System Prompt 分层构建器 — 身份/工具/规则/安全四层可组合。&quot;&quot;&quot;
 
 IDENTITY = &quot;&quot;&quot;你是 NsAgent，一个本地 AI 助手。
 你的知识库包含 A 股上市公司年报、Agent 工程文档和技术 Wiki。&quot;&quot;&quot;
@@ -614,8 +672,8 @@ def build_prompt(skills_text: str = &quot;&quot;) -&gt; str:
 </div></div>
 </div>
 <div class="card" id="core-retry-py" data-versions="v020 v030">
-<div class="card-title">core/retry.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">API 重试 — 指数退避，只重试可恢复错误</div>
+<div class="card-title">core/retry.py <span class="ver-badge badge-new" data-versions="v020">NEW v0.2.0</span></div>
+<div class="card-desc">API 重试 — 指数退避</div>
 <div data-versions="v020"><div class="code-label">v0.2.0 — 36 行</div><div class="code-block">&quot;&quot;&quot;API 重试 — 指数退避，可重试错误自动重试。&quot;&quot;&quot;
 import time
 from openai import (
@@ -653,7 +711,7 @@ def call_with_retry(fn, *args, **kwargs):
         raise last_error
     raise RuntimeError(&quot;retry: unreachable&quot;)  # 理论上不会到这里
 </div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 38 行 (+2 行)</div><div class="code-block">&quot;&quot;&quot;API 重试 — 指数退避，可重试错误自动重试。&quot;&quot;&quot;
+<div data-versions="v030"><div class="code-label">v0.3.0 — 38 行</div><div class="code-block">&quot;&quot;&quot;API 重试 — 指数退避，可重试错误自动重试。&quot;&quot;&quot;
 
 import time
 
@@ -693,665 +751,13 @@ def call_with_retry(fn, *args, **kwargs):
     raise RuntimeError(&quot;retry: unreachable&quot;)  # 理论上不会到这里
 </div></div>
 </div>
-</div>
-<div class="pkg-section"><div class="pkg-title">tools/ — 9 个文件</div>
-<div class="card" id="tools-__init__-py" data-versions="v020 v030">
-<div class="card-title">tools/__init__.py </div>
-<div class="card-desc">tools 包占位（空文件）</div>
-</div>
-<div class="card" id="tools-file_tools-py" data-versions="v020 v030">
-<div class="card-title">tools/file_tools.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">文件读写 — read_file + write_file</div>
-<div data-versions="v020"><div class="code-label">v0.2.0 — 70 行</div><div class="code-block">&quot;&quot;&quot;文件读写工具 — read_file 和 write_file。&quot;&quot;&quot;
-from tools.registry import register
-from pathlib import Path
-
-
-def read_file(path, offset=1, limit=200):
-    &quot;&quot;&quot;读取文件内容。offset 和 limit 控制读取范围。&quot;&quot;&quot;
-    p = Path(path).expanduser().resolve()
-    if not p.exists():
-        return f&quot;错误：文件不存在 {path}&quot;
-    try:
-        lines = p.read_text(encoding=&quot;utf-8&quot;).split(&quot;\n&quot;)
-        total = len(lines)
-        start = max(0, offset - 1)
-        end = min(total, start + limit)
-        result = []
-        for i in range(start, end):
-            result.append(f&quot;{i+1}|{lines[i]}&quot;)
-        header = f&quot;文件 {path}（第 {start+1}-{end} 行 / 共 {total} 行）\n&quot;
-        return header + &quot;\n&quot;.join(result)
-    except Exception as e:
-        return f&quot;错误：读取失败 {e}&quot;
-
-
-def write_file(path, content):
-    &quot;&quot;&quot;写入文件内容（覆盖）。&quot;&quot;&quot;
-    p = Path(path).expanduser().resolve()
-    try:
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(content, encoding=&quot;utf-8&quot;)
-        return f&quot;已写入 {path}（{len(content)} 字符）&quot;
-    except Exception as e:
-        return f&quot;错误：写入失败 {e}&quot;
-
-
-READ_DEF = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;read_file&quot;,
-        &quot;description&quot;: &quot;读取文件内容，返回带行号的文本&quot;,
-        &quot;parameters&quot;: {
-            &quot;type&quot;: &quot;object&quot;,
-            &quot;properties&quot;: {
-                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
-                &quot;offset&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;起始行号（默认1）&quot;},
-                &quot;limit&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;读取行数（默认200）&quot;}
-            },
-            &quot;required&quot;: [&quot;path&quot;]
-        }
-    }
-}
-
-WRITE_DEF = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;write_file&quot;,
-        &quot;description&quot;: &quot;写入文件内容（覆盖模式）&quot;,
-        &quot;parameters&quot;: {
-            &quot;type&quot;: &quot;object&quot;,
-            &quot;properties&quot;: {
-                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
-                &quot;content&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要写入的内容&quot;}
-            },
-            &quot;required&quot;: [&quot;path&quot;, &quot;content&quot;]
-        }
-    }
-}
-
-register(&quot;read_file&quot;, READ_DEF, read_file)
-register(&quot;write_file&quot;, WRITE_DEF, write_file)
-</div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 72 行 (+2 行)</div><div class="code-block">&quot;&quot;&quot;文件读写工具 — read_file 和 write_file。&quot;&quot;&quot;
-
-from pathlib import Path
-
-from tools.registry import register
-
-
-def read_file(path, offset=1, limit=200):
-    &quot;&quot;&quot;读取文件内容。offset 和 limit 控制读取范围。&quot;&quot;&quot;
-    p = Path(path).expanduser().resolve()
-    if not p.exists():
-        return f&quot;错误：文件不存在 {path}&quot;
-    try:
-        lines = p.read_text(encoding=&quot;utf-8&quot;).split(&quot;\n&quot;)
-        total = len(lines)
-        start = max(0, offset - 1)
-        end = min(total, start + limit)
-        result = []
-        for i in range(start, end):
-            result.append(f&quot;{i + 1}|{lines[i]}&quot;)
-        header = f&quot;文件 {path}（第 {start + 1}-{end} 行 / 共 {total} 行）\n&quot;
-        return header + &quot;\n&quot;.join(result)
-    except Exception as e:
-        return f&quot;错误：读取失败 {e}&quot;
-
-
-def write_file(path, content):
-    &quot;&quot;&quot;写入文件内容（覆盖）。&quot;&quot;&quot;
-    p = Path(path).expanduser().resolve()
-    try:
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(content, encoding=&quot;utf-8&quot;)
-        return f&quot;已写入 {path}（{len(content)} 字符）&quot;
-    except Exception as e:
-        return f&quot;错误：写入失败 {e}&quot;
-
-
-READ_DEF = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;read_file&quot;,
-        &quot;description&quot;: &quot;读取文件内容，返回带行号的文本&quot;,
-        &quot;parameters&quot;: {
-            &quot;type&quot;: &quot;object&quot;,
-            &quot;properties&quot;: {
-                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
-                &quot;offset&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;起始行号（默认1）&quot;},
-                &quot;limit&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;读取行数（默认200）&quot;},
-            },
-            &quot;required&quot;: [&quot;path&quot;],
-        },
-    },
-}
-
-WRITE_DEF = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;write_file&quot;,
-        &quot;description&quot;: &quot;写入文件内容（覆盖模式）&quot;,
-        &quot;parameters&quot;: {
-            &quot;type&quot;: &quot;object&quot;,
-            &quot;properties&quot;: {
-                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
-                &quot;content&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要写入的内容&quot;},
-            },
-            &quot;required&quot;: [&quot;path&quot;, &quot;content&quot;],
-        },
-    },
-}
-
-register(&quot;read_file&quot;, READ_DEF, read_file)
-register(&quot;write_file&quot;, WRITE_DEF, write_file)
-</div></div>
-</div>
-<div class="card" id="tools-finance-__init__-py" data-versions="v030">
-<div class="card-title">tools/finance/__init__.py <span class="ver-badge badge-new">NEW</span></div>
-<div class="card-desc">finance 包占位（空文件）</div>
-<div data-versions="v030"><div class="code-block"></div></div>
-</div>
-<div class="card" id="tools-finance-financial_report-py" data-versions="v030">
-<div class="card-title">tools/finance/financial_report.py <span class="ver-badge badge-new">NEW</span></div>
-<div class="card-desc">年报结构化报告 — 多指标并行搜索 + 去重</div>
-<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;年报结构化报告工具 — 多指标并行搜索 → 整理文本 → 交 LLM 分析。&quot;&quot;&quot;
-
-from knowledge.search import unified_search
-from tools.registry import register
-
-
-def financial_report(stock_name):
-    &quot;&quot;&quot;搜索指定公司的关键财务指标，返回整理后的年报数据。
-
-    搜索营收、净利润、增长率等核心指标，合并去重后返回结构化文本。
-    LLM 拿到整理好的数据后自行做分析和格式化。
-    &quot;&quot;&quot;
-    try:
-        metrics = [
-            &quot;营业收入 2024年&quot;,
-            &quot;归属于上市公司股东的净利润&quot;,
-            &quot;营业收入 同比增长&quot;,
-            &quot;基本每股收益&quot;,
-        ]
-
-        all_chunks = []
-        seen = set()
-        for metric in metrics:
-            results = unified_search(
-                f&quot;{stock_name} {metric}&quot;, top_k=3, collections=[&quot;annual_reports&quot;]
-            )
-            for r in results:
-                # 去重：同一段文本不重复
-                key = r[&quot;content&quot;][:80]
-                if key not in seen and r[&quot;content&quot;].strip():
-                    seen.add(key)
-                    all_chunks.append(r)
-
-        if not all_chunks:
-            return f&quot;年报库中未找到 {stock_name} 的财务数据&quot;
-
-        # 按相关度排序
-        all_chunks.sort(key=lambda x: x[&quot;distance&quot;])
-
-        lines = [f&quot;{stock_name} 年报财务数据\n&quot;]
-        for i, r in enumerate(all_chunks, 1):
-            lines.append(f&quot;## 数据块 {i}（距离 {r[&#x27;distance&#x27;]}）&quot;)
-            lines.append(r[&quot;content&quot;])
-            lines.append(&quot;---&quot;)
-
-        return &quot;\n&quot;.join(lines)
-
-    except Exception as e:
-        return f&quot;查询失败: {e}&quot;
-
-
-REPORT_DEF = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;financial_report&quot;,
-        &quot;description&quot;: &quot;查询上市公司年报，搜索营业收入、净利润、增长率等核心财务指标，返回整理后的年报原文供分析&quot;,
-        &quot;parameters&quot;: {
-            &quot;type&quot;: &quot;object&quot;,
-            &quot;properties&quot;: {
-                &quot;stock_name&quot;: {
-                    &quot;type&quot;: &quot;string&quot;,
-                    &quot;description&quot;: &quot;公司名称，如 贵州茅台、比亚迪&quot;,
-                },
-            },
-            &quot;required&quot;: [&quot;stock_name&quot;],
-        },
-    },
-}
-
-register(&quot;financial_report&quot;, REPORT_DEF, financial_report)
-</div></div>
-</div>
-<div class="card" id="tools-finance-market_data-py" data-versions="v030">
-<div class="card-title">tools/finance/market_data.py <span class="ver-badge badge-new">NEW</span></div>
-<div class="card-desc">实时行情 — 调用 akshare 查 A 股价格</div>
-<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;A 股实时行情查询工具。&quot;&quot;&quot;
-
-import akshare as ak
-
-from tools.registry import register
-
-
-def get_stock_price(code):
-    &quot;&quot;&quot;查询 A 股实时价格&quot;&quot;&quot;
-    try:
-        df = ak.stock_zh_a_spot_em()
-        row = df[df[&quot;代码&quot;] == code]
-        if row.empty:
-            return f&quot;未找到股票代码 {code}&quot;
-        r = row.iloc[0]
-        return (
-            f&quot;{r[&#x27;名称&#x27;]}({code})\n&quot;
-            f&quot;最新价: {r[&#x27;最新价&#x27;]}\n&quot;
-            f&quot;涨跌幅: {r[&#x27;涨跌幅&#x27;]}%\n&quot;
-            f&quot;成交量: {r[&#x27;成交量&#x27;]}\n&quot;
-            f&quot;成交额: {r[&#x27;成交额&#x27;]}&quot;
-        )
-    except Exception as e:
-        return f&quot;查询失败: {e}&quot;
-
-
-PRICE_DEF = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;get_stock_price&quot;,
-        &quot;description&quot;: &quot;查询 A 股实时行情，返回最新价、涨跌幅、成交量、成交额&quot;,
-        &quot;parameters&quot;: {
-            &quot;type&quot;: &quot;object&quot;,
-            &quot;properties&quot;: {
-                &quot;code&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;股票代码，如 600519（茅台）&quot;}
-            },
-            &quot;required&quot;: [&quot;code&quot;],
-        },
-    },
-}
-
-register(&quot;get_stock_price&quot;, PRICE_DEF, get_stock_price)
-</div></div>
-</div>
-<div class="card" id="tools-registry-py" data-versions="v020 v030">
-<div class="card-title">tools/registry.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">工具注册表 — register/get/execute 中心枢纽</div>
-<div data-versions="v020"><div class="code-label">v0.2.0 — 36 行</div><div class="code-block">&quot;&quot;&quot;工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。&quot;&quot;&quot;
-
-_registry = {}  # {工具名: {&quot;definition&quot;: {...}, &quot;handler&quot;: 函数}}
-
-# 调用工具时,会自动来这报道.在tools里调用该函数
-def register(name, definition, handler):
-    &quot;&quot;&quot;注册一个工具。definition 是给 LLM 看的 JSON Schema。&quot;&quot;&quot;
-    _registry[name] = {&quot;definition&quot;: definition, &quot;handler&quot;: handler}
-
-# 让LLM知道有哪些工具(main函数开具就调用了工具,所以可以直接让LLM知悉)
-def get_tool_definitions():
-    &quot;&quot;&quot;返回所有工具的 definition 列表（给 LLM 的 tools 参数）。&quot;&quot;&quot;
-    return [item[&quot;definition&quot;] for item in _registry.values()]
-
-# 执行工具
-def execute(name, args):
-    &quot;&quot;&quot;根据工具名执行对应函数。&quot;&quot;&quot;
-    if name not in _registry:
-        return f&quot;错误：未知工具 {name}&quot;
-    return _registry[name][&quot;handler&quot;](**args)
-
-
-
-
-
-&quot;&quot;&quot;
-示例
-     _registry = {
-         &quot;read_file&quot;:   {&quot;definition&quot;: {...给LLM看的JSON...}, &quot;handler&quot;: &lt;read_file函数&gt;},
-         &quot;write_file&quot;:  {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;write_file函数&gt;},
-         &quot;terminal&quot;:    {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;run_command函数&gt;},
-         ...
-     }
-
- Agent Loop 只需要知道 get_tool_definitions() 和 execute() 两个入口，不关心注册表里有什么。
-
-&quot;&quot;&quot;</div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 37 行 (+1 行)</div><div class="code-block">&quot;&quot;&quot;工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。&quot;&quot;&quot;
-
-_registry = {}  # {工具名: {&quot;definition&quot;: {...}, &quot;handler&quot;: 函数}}
-
-
-# 调用工具时,会自动来这报道.在tools里调用该函数
-def register(name, definition, handler):
-    &quot;&quot;&quot;注册一个工具。definition 是给 LLM 看的 JSON Schema。&quot;&quot;&quot;
-    _registry[name] = {&quot;definition&quot;: definition, &quot;handler&quot;: handler}
-
-
-# 让LLM知道有哪些工具(main函数开具就调用了工具,所以可以直接让LLM知悉)
-def get_tool_definitions():
-    &quot;&quot;&quot;返回所有工具的 definition 列表（给 LLM 的 tools 参数）。&quot;&quot;&quot;
-    return [item[&quot;definition&quot;] for item in _registry.values()]
-
-
-# 执行工具
-def execute(name, args):
-    &quot;&quot;&quot;根据工具名执行对应函数。&quot;&quot;&quot;
-    if name not in _registry:
-        return f&quot;错误：未知工具 {name}&quot;
-    return _registry[name][&quot;handler&quot;](**args)
-
-
-&quot;&quot;&quot;
-示例
-     _registry = {
-         &quot;read_file&quot;:   {&quot;definition&quot;: {...给LLM看的JSON...}, &quot;handler&quot;: &lt;read_file函数&gt;},
-         &quot;write_file&quot;:  {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;write_file函数&gt;},
-         &quot;terminal&quot;:    {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;run_command函数&gt;},
-         ...
-     }
-
- Agent Loop 只需要知道 get_tool_definitions() 和 execute() 两个入口，不关心注册表里有什么。
-
-&quot;&quot;&quot;
-</div></div>
-</div>
-<div class="card" id="tools-search_tool-py" data-versions="v020 v030">
-<div class="card-title">tools/search_tool.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">知识搜索 — 调 knowledge.search 格式化返回</div>
-<div data-versions="v020"><div class="code-label">v0.2.0 — 26 行</div><div class="code-block">&quot;&quot;&quot;知识库搜索工具 — 调用 knowledge.search 统一搜索。&quot;&quot;&quot;
-from tools.registry import register
-from knowledge.search import search_formatted
-
-
-def search_knowledge(query):
-    &quot;&quot;&quot;搜索知识库(年报 + Agent文档 + Wiki)，返回格式化结果。&quot;&quot;&quot;
-    return search_formatted(query)
-
-
-SEARCH_DEF = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;search_knowledge&quot;,
-        &quot;description&quot;: &quot;搜索本地知识库，包括年报、Agent工程文档等。用来查找事实、数据、技术方案。&quot;,
-        &quot;parameters&quot;: {
-            &quot;type&quot;: &quot;object&quot;,
-            &quot;properties&quot;: {
-                &quot;query&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;搜索关键词或问题&quot;}
-            },
-            &quot;required&quot;: [&quot;query&quot;]
-        }
-    }
-}
-
-register(&quot;search_knowledge&quot;, SEARCH_DEF, search_knowledge)
-</div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 25 行 (-1 行)</div><div class="code-block">&quot;&quot;&quot;知识库搜索工具 — 调用 knowledge.search 统一搜索。&quot;&quot;&quot;
-
-from knowledge.search import search_formatted
-from tools.registry import register
-
-
-def search_knowledge(query):
-    &quot;&quot;&quot;搜索知识库(年报 + Agent文档 + Wiki)，返回格式化结果。&quot;&quot;&quot;
-    return search_formatted(query)
-
-
-SEARCH_DEF = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;search_knowledge&quot;,
-        &quot;description&quot;: &quot;搜索本地知识库，包括年报、Agent工程文档等。用来查找事实、数据、技术方案。&quot;,
-        &quot;parameters&quot;: {
-            &quot;type&quot;: &quot;object&quot;,
-            &quot;properties&quot;: {&quot;query&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;搜索关键词或问题&quot;}},
-            &quot;required&quot;: [&quot;query&quot;],
-        },
-    },
-}
-
-register(&quot;search_knowledge&quot;, SEARCH_DEF, search_knowledge)
-</div></div>
-</div>
-<div class="card" id="tools-terminal_tool-py" data-versions="v020 v030">
-<div class="card-title">tools/terminal_tool.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">终端执行 — subprocess.run 封装</div>
-<div data-versions="v020"><div class="code-label">v0.2.0 — 39 行</div><div class="code-block">&quot;&quot;&quot;终端命令执行工具。&quot;&quot;&quot;
-from tools.registry import register
-import subprocess
-
-
-def run_command(command, timeout=30):
-    &quot;&quot;&quot;执行 shell 命令并返回输出。&quot;&quot;&quot;
-    try:
-        result = subprocess.run(
-            command, shell=True, capture_output=True,
-            text=True, timeout=timeout, cwd=&quot;/Users/ns/Projects/ns-agent&quot;
-        )
-        output = result.stdout
-        if result.stderr:
-            output += &quot;\n[stderr]\n&quot; + result.stderr
-        return output or f&quot;命令执行完毕（退出码 {result.returncode}）&quot;
-    except subprocess.TimeoutExpired:
-        return f&quot;错误：命令超时（&gt;{timeout}秒）&quot;
-    except Exception as e:
-        return f&quot;错误：{e}&quot;
-
-
-TERMINAL_DEF = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;terminal&quot;,
-        &quot;description&quot;: &quot;在终端执行 shell 命令并返回输出。用来运行代码、安装包、查看文件等。&quot;,
-        &quot;parameters&quot;: {
-            &quot;type&quot;: &quot;object&quot;,
-            &quot;properties&quot;: {
-                &quot;command&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要执行的命令&quot;},
-                &quot;timeout&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;超时秒数（默认30）&quot;}
-            },
-            &quot;required&quot;: [&quot;command&quot;]
-        }
-    }
-}
-
-register(&quot;terminal&quot;, TERMINAL_DEF, run_command)
-</div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 45 行 (+6 行)</div><div class="code-block">&quot;&quot;&quot;终端命令执行工具。&quot;&quot;&quot;
-
-import subprocess
-
-from tools.registry import register
-
-
-def run_command(command, timeout=30):
-    &quot;&quot;&quot;执行 shell 命令并返回输出。&quot;&quot;&quot;
-    try:
-        result = subprocess.run(
-            command,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            cwd=&quot;/Users/ns/Projects/ns-agent&quot;,
-        )
-        output = result.stdout
-        if result.stderr:
-            output += &quot;\n[stderr]\n&quot; + result.stderr
-        return output or f&quot;命令执行完毕（退出码 {result.returncode}）&quot;
-    except subprocess.TimeoutExpired:
-        return f&quot;错误：命令超时（&gt;{timeout}秒）&quot;
-    except Exception as e:
-        return f&quot;错误：{e}&quot;
-
-
-TERMINAL_DEF = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;terminal&quot;,
-        &quot;description&quot;: &quot;在终端执行 shell 命令并返回输出。用来运行代码、安装包、查看文件等。&quot;,
-        &quot;parameters&quot;: {
-            &quot;type&quot;: &quot;object&quot;,
-            &quot;properties&quot;: {
-                &quot;command&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要执行的命令&quot;},
-                &quot;timeout&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;超时秒数（默认30）&quot;},
-            },
-            &quot;required&quot;: [&quot;command&quot;],
-        },
-    },
-}
-
-register(&quot;terminal&quot;, TERMINAL_DEF, run_command)
-</div></div>
-</div>
-<div class="card" id="tools-time_tool-py" data-versions="v020 v030">
-<div class="card-title">tools/time_tool.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">时间工具 — datetime.now()</div>
-<div data-versions="v020"><div class="code-label">v0.2.0 — 20 行</div><div class="code-block">&quot;&quot;&quot;获取当前时间的工具。&quot;&quot;&quot;
-from tools.registry import register
-from datetime import datetime
-
-
-def get_current_time():
-    &quot;&quot;&quot;返回当前日期时间字符串。&quot;&quot;&quot;
-    return datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
-
-
-TOOL_DEFINITION = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;get_current_time&quot;,
-        &quot;description&quot;: &quot;获取当前日期和时间&quot;,
-        &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {}}
-    }
-}
-
-register(&quot;get_current_time&quot;, TOOL_DEFINITION, get_current_time)
-</div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 22 行 (+2 行)</div><div class="code-block">&quot;&quot;&quot;获取当前时间的工具。&quot;&quot;&quot;
-
-from datetime import datetime
-
-from tools.registry import register
-
-
-def get_current_time():
-    &quot;&quot;&quot;返回当前日期时间字符串。&quot;&quot;&quot;
-    return datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
-
-
-TOOL_DEFINITION = {
-    &quot;type&quot;: &quot;function&quot;,
-    &quot;function&quot;: {
-        &quot;name&quot;: &quot;get_current_time&quot;,
-        &quot;description&quot;: &quot;获取当前日期和时间&quot;,
-        &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {}},
-    },
-}
-
-register(&quot;get_current_time&quot;, TOOL_DEFINITION, get_current_time)
-</div></div>
-</div>
-</div>
-<div class="pkg-section"><div class="pkg-title">skills/ — 3 个文件</div>
-<div class="card" id="skills-__init__-py" data-versions="v030">
-<div class="card-title">skills/__init__.py <span class="ver-badge badge-new">NEW</span></div>
-<div class="card-desc">skills 包占位（空文件）</div>
-<div data-versions="v030"><div class="code-block"></div></div>
-</div>
-<div class="card" id="skills-finance-py" data-versions="v030">
-<div class="card-title">skills/finance.py <span class="ver-badge badge-new">NEW</span></div>
-<div class="card-desc">财报分析技能 — 触发词匹配后注入专业知识</div>
-<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;财报分析技能 — 当用户查询财务数据时自动激活。&quot;&quot;&quot;
-
-from skills.registry import register_skill
-
-FINANCE_CONTENT = &quot;&quot;&quot;你是财报分析专家。当用户查询财务数据时，遵循以下规范：
-
-1. **数据来源优先**：优先从 search_knowledge 或 search_financial 获取年报数据
-2. **结构化展示**：用表格展示关键指标（营收、净利润、毛利率、同比增长率）
-3. **单位统一**：年报数据通常是&quot;千元&quot;或&quot;元&quot;，换算为&quot;亿元&quot;展示
-4. **对比分析**：如有同比数据，自动计算增长率
-5. **归因分析**：解释数据变化的原因（行业趋势、公司战略、季节性因素）
-6. **风险提示**：最后加一句免责声明，数据仅供参考&quot;&quot;&quot;
-
-register_skill(
-    name=&quot;financial_analysis&quot;,
-    trigger=&quot;营收|利润|财报|年报|净利润|毛利率|资产负债|现金流&quot;,
-    description=&quot;财报分析&quot;,
-    content=FINANCE_CONTENT,
-)
-</div></div>
-</div>
-<div class="card" id="skills-registry-py" data-versions="v030">
-<div class="card-title">skills/registry.py <span class="ver-badge badge-new">NEW</span></div>
-<div class="card-desc">技能注册表 — register/match/inject 三件套</div>
-<div data-versions="v030"><div class="code-block">&quot;&quot;&quot;技能注册表 — 知识模块的注册、匹配、注入。
-
-工具 = LLM 调用的函数（function calling）
-技能 = 注入 System Prompt 的知识模块（关键词触发）
-&quot;&quot;&quot;
-
-from typing import Any
-
-_skills: dict[str, dict[str, Any]] = {}
-
-
-def register_skill(name: str, trigger: str, description: str, content: str) -&gt; None:
-    &quot;&quot;&quot;注册一个技能。
-
-    name: 技能名（唯一标识）
-    trigger: 触发关键词（匹配用户输入）
-    description: 一句话描述（给开发者看的）
-    content: 注入到 System Prompt 的知识内容
-    &quot;&quot;&quot;
-    _skills[name] = {
-        &quot;trigger&quot;: trigger,
-        &quot;description&quot;: description,
-        &quot;content&quot;: content,
-    }
-
-
-def match_skills(user_input: str) -&gt; list[dict[str, Any]]:
-    &quot;&quot;&quot;根据用户输入匹配已注册的技能。
-
-    匹配规则：trigger 中的任一关键词出现在用户输入中（不区分大小写）。
-    trigger 可用 `|` 分隔多个关键词。
-    &quot;&quot;&quot;
-    matched = []
-    user_lower = user_input.lower()
-    for _name, skill in _skills.items():
-        keywords = skill[&quot;trigger&quot;].split(&quot;|&quot;)
-        if any(kw.strip().lower() in user_lower for kw in keywords):
-            matched.append(skill)
-    return matched
-
-
-def inject_skills(
-    messages: list[dict[str, Any]], matched: list[dict[str, Any]]
-) -&gt; list[dict[str, Any]]:
-    &quot;&quot;&quot;将匹配到的技能内容注入 System Prompt。
-
-    在第一条 system 消息末尾追加技能内容。
-    &quot;&quot;&quot;
-    if not matched:
-        return messages
-
-    skill_text = &quot;\n\n&quot;.join(f&quot;## {s[&#x27;description&#x27;]}\n{s[&#x27;content&#x27;]}&quot; for s in matched)
-    messages[0][&quot;content&quot;] += f&quot;\n\n---\n## 已激活的知识模块\n{skill_text}&quot;
-    return messages
-
-
-def list_skills() -&gt; list[dict[str, str]]:
-    &quot;&quot;&quot;列出所有已注册的技能（名称 + 描述）。&quot;&quot;&quot;
-    return [{&quot;name&quot;: name, &quot;description&quot;: s[&quot;description&quot;]} for name, s in _skills.items()]
-</div></div>
-</div>
-</div>
-<div class="pkg-section"><div class="pkg-title">knowledge/ — 3 个文件</div>
-<div class="card" id="knowledge-__init__-py" data-versions="v020 v030">
+<div class="card" id="knowledge-__init__-py" data-versions="v010 v020 v030">
 <div class="card-title">knowledge/__init__.py </div>
-<div class="card-desc">knowledge 包占位（空文件）</div>
+<div class="card-desc"></div>
 </div>
 <div class="card" id="knowledge-ingest_wiki-py" data-versions="v020 v030">
-<div class="card-title">knowledge/ingest_wiki.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">Wiki 入库 — 扫描 → 分块 → 向量化 → ChromaDB</div>
+<div class="card-title">knowledge/ingest_wiki.py <span class="ver-badge badge-new" data-versions="v020">NEW v0.2.0</span></div>
+<div class="card-desc">Wiki 入库 — 扫描→分块→向量化→ChromaDB</div>
 <div data-versions="v020"><div class="code-label">v0.2.0 — 87 行</div><div class="code-block">&quot;&quot;&quot;Wiki 入库 — 扫描 Wiki 目录 → 分块 → 向量化 → ChromaDB collection wiki_knowledge。&quot;&quot;&quot;
 import re
 from pathlib import Path
@@ -1440,7 +846,7 @@ def ingest():
 if __name__ == &quot;__main__&quot;:
     ingest()
 </div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 88 行 (+1 行)</div><div class="code-block">&quot;&quot;&quot;Wiki 入库 — 扫描 Wiki 目录 → 分块 → 向量化 → ChromaDB collection wiki_knowledge。&quot;&quot;&quot;
+<div data-versions="v030"><div class="code-label">v0.3.0 — 88 行</div><div class="code-block">&quot;&quot;&quot;Wiki 入库 — 扫描 Wiki 目录 → 分块 → 向量化 → ChromaDB collection wiki_knowledge。&quot;&quot;&quot;
 
 from pathlib import Path
 import re
@@ -1530,9 +936,90 @@ if __name__ == &quot;__main__&quot;:
     ingest()
 </div></div>
 </div>
-<div class="card" id="knowledge-search-py" data-versions="v020 v030">
-<div class="card-title">knowledge/search.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">统一多源搜索 — 并行搜索年报+Agent工程+Wiki</div>
+<div class="card" id="knowledge-search-py" data-versions="v010 v020 v030">
+<div class="card-title">knowledge/search.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
+<div class="card-desc">统一多源搜索 — 年报+Agent工程+Wiki</div>
+<div data-versions="v010"><div class="code-label">v0.1.0 — 80 行</div><div class="code-block">&quot;&quot;&quot;统一多源搜索 — 一个查询并行搜索所有知识库。&quot;&quot;&quot;
+import os
+from pathlib import Path
+
+# 离线模式，避免 sentence-transformers 直连 huggingface
+os.environ[&quot;HF_HUB_OFFLINE&quot;] = &quot;1&quot;
+
+import chromadb
+from sentence_transformers import SentenceTransformer
+
+
+# === 初始化 ===
+
+CHROMA_PATH = str(Path(__file__).parent.parent.parent / &quot;rag-project/backend/chroma_data&quot;)
+
+_client = chromadb.PersistentClient(path=CHROMA_PATH)
+
+# 已知的集合（wiki_knowledge 待后续入库后加入）
+KNOWN_COLLECTIONS = [&quot;annual_reports&quot;, &quot;agent_engineering&quot;]
+
+# bge 中文语义模型（384维）
+_embed_model = SentenceTransformer(
+    &quot;BAAI/bge-small-zh-v1.5&quot;,
+    local_files_only=True
+)
+
+
+# === 核心函数 ===
+
+def unified_search(query, top_k=5):
+    &quot;&quot;&quot;并行搜索所有知识库，按相关度合并返回。
+
+    返回格式：
+    [
+        {&quot;source&quot;: &quot;annual_reports&quot;, &quot;content&quot;: &quot;...&quot;, &quot;distance&quot;: 0.23},
+        {&quot;source&quot;: &quot;agent_engineering&quot;, &quot;content&quot;: &quot;...&quot;, &quot;distance&quot;: 0.45},
+        ...
+    ]
+    &quot;&quot;&quot;
+    query_vec = _embed_model.encode(query).tolist()
+    all_results = []
+
+    for coll_name in KNOWN_COLLECTIONS:
+        try:
+            collection = _client.get_collection(coll_name)
+            results = collection.query(
+                query_embeddings=[query_vec],
+                n_results=top_k
+            )
+            # results[&quot;documents&quot;][0] 是 top_k 个文档列表
+            # results[&quot;distances&quot;][0] 是对应的距离列表
+            for doc, dist in zip(results[&quot;documents&quot;][0], results[&quot;distances&quot;][0]):
+                all_results.append({
+                    &quot;source&quot;: coll_name,
+                    &quot;content&quot;: doc,
+                    &quot;distance&quot;: round(dist, 4)
+                })
+        except Exception as e:
+            continue  # 集合不存在就跳过
+
+    # 按相关度排序（距离越小越相关）
+    all_results.sort(key=lambda x: x[&quot;distance&quot;])
+    return all_results
+
+
+def search_formatted(query, top_k=5):
+    &quot;&quot;&quot;搜索并格式化为 Agent 可读的文本。&quot;&quot;&quot;
+    results = unified_search(query, top_k)
+    if not results:
+        return &quot;未找到相关知识。&quot;
+    
+    lines = [f&quot;搜索「{query}」找到 {len(results)} 条结果：\n&quot;]
+    for i, r in enumerate(results, 1):
+        source_label = {&quot;annual_reports&quot;: &quot;年报&quot;, &quot;agent_engineering&quot;: &quot;Agent工程&quot;}
+        label = source_label.get(r[&quot;source&quot;], r[&quot;source&quot;])
+        lines.append(f&quot;[{i}] 来源：{label}（距离 {r[&#x27;distance&#x27;]}）&quot;)
+        lines.append(f&quot;    {r[&#x27;content&#x27;][:300]}&quot;)
+        lines.append(&quot;&quot;)
+    
+    return &quot;\n&quot;.join(lines)
+</div></div>
 <div data-versions="v020"><div class="code-label">v0.2.0 — 80 行</div><div class="code-block">&quot;&quot;&quot;统一多源搜索 — 一个查询并行搜索所有知识库。&quot;&quot;&quot;
 import os
 from pathlib import Path
@@ -1614,7 +1101,7 @@ def search_formatted(query, top_k=5):
     
     return &quot;\n&quot;.join(lines)
 </div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 75 行 (-5 行)</div><div class="code-block">&quot;&quot;&quot;统一多源搜索 — 一个查询并行搜索所有知识库。&quot;&quot;&quot;
+<div data-versions="v030"><div class="code-label">v0.3.0 — 75 行</div><div class="code-block">&quot;&quot;&quot;统一多源搜索 — 一个查询并行搜索所有知识库。&quot;&quot;&quot;
 
 import os
 from pathlib import Path
@@ -1691,15 +1178,56 @@ def search_formatted(query, top_k=5):
     return &quot;\n&quot;.join(lines)
 </div></div>
 </div>
+<div class="card" id="main-py" data-versions="v010 v020 v030">
+<div class="card-title">main.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
+<div class="card-desc">入口脚本 — import 所有工具模块触发 register()</div>
+<div data-versions="v010"><div class="code-label">v0.1.0 — 11 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 入口 — 加载工具 → 启动 Agent。&quot;&quot;&quot;
+# 导入工具模块 = 触发 register() 报到
+import tools.time_tool      # noqa: F401
+import tools.file_tools     # noqa: F401
+import tools.terminal_tool  # noqa: F401
+import tools.search_tool    # noqa: F401
+
+from core.agent import chat
+
+if __name__ == &quot;__main__&quot;:
+    chat()
+</div></div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 11 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 入口 — 加载工具 → 启动 Agent。&quot;&quot;&quot;
+# 导入工具模块 = 触发 register() 报到
+import tools.time_tool      # noqa: F401
+import tools.file_tools     # noqa: F401
+import tools.terminal_tool  # noqa: F401
+import tools.search_tool    # noqa: F401
+
+from core.agent import chat
+
+if __name__ == &quot;__main__&quot;:
+    chat()
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 14 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 入口 — 加载工具 → 启动 Agent。&quot;&quot;&quot;
+
+# 导入工具模块 = 触发 register() 报到
+from core.agent import chat
+import skills.finance  # noqa: F401
+import tools.file_tools  # noqa: F401
+import tools.finance.financial_report  # noqa: F401
+import tools.finance.market_data  # noqa: F401
+import tools.search_tool  # noqa: F401
+import tools.terminal_tool  # noqa: F401
+import tools.time_tool  # noqa: F401
+
+if __name__ == &quot;__main__&quot;:
+    chat()
+</div></div>
 </div>
-<div class="pkg-section"><div class="pkg-title">memory/ — 2 个文件</div>
-<div class="card" id="memory-__init__-py" data-versions="v020 v030">
+<div class="card" id="memory-__init__-py" data-versions="v010 v020 v030">
 <div class="card-title">memory/__init__.py </div>
-<div class="card-desc">memory 包占位（空文件）</div>
+<div class="card-desc"></div>
 </div>
 <div class="card" id="memory-session-py" data-versions="v020 v030">
-<div class="card-title">memory/session.py <span class="ver-badge badge-mod">MOD</span></div>
-<div class="card-desc">会话持久化 — SQLite 存储 + 24h 恢复</div>
+<div class="card-title">memory/session.py <span class="ver-badge badge-new" data-versions="v020">NEW v0.2.0</span></div>
+<div class="card-desc">会话持久化 — SQLite + 24h 恢复</div>
 <div data-versions="v020"><div class="code-label">v0.2.0 — 119 行</div><div class="code-block">&quot;&quot;&quot;会话持久化 — SQLite 存储对话历史，启动时恢复。&quot;&quot;&quot;
 import json
 import sqlite3
@@ -1820,7 +1348,7 @@ def get_last_session():
     conn.close()
     return row[&quot;id&quot;] if row else None
 </div></div>
-<div data-versions="v030"><div class="code-label">v0.3.0 — 115 行 (-4 行)</div><div class="code-block">&quot;&quot;&quot;会话持久化 — SQLite 存储对话历史，启动时恢复。&quot;&quot;&quot;
+<div data-versions="v030"><div class="code-label">v0.3.0 — 115 行</div><div class="code-block">&quot;&quot;&quot;会话持久化 — SQLite 存储对话历史，启动时恢复。&quot;&quot;&quot;
 
 from datetime import datetime, timedelta
 import json
@@ -1937,60 +1465,833 @@ def get_last_session():
     return row[&quot;id&quot;] if row else None
 </div></div>
 </div>
+<div class="card" id="skills-__init__-py" data-versions="v030">
+<div class="card-title">skills/__init__.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
+<div class="card-desc"></div>
 </div>
-<div class="card" data-versions="v030"><div class="card-title">v0.3.0 依赖关系 <span class="ver-badge badge-new">NEW</span></div><div class="dep-grid">
-<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ core/context.py</div></div>
-<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ core/errors.py</div></div>
-<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ core/prompt.py</div></div>
-<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ core/retry.py</div></div>
-<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ memory/__init__.py</div></div>
-<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ memory/session.py</div></div>
-<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ skills/registry.py</div></div>
-<div class="dep-item"><div class="from">core/agent.py</div><div class="to">→ tools/registry.py</div></div>
-<div class="dep-item"><div class="from">core/retry.py</div><div class="to">→ tools/time_tool.py</div></div>
-<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/__init__.py</div></div>
-<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/agent.py</div></div>
-<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/context.py</div></div>
-<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/errors.py</div></div>
-<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/prompt.py</div></div>
-<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ core/retry.py</div></div>
-<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ skills/registry.py</div></div>
-<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ tools/finance/financial_report.py</div></div>
-<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ tools/registry.py</div></div>
-<div class="dep-item"><div class="from">knowledge/ingest_wiki.py</div><div class="to">→ knowledge/search.py</div></div>
-<div class="dep-item"><div class="from">main.py</div><div class="to">→ core/agent.py</div></div>
-<div class="dep-item"><div class="from">main.py</div><div class="to">→ skills/finance.py</div></div>
-<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/file_tools.py</div></div>
-<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/finance/financial_report.py</div></div>
-<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/finance/market_data.py</div></div>
-<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/search_tool.py</div></div>
-<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/terminal_tool.py</div></div>
-<div class="dep-item"><div class="from">main.py</div><div class="to">→ tools/time_tool.py</div></div>
-<div class="dep-item"><div class="from">skills/finance.py</div><div class="to">→ skills/registry.py</div></div>
-<div class="dep-item"><div class="from">tools/file_tools.py</div><div class="to">→ tools/registry.py</div></div>
-<div class="dep-item"><div class="from">tools/finance/financial_report.py</div><div class="to">→ knowledge/search.py</div></div>
-<div class="dep-item"><div class="from">tools/finance/financial_report.py</div><div class="to">→ tools/registry.py</div></div>
-<div class="dep-item"><div class="from">tools/finance/market_data.py</div><div class="to">→ tools/registry.py</div></div>
-<div class="dep-item"><div class="from">tools/search_tool.py</div><div class="to">→ knowledge/search.py</div></div>
-<div class="dep-item"><div class="from">tools/search_tool.py</div><div class="to">→ tools/registry.py</div></div>
-<div class="dep-item"><div class="from">tools/terminal_tool.py</div><div class="to">→ tools/registry.py</div></div>
-<div class="dep-item"><div class="from">tools/time_tool.py</div><div class="to">→ tools/registry.py</div></div>
+<div class="card" id="skills-finance-py" data-versions="v030">
+<div class="card-title">skills/finance.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
+<div class="card-desc">财报分析技能 — 关键词触发注入专业知识</div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 19 行</div><div class="code-block">&quot;&quot;&quot;财报分析技能 — 当用户查询财务数据时自动激活。&quot;&quot;&quot;
+
+from skills.registry import register_skill
+
+FINANCE_CONTENT = &quot;&quot;&quot;你是财报分析专家。当用户查询财务数据时，遵循以下规范：
+
+1. **数据来源优先**：优先从 search_knowledge 或 search_financial 获取年报数据
+2. **结构化展示**：用表格展示关键指标（营收、净利润、毛利率、同比增长率）
+3. **单位统一**：年报数据通常是&quot;千元&quot;或&quot;元&quot;，换算为&quot;亿元&quot;展示
+4. **对比分析**：如有同比数据，自动计算增长率
+5. **归因分析**：解释数据变化的原因（行业趋势、公司战略、季节性因素）
+6. **风险提示**：最后加一句免责声明，数据仅供参考&quot;&quot;&quot;
+
+register_skill(
+    name=&quot;financial_analysis&quot;,
+    trigger=&quot;营收|利润|财报|年报|净利润|毛利率|资产负债|现金流&quot;,
+    description=&quot;财报分析&quot;,
+    content=FINANCE_CONTENT,
+)
 </div></div>
 </div>
-<script>
-function switchVersion(version) {
-  document.getElementById("btn-v020").classList.toggle("active", version==="v020");
-  document.getElementById("btn-v030").classList.toggle("active", version==="v030");
-  var vn = version==="v020" ? "v0.2.0" : "v0.3.0";
-  var st = version==="v020" ? "16 文件" : "24 文件";
-  document.getElementById("ver-info").innerHTML = "当前 <b>" + vn + "</b> — " + st;
-  document.querySelectorAll("[data-versions]").forEach(function(el) {
-    var vs = el.getAttribute("data-versions");
-    if (vs.indexOf(version) === -1) el.classList.add("hidden-version");
-    else el.classList.remove("hidden-version");
-  });
-  document.body.className = version + "-view";
+<div class="card" id="skills-registry-py" data-versions="v030">
+<div class="card-title">skills/registry.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
+<div class="card-desc">技能注册表 — register/match/inject</div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 59 行</div><div class="code-block">&quot;&quot;&quot;技能注册表 — 知识模块的注册、匹配、注入。
+
+工具 = LLM 调用的函数（function calling）
+技能 = 注入 System Prompt 的知识模块（关键词触发）
+&quot;&quot;&quot;
+
+from typing import Any
+
+_skills: dict[str, dict[str, Any]] = {}
+
+
+def register_skill(name: str, trigger: str, description: str, content: str) -&gt; None:
+    &quot;&quot;&quot;注册一个技能。
+
+    name: 技能名（唯一标识）
+    trigger: 触发关键词（匹配用户输入）
+    description: 一句话描述（给开发者看的）
+    content: 注入到 System Prompt 的知识内容
+    &quot;&quot;&quot;
+    _skills[name] = {
+        &quot;trigger&quot;: trigger,
+        &quot;description&quot;: description,
+        &quot;content&quot;: content,
+    }
+
+
+def match_skills(user_input: str) -&gt; list[dict[str, Any]]:
+    &quot;&quot;&quot;根据用户输入匹配已注册的技能。
+
+    匹配规则：trigger 中的任一关键词出现在用户输入中（不区分大小写）。
+    trigger 可用 `|` 分隔多个关键词。
+    &quot;&quot;&quot;
+    matched = []
+    user_lower = user_input.lower()
+    for _name, skill in _skills.items():
+        keywords = skill[&quot;trigger&quot;].split(&quot;|&quot;)
+        if any(kw.strip().lower() in user_lower for kw in keywords):
+            matched.append(skill)
+    return matched
+
+
+def inject_skills(
+    messages: list[dict[str, Any]], matched: list[dict[str, Any]]
+) -&gt; list[dict[str, Any]]:
+    &quot;&quot;&quot;将匹配到的技能内容注入 System Prompt。
+
+    在第一条 system 消息末尾追加技能内容。
+    &quot;&quot;&quot;
+    if not matched:
+        return messages
+
+    skill_text = &quot;\n\n&quot;.join(f&quot;## {s[&#x27;description&#x27;]}\n{s[&#x27;content&#x27;]}&quot; for s in matched)
+    messages[0][&quot;content&quot;] += f&quot;\n\n---\n## 已激活的知识模块\n{skill_text}&quot;
+    return messages
+
+
+def list_skills() -&gt; list[dict[str, str]]:
+    &quot;&quot;&quot;列出所有已注册的技能（名称 + 描述）。&quot;&quot;&quot;
+    return [{&quot;name&quot;: name, &quot;description&quot;: s[&quot;description&quot;]} for name, s in _skills.items()]
+</div></div>
+</div>
+<div class="card" id="tools-__init__-py" data-versions="v010 v020 v030">
+<div class="card-title">tools/__init__.py </div>
+<div class="card-desc"></div>
+</div>
+<div class="card" id="tools-file_tools-py" data-versions="v010 v020 v030">
+<div class="card-title">tools/file_tools.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
+<div class="card-desc">文件读写 — read_file + write_file</div>
+<div data-versions="v010"><div class="code-label">v0.1.0 — 70 行</div><div class="code-block">&quot;&quot;&quot;文件读写工具 — read_file 和 write_file。&quot;&quot;&quot;
+from tools.registry import register
+from pathlib import Path
+
+
+def read_file(path, offset=1, limit=200):
+    &quot;&quot;&quot;读取文件内容。offset 和 limit 控制读取范围。&quot;&quot;&quot;
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        return f&quot;错误：文件不存在 {path}&quot;
+    try:
+        lines = p.read_text(encoding=&quot;utf-8&quot;).split(&quot;\n&quot;)
+        total = len(lines)
+        start = max(0, offset - 1)
+        end = min(total, start + limit)
+        result = []
+        for i in range(start, end):
+            result.append(f&quot;{i+1}|{lines[i]}&quot;)
+        header = f&quot;文件 {path}（第 {start+1}-{end} 行 / 共 {total} 行）\n&quot;
+        return header + &quot;\n&quot;.join(result)
+    except Exception as e:
+        return f&quot;错误：读取失败 {e}&quot;
+
+
+def write_file(path, content):
+    &quot;&quot;&quot;写入文件内容（覆盖）。&quot;&quot;&quot;
+    p = Path(path).expanduser().resolve()
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content, encoding=&quot;utf-8&quot;)
+        return f&quot;已写入 {path}（{len(content)} 字符）&quot;
+    except Exception as e:
+        return f&quot;错误：写入失败 {e}&quot;
+
+
+READ_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;read_file&quot;,
+        &quot;description&quot;: &quot;读取文件内容，返回带行号的文本&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
+                &quot;offset&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;起始行号（默认1）&quot;},
+                &quot;limit&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;读取行数（默认200）&quot;}
+            },
+            &quot;required&quot;: [&quot;path&quot;]
+        }
+    }
 }
-switchVersion("v030");
+
+WRITE_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;write_file&quot;,
+        &quot;description&quot;: &quot;写入文件内容（覆盖模式）&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
+                &quot;content&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要写入的内容&quot;}
+            },
+            &quot;required&quot;: [&quot;path&quot;, &quot;content&quot;]
+        }
+    }
+}
+
+register(&quot;read_file&quot;, READ_DEF, read_file)
+register(&quot;write_file&quot;, WRITE_DEF, write_file)
+</div></div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 70 行</div><div class="code-block">&quot;&quot;&quot;文件读写工具 — read_file 和 write_file。&quot;&quot;&quot;
+from tools.registry import register
+from pathlib import Path
+
+
+def read_file(path, offset=1, limit=200):
+    &quot;&quot;&quot;读取文件内容。offset 和 limit 控制读取范围。&quot;&quot;&quot;
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        return f&quot;错误：文件不存在 {path}&quot;
+    try:
+        lines = p.read_text(encoding=&quot;utf-8&quot;).split(&quot;\n&quot;)
+        total = len(lines)
+        start = max(0, offset - 1)
+        end = min(total, start + limit)
+        result = []
+        for i in range(start, end):
+            result.append(f&quot;{i+1}|{lines[i]}&quot;)
+        header = f&quot;文件 {path}（第 {start+1}-{end} 行 / 共 {total} 行）\n&quot;
+        return header + &quot;\n&quot;.join(result)
+    except Exception as e:
+        return f&quot;错误：读取失败 {e}&quot;
+
+
+def write_file(path, content):
+    &quot;&quot;&quot;写入文件内容（覆盖）。&quot;&quot;&quot;
+    p = Path(path).expanduser().resolve()
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content, encoding=&quot;utf-8&quot;)
+        return f&quot;已写入 {path}（{len(content)} 字符）&quot;
+    except Exception as e:
+        return f&quot;错误：写入失败 {e}&quot;
+
+
+READ_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;read_file&quot;,
+        &quot;description&quot;: &quot;读取文件内容，返回带行号的文本&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
+                &quot;offset&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;起始行号（默认1）&quot;},
+                &quot;limit&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;读取行数（默认200）&quot;}
+            },
+            &quot;required&quot;: [&quot;path&quot;]
+        }
+    }
+}
+
+WRITE_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;write_file&quot;,
+        &quot;description&quot;: &quot;写入文件内容（覆盖模式）&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
+                &quot;content&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要写入的内容&quot;}
+            },
+            &quot;required&quot;: [&quot;path&quot;, &quot;content&quot;]
+        }
+    }
+}
+
+register(&quot;read_file&quot;, READ_DEF, read_file)
+register(&quot;write_file&quot;, WRITE_DEF, write_file)
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 72 行</div><div class="code-block">&quot;&quot;&quot;文件读写工具 — read_file 和 write_file。&quot;&quot;&quot;
+
+from pathlib import Path
+
+from tools.registry import register
+
+
+def read_file(path, offset=1, limit=200):
+    &quot;&quot;&quot;读取文件内容。offset 和 limit 控制读取范围。&quot;&quot;&quot;
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        return f&quot;错误：文件不存在 {path}&quot;
+    try:
+        lines = p.read_text(encoding=&quot;utf-8&quot;).split(&quot;\n&quot;)
+        total = len(lines)
+        start = max(0, offset - 1)
+        end = min(total, start + limit)
+        result = []
+        for i in range(start, end):
+            result.append(f&quot;{i + 1}|{lines[i]}&quot;)
+        header = f&quot;文件 {path}（第 {start + 1}-{end} 行 / 共 {total} 行）\n&quot;
+        return header + &quot;\n&quot;.join(result)
+    except Exception as e:
+        return f&quot;错误：读取失败 {e}&quot;
+
+
+def write_file(path, content):
+    &quot;&quot;&quot;写入文件内容（覆盖）。&quot;&quot;&quot;
+    p = Path(path).expanduser().resolve()
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content, encoding=&quot;utf-8&quot;)
+        return f&quot;已写入 {path}（{len(content)} 字符）&quot;
+    except Exception as e:
+        return f&quot;错误：写入失败 {e}&quot;
+
+
+READ_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;read_file&quot;,
+        &quot;description&quot;: &quot;读取文件内容，返回带行号的文本&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
+                &quot;offset&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;起始行号（默认1）&quot;},
+                &quot;limit&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;读取行数（默认200）&quot;},
+            },
+            &quot;required&quot;: [&quot;path&quot;],
+        },
+    },
+}
+
+WRITE_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;write_file&quot;,
+        &quot;description&quot;: &quot;写入文件内容（覆盖模式）&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;path&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;文件路径&quot;},
+                &quot;content&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要写入的内容&quot;},
+            },
+            &quot;required&quot;: [&quot;path&quot;, &quot;content&quot;],
+        },
+    },
+}
+
+register(&quot;read_file&quot;, READ_DEF, read_file)
+register(&quot;write_file&quot;, WRITE_DEF, write_file)
+</div></div>
+</div>
+<div class="card" id="tools-finance-__init__-py" data-versions="v030">
+<div class="card-title">tools/finance/__init__.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
+<div class="card-desc"></div>
+</div>
+<div class="card" id="tools-finance-financial_report-py" data-versions="v030">
+<div class="card-title">tools/finance/financial_report.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
+<div class="card-desc">年报结构化报告 — 多指标并行+去重</div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 70 行</div><div class="code-block">&quot;&quot;&quot;年报结构化报告工具 — 多指标并行搜索 → 整理文本 → 交 LLM 分析。&quot;&quot;&quot;
+
+from knowledge.search import unified_search
+from tools.registry import register
+
+
+def financial_report(stock_name):
+    &quot;&quot;&quot;搜索指定公司的关键财务指标，返回整理后的年报数据。
+
+    搜索营收、净利润、增长率等核心指标，合并去重后返回结构化文本。
+    LLM 拿到整理好的数据后自行做分析和格式化。
+    &quot;&quot;&quot;
+    try:
+        metrics = [
+            &quot;营业收入 2024年&quot;,
+            &quot;归属于上市公司股东的净利润&quot;,
+            &quot;营业收入 同比增长&quot;,
+            &quot;基本每股收益&quot;,
+        ]
+
+        all_chunks = []
+        seen = set()
+        for metric in metrics:
+            results = unified_search(
+                f&quot;{stock_name} {metric}&quot;, top_k=3, collections=[&quot;annual_reports&quot;]
+            )
+            for r in results:
+                # 去重：同一段文本不重复
+                key = r[&quot;content&quot;][:80]
+                if key not in seen and r[&quot;content&quot;].strip():
+                    seen.add(key)
+                    all_chunks.append(r)
+
+        if not all_chunks:
+            return f&quot;年报库中未找到 {stock_name} 的财务数据&quot;
+
+        # 按相关度排序
+        all_chunks.sort(key=lambda x: x[&quot;distance&quot;])
+
+        lines = [f&quot;{stock_name} 年报财务数据\n&quot;]
+        for i, r in enumerate(all_chunks, 1):
+            lines.append(f&quot;## 数据块 {i}（距离 {r[&#x27;distance&#x27;]}）&quot;)
+            lines.append(r[&quot;content&quot;])
+            lines.append(&quot;---&quot;)
+
+        return &quot;\n&quot;.join(lines)
+
+    except Exception as e:
+        return f&quot;查询失败: {e}&quot;
+
+
+REPORT_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;financial_report&quot;,
+        &quot;description&quot;: &quot;查询上市公司年报，搜索营业收入、净利润、增长率等核心财务指标，返回整理后的年报原文供分析&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;stock_name&quot;: {
+                    &quot;type&quot;: &quot;string&quot;,
+                    &quot;description&quot;: &quot;公司名称，如 贵州茅台、比亚迪&quot;,
+                },
+            },
+            &quot;required&quot;: [&quot;stock_name&quot;],
+        },
+    },
+}
+
+register(&quot;financial_report&quot;, REPORT_DEF, financial_report)
+</div></div>
+</div>
+<div class="card" id="tools-finance-market_data-py" data-versions="v030">
+<div class="card-title">tools/finance/market_data.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
+<div class="card-desc">实时行情 — akshare A股价格</div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 42 行</div><div class="code-block">&quot;&quot;&quot;A 股实时行情查询工具。&quot;&quot;&quot;
+
+import akshare as ak
+
+from tools.registry import register
+
+
+def get_stock_price(code):
+    &quot;&quot;&quot;查询 A 股实时价格&quot;&quot;&quot;
+    try:
+        df = ak.stock_zh_a_spot_em()
+        row = df[df[&quot;代码&quot;] == code]
+        if row.empty:
+            return f&quot;未找到股票代码 {code}&quot;
+        r = row.iloc[0]
+        return (
+            f&quot;{r[&#x27;名称&#x27;]}({code})\n&quot;
+            f&quot;最新价: {r[&#x27;最新价&#x27;]}\n&quot;
+            f&quot;涨跌幅: {r[&#x27;涨跌幅&#x27;]}%\n&quot;
+            f&quot;成交量: {r[&#x27;成交量&#x27;]}\n&quot;
+            f&quot;成交额: {r[&#x27;成交额&#x27;]}&quot;
+        )
+    except Exception as e:
+        return f&quot;查询失败: {e}&quot;
+
+
+PRICE_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;get_stock_price&quot;,
+        &quot;description&quot;: &quot;查询 A 股实时行情，返回最新价、涨跌幅、成交量、成交额&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;code&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;股票代码，如 600519（茅台）&quot;}
+            },
+            &quot;required&quot;: [&quot;code&quot;],
+        },
+    },
+}
+
+register(&quot;get_stock_price&quot;, PRICE_DEF, get_stock_price)
+</div></div>
+</div>
+<div class="card" id="tools-registry-py" data-versions="v010 v020 v030">
+<div class="card-title">tools/registry.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
+<div class="card-desc">工具注册表 — 中心枢纽</div>
+<div data-versions="v010"><div class="code-label">v0.1.0 — 20 行</div><div class="code-block">&quot;&quot;&quot;工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。&quot;&quot;&quot;
+
+_registry = {}  # {工具名: {&quot;definition&quot;: {...}, &quot;handler&quot;: 函数}}
+
+
+def register(name, definition, handler):
+    &quot;&quot;&quot;注册一个工具。definition 是给 LLM 看的 JSON Schema。&quot;&quot;&quot;
+    _registry[name] = {&quot;definition&quot;: definition, &quot;handler&quot;: handler}
+
+
+def get_tool_definitions():
+    &quot;&quot;&quot;返回所有工具的 definition 列表（给 LLM 的 tools 参数）。&quot;&quot;&quot;
+    return [item[&quot;definition&quot;] for item in _registry.values()]
+
+
+def execute(name, args):
+    &quot;&quot;&quot;根据工具名执行对应函数。&quot;&quot;&quot;
+    if name not in _registry:
+        return f&quot;错误：未知工具 {name}&quot;
+    return _registry[name][&quot;handler&quot;](**args)
+</div></div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 36 行</div><div class="code-block">&quot;&quot;&quot;工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。&quot;&quot;&quot;
+
+_registry = {}  # {工具名: {&quot;definition&quot;: {...}, &quot;handler&quot;: 函数}}
+
+# 调用工具时,会自动来这报道.在tools里调用该函数
+def register(name, definition, handler):
+    &quot;&quot;&quot;注册一个工具。definition 是给 LLM 看的 JSON Schema。&quot;&quot;&quot;
+    _registry[name] = {&quot;definition&quot;: definition, &quot;handler&quot;: handler}
+
+# 让LLM知道有哪些工具(main函数开具就调用了工具,所以可以直接让LLM知悉)
+def get_tool_definitions():
+    &quot;&quot;&quot;返回所有工具的 definition 列表（给 LLM 的 tools 参数）。&quot;&quot;&quot;
+    return [item[&quot;definition&quot;] for item in _registry.values()]
+
+# 执行工具
+def execute(name, args):
+    &quot;&quot;&quot;根据工具名执行对应函数。&quot;&quot;&quot;
+    if name not in _registry:
+        return f&quot;错误：未知工具 {name}&quot;
+    return _registry[name][&quot;handler&quot;](**args)
+
+
+
+
+
+&quot;&quot;&quot;
+示例
+     _registry = {
+         &quot;read_file&quot;:   {&quot;definition&quot;: {...给LLM看的JSON...}, &quot;handler&quot;: &lt;read_file函数&gt;},
+         &quot;write_file&quot;:  {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;write_file函数&gt;},
+         &quot;terminal&quot;:    {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;run_command函数&gt;},
+         ...
+     }
+
+ Agent Loop 只需要知道 get_tool_definitions() 和 execute() 两个入口，不关心注册表里有什么。
+
+&quot;&quot;&quot;</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 37 行</div><div class="code-block">&quot;&quot;&quot;工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。&quot;&quot;&quot;
+
+_registry = {}  # {工具名: {&quot;definition&quot;: {...}, &quot;handler&quot;: 函数}}
+
+
+# 调用工具时,会自动来这报道.在tools里调用该函数
+def register(name, definition, handler):
+    &quot;&quot;&quot;注册一个工具。definition 是给 LLM 看的 JSON Schema。&quot;&quot;&quot;
+    _registry[name] = {&quot;definition&quot;: definition, &quot;handler&quot;: handler}
+
+
+# 让LLM知道有哪些工具(main函数开具就调用了工具,所以可以直接让LLM知悉)
+def get_tool_definitions():
+    &quot;&quot;&quot;返回所有工具的 definition 列表（给 LLM 的 tools 参数）。&quot;&quot;&quot;
+    return [item[&quot;definition&quot;] for item in _registry.values()]
+
+
+# 执行工具
+def execute(name, args):
+    &quot;&quot;&quot;根据工具名执行对应函数。&quot;&quot;&quot;
+    if name not in _registry:
+        return f&quot;错误：未知工具 {name}&quot;
+    return _registry[name][&quot;handler&quot;](**args)
+
+
+&quot;&quot;&quot;
+示例
+     _registry = {
+         &quot;read_file&quot;:   {&quot;definition&quot;: {...给LLM看的JSON...}, &quot;handler&quot;: &lt;read_file函数&gt;},
+         &quot;write_file&quot;:  {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;write_file函数&gt;},
+         &quot;terminal&quot;:    {&quot;definition&quot;: {...}, &quot;handler&quot;: &lt;run_command函数&gt;},
+         ...
+     }
+
+ Agent Loop 只需要知道 get_tool_definitions() 和 execute() 两个入口，不关心注册表里有什么。
+
+&quot;&quot;&quot;
+</div></div>
+</div>
+<div class="card" id="tools-search_tool-py" data-versions="v010 v020 v030">
+<div class="card-title">tools/search_tool.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
+<div class="card-desc">知识搜索 — 调 knowledge.search</div>
+<div data-versions="v010"><div class="code-label">v0.1.0 — 26 行</div><div class="code-block">&quot;&quot;&quot;知识库搜索工具 — 调用 knowledge.search 统一搜索。&quot;&quot;&quot;
+from tools.registry import register
+from knowledge.search import search_formatted
+
+
+def search_knowledge(query):
+    &quot;&quot;&quot;搜索知识库（年报 + Agent文档 + Wiki），返回格式化结果。&quot;&quot;&quot;
+    return search_formatted(query)
+
+
+SEARCH_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;search_knowledge&quot;,
+        &quot;description&quot;: &quot;搜索本地知识库，包括年报、Agent工程文档等。用来查找事实、数据、技术方案。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;query&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;搜索关键词或问题&quot;}
+            },
+            &quot;required&quot;: [&quot;query&quot;]
+        }
+    }
+}
+
+register(&quot;search_knowledge&quot;, SEARCH_DEF, search_knowledge)
+</div></div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 26 行</div><div class="code-block">&quot;&quot;&quot;知识库搜索工具 — 调用 knowledge.search 统一搜索。&quot;&quot;&quot;
+from tools.registry import register
+from knowledge.search import search_formatted
+
+
+def search_knowledge(query):
+    &quot;&quot;&quot;搜索知识库(年报 + Agent文档 + Wiki)，返回格式化结果。&quot;&quot;&quot;
+    return search_formatted(query)
+
+
+SEARCH_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;search_knowledge&quot;,
+        &quot;description&quot;: &quot;搜索本地知识库，包括年报、Agent工程文档等。用来查找事实、数据、技术方案。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;query&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;搜索关键词或问题&quot;}
+            },
+            &quot;required&quot;: [&quot;query&quot;]
+        }
+    }
+}
+
+register(&quot;search_knowledge&quot;, SEARCH_DEF, search_knowledge)
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 25 行</div><div class="code-block">&quot;&quot;&quot;知识库搜索工具 — 调用 knowledge.search 统一搜索。&quot;&quot;&quot;
+
+from knowledge.search import search_formatted
+from tools.registry import register
+
+
+def search_knowledge(query):
+    &quot;&quot;&quot;搜索知识库(年报 + Agent文档 + Wiki)，返回格式化结果。&quot;&quot;&quot;
+    return search_formatted(query)
+
+
+SEARCH_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;search_knowledge&quot;,
+        &quot;description&quot;: &quot;搜索本地知识库，包括年报、Agent工程文档等。用来查找事实、数据、技术方案。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {&quot;query&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;搜索关键词或问题&quot;}},
+            &quot;required&quot;: [&quot;query&quot;],
+        },
+    },
+}
+
+register(&quot;search_knowledge&quot;, SEARCH_DEF, search_knowledge)
+</div></div>
+</div>
+<div class="card" id="tools-terminal_tool-py" data-versions="v010 v020 v030">
+<div class="card-title">tools/terminal_tool.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
+<div class="card-desc">终端执行 — subprocess.run</div>
+<div data-versions="v010"><div class="code-label">v0.1.0 — 39 行</div><div class="code-block">&quot;&quot;&quot;终端命令执行工具。&quot;&quot;&quot;
+from tools.registry import register
+import subprocess
+
+
+def run_command(command, timeout=30):
+    &quot;&quot;&quot;执行 shell 命令并返回输出。&quot;&quot;&quot;
+    try:
+        result = subprocess.run(
+            command, shell=True, capture_output=True,
+            text=True, timeout=timeout, cwd=&quot;/Users/ns/Projects/AI工程/ns-agent&quot;
+        )
+        output = result.stdout
+        if result.stderr:
+            output += &quot;\n[stderr]\n&quot; + result.stderr
+        return output or f&quot;命令执行完毕（退出码 {result.returncode}）&quot;
+    except subprocess.TimeoutExpired:
+        return f&quot;错误：命令超时（&gt;{timeout}秒）&quot;
+    except Exception as e:
+        return f&quot;错误：{e}&quot;
+
+
+TERMINAL_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;terminal&quot;,
+        &quot;description&quot;: &quot;在终端执行 shell 命令并返回输出。用来运行代码、安装包、查看文件等。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;command&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要执行的命令&quot;},
+                &quot;timeout&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;超时秒数（默认30）&quot;}
+            },
+            &quot;required&quot;: [&quot;command&quot;]
+        }
+    }
+}
+
+register(&quot;terminal&quot;, TERMINAL_DEF, run_command)
+</div></div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 39 行</div><div class="code-block">&quot;&quot;&quot;终端命令执行工具。&quot;&quot;&quot;
+from tools.registry import register
+import subprocess
+
+
+def run_command(command, timeout=30):
+    &quot;&quot;&quot;执行 shell 命令并返回输出。&quot;&quot;&quot;
+    try:
+        result = subprocess.run(
+            command, shell=True, capture_output=True,
+            text=True, timeout=timeout, cwd=&quot;/Users/ns/Projects/ns-agent&quot;
+        )
+        output = result.stdout
+        if result.stderr:
+            output += &quot;\n[stderr]\n&quot; + result.stderr
+        return output or f&quot;命令执行完毕（退出码 {result.returncode}）&quot;
+    except subprocess.TimeoutExpired:
+        return f&quot;错误：命令超时（&gt;{timeout}秒）&quot;
+    except Exception as e:
+        return f&quot;错误：{e}&quot;
+
+
+TERMINAL_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;terminal&quot;,
+        &quot;description&quot;: &quot;在终端执行 shell 命令并返回输出。用来运行代码、安装包、查看文件等。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;command&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要执行的命令&quot;},
+                &quot;timeout&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;超时秒数（默认30）&quot;}
+            },
+            &quot;required&quot;: [&quot;command&quot;]
+        }
+    }
+}
+
+register(&quot;terminal&quot;, TERMINAL_DEF, run_command)
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 45 行</div><div class="code-block">&quot;&quot;&quot;终端命令执行工具。&quot;&quot;&quot;
+
+import subprocess
+
+from tools.registry import register
+
+
+def run_command(command, timeout=30):
+    &quot;&quot;&quot;执行 shell 命令并返回输出。&quot;&quot;&quot;
+    try:
+        result = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=&quot;/Users/ns/Projects/ns-agent&quot;,
+        )
+        output = result.stdout
+        if result.stderr:
+            output += &quot;\n[stderr]\n&quot; + result.stderr
+        return output or f&quot;命令执行完毕（退出码 {result.returncode}）&quot;
+    except subprocess.TimeoutExpired:
+        return f&quot;错误：命令超时（&gt;{timeout}秒）&quot;
+    except Exception as e:
+        return f&quot;错误：{e}&quot;
+
+
+TERMINAL_DEF = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;terminal&quot;,
+        &quot;description&quot;: &quot;在终端执行 shell 命令并返回输出。用来运行代码、安装包、查看文件等。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;command&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;要执行的命令&quot;},
+                &quot;timeout&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;description&quot;: &quot;超时秒数（默认30）&quot;},
+            },
+            &quot;required&quot;: [&quot;command&quot;],
+        },
+    },
+}
+
+register(&quot;terminal&quot;, TERMINAL_DEF, run_command)
+</div></div>
+</div>
+<div class="card" id="tools-time_tool-py" data-versions="v010 v020 v030">
+<div class="card-title">tools/time_tool.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
+<div class="card-desc">时间工具 — datetime.now()</div>
+<div data-versions="v010"><div class="code-label">v0.1.0 — 20 行</div><div class="code-block">&quot;&quot;&quot;获取当前时间的工具。&quot;&quot;&quot;
+from tools.registry import register
+from datetime import datetime
+
+
+def get_current_time():
+    &quot;&quot;&quot;返回当前日期时间字符串。&quot;&quot;&quot;
+    return datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+
+
+TOOL_DEFINITION = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;get_current_time&quot;,
+        &quot;description&quot;: &quot;获取当前日期和时间&quot;,
+        &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {}}
+    }
+}
+
+register(&quot;get_current_time&quot;, TOOL_DEFINITION, get_current_time)
+</div></div>
+<div data-versions="v020"><div class="code-label">v0.2.0 — 20 行</div><div class="code-block">&quot;&quot;&quot;获取当前时间的工具。&quot;&quot;&quot;
+from tools.registry import register
+from datetime import datetime
+
+
+def get_current_time():
+    &quot;&quot;&quot;返回当前日期时间字符串。&quot;&quot;&quot;
+    return datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+
+
+TOOL_DEFINITION = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;get_current_time&quot;,
+        &quot;description&quot;: &quot;获取当前日期和时间&quot;,
+        &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {}}
+    }
+}
+
+register(&quot;get_current_time&quot;, TOOL_DEFINITION, get_current_time)
+</div></div>
+<div data-versions="v030"><div class="code-label">v0.3.0 — 22 行</div><div class="code-block">&quot;&quot;&quot;获取当前时间的工具。&quot;&quot;&quot;
+
+from datetime import datetime
+
+from tools.registry import register
+
+
+def get_current_time():
+    &quot;&quot;&quot;返回当前日期时间字符串。&quot;&quot;&quot;
+    return datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+
+
+TOOL_DEFINITION = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;get_current_time&quot;,
+        &quot;description&quot;: &quot;获取当前日期和时间&quot;,
+        &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {}},
+    },
+}
+
+register(&quot;get_current_time&quot;, TOOL_DEFINITION, get_current_time)
+</div></div>
+</div>
+</div>
+<script>
+function switchVersion(v){["v010","v020","v030"].forEach(function(x){document.getElementById("btn-"+x).classList.toggle("active",v===x)});var L={v010:"v0.1.0",v020:"v0.2.0",v030:"v0.3.0"},S={v010:"9 文件",v020:"16 文件",v030:"24 文件"};document.getElementById("ver-info").innerHTML="当前 <b>"+L[v]+"</b> — "+S[v];document.querySelectorAll("[data-versions]").forEach(function(el){var vs=el.getAttribute("data-versions");if(vs.indexOf(v)===-1)el.classList.add("hidden-version");else el.classList.remove("hidden-version")});document.body.className=v+"-view"}switchVersion("v030");
 </script>
-</body></html>
+</body>
+</html>

@@ -349,16 +349,14 @@ const allNodes = new vis.DataSet([
   { id:"knowledge/ingest_wiki.py",group:"knowledge",x:400, y:0,   versions:["v020"],       status:{v020:"new"} },
   { id:"memory/__init__.py",    group:"memory",    x:400,  y:150, versions:["v010"],       status:{v010:"new"} },
   { id:"memory/session.py",     group:"memory",    x:400,  y:150, versions:["v020"],       status:{v020:"new"} },
-  { id:"core/prompt.py",         group:"core",    x:-250, y:-180, versions:["v030"], status:{v030:"new"} },
-  { id:"core/context.py",        group:"core",    x:-250, y:-80,  versions:["v030"], status:{v030:"new"} },
-  { id:"skills/registry.py",     group:"skills",  x:0,    y:-250, versions:["v030"], status:{v030:"new"} },
-  { id:"skills/finance.py",      group:"skills",  x:0,    y:-340, versions:["v030"], status:{v030:"new"} },
-  { id:"tools/finance/market_data.py",   group:"tools", x:220, y:-250, versions:["v030"], status:{v030:"new"} },
-  { id:"tools/finance/financial_report.py",group:"tools", x:380, y:-200, versions:["v030"],status:{v030:"new"} },
-  { id:"pyproject.toml",         group:"infra",   x:500,  y:200,  versions:["v030"], status:{v030:"new"} },
-  { id:"CONVENTIONS.md",         group:"infra",   x:500,  y:280,  versions:["v030"], status:{v030:"new"} },
-]);
-
+  { id:"core/prompt.py",         group:"core",    x:-100, y:300,  versions:["v030"], status:{v030:"new"} },
+  { id:"core/context.py",        group:"core",    x:50,   y:300,  versions:["v030"], status:{v030:"new"} },
+  { id:"skills/registry.py",     group:"skills",  x:200,  y:300,  versions:["v030"], status:{v030:"new"} },
+  { id:"skills/finance.py",      group:"skills",  x:200,  y:380,  versions:["v030"], status:{v030:"new"} },
+  { id:"tools/finance/market_data.py",   group:"tools", x:350, y:300,  versions:["v030"], status:{v030:"new"} },
+  { id:"tools/finance/financial_report.py",group:"tools", x:500, y:300,  versions:["v030"],status:{v030:"new"} },
+  { id:"pyproject.toml",         group:"infra",   x:550,  y:200,  versions:["v030"], status:{v030:"new"} },
+  { id:"CONVENTIONS.md",         group:"infra",   x:600,  y:280,  versions:["v030"], status:{v030:"new"} },
 ]);
 
 // ============================
@@ -384,8 +382,6 @@ const allEdges = new vis.DataSet([
   { from:"tools/finance/financial_report.py",to:"tools/registry.py",versions:["v030"],label:"register()",color:{color:"#94a3b8"},width:1,dashes:true },
   { from:"tools/finance/financial_report.py",to:"knowledge/search.py",versions:["v030"],label:"unified_search()",color:{color:"#10b981"},width:2 },
   { from:"tools/finance/market_data.py",to:"knowledge/search.py",versions:["v030"],label:"(akshare)",   color:{color:"#6366f1"},width:1.5 },
-]);
-
 ]);
 
 // 版本统计
