@@ -7,7 +7,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;background:#f1f5f9;color:#334155;line-height:1.8}
-body.v030-view .ver-badge{display:inline-block} body.v020-view .ver-badge{display:none} body.v010-view .ver-badge{display:none}
+body.v040-view .ver-badge{display:inline-block} body.v030-view .ver-badge{display:inline-block} body.v020-view .ver-badge{display:none} body.v010-view .ver-badge{display:none}
 .hidden-version{display:none!important}
 .container{max-width:1100px;margin:0 auto;padding:20px}
 .header{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
@@ -29,10 +29,10 @@ body.v030-view .ver-badge{display:inline-block} body.v020-view .ver-badge{displa
 .ver-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;color:#fff}
 </style>
 </head>
-<body class="v030-view">
-<div class="header"><h1>NsAgent 架构全景逐行注释</h1><div class="ver-switch"><button id="btn-v010" onclick="switchVersion('v010')">v0.1.0</button><button id="btn-v020" onclick="switchVersion('v020')">v0.2.0</button><button id="btn-v030" class="active" onclick="switchVersion('v030')">v0.3.0</button></div><span class="ver-info" id="ver-info">当前 <b>v0.3.0</b> — 24 文件</span></div>
+<body class="v040-view">
+<div class="header"><h1>NsAgent 架构全景逐行注释</h1><div class="ver-switch"><button id="btn-v010" onclick="switchVersion('v010')">v0.1.0</button><button id="btn-v020" onclick="switchVersion('v020')">v0.2.0</button><button id="btn-v030" onclick="switchVersion('v030')">v0.3.0</button><button id="btn-v040" class="active" onclick="switchVersion('v040')">v0.4.0</button></div><span class="ver-info" id="ver-info">当前 <b>v0.4.0</b> — 33 文件</span></div>
 <div class="container">
-<div class="card" data-versions="v010 v020 v030"><div class="card-title">架构全景</div>
+<div class="card" data-versions="v010 v020 v030 v040"><div class="card-title">架构全景</div>
 <div class="arch" data-versions="v010">ns-agent/ (v0.1.0 · 9 文件)
 ├── main.py
 ├── core/
@@ -79,38 +79,93 @@ body.v030-view .ver-badge{display:inline-block} body.v020-view .ver-badge{displa
 ├── memory/session.py
 ├── pyproject.toml   <span class="ver-badge badge-new">NEW</span>
 └── CONVENTIONS.md   <span class="ver-badge badge-new">NEW</span></div>
+<div class="arch" data-versions="v040">
+ns-agent/ (v0.4.0 · 33 文件)
+├── core/
+│   ├── __init__.py
+│   ├── agent.py <span class="ver-badge badge-mod">MOD</span>
+│   ├── context.py
+│   ├── errors.py
+│   ├── fallback.py <span class="ver-badge badge-new">NEW</span>
+│   ├── logging.py <span class="ver-badge badge-new">NEW</span>
+│   ├── prompt.py
+│   ├── retry.py <span class="ver-badge badge-mod">MOD</span>
+│   └── security.py <span class="ver-badge badge-new">NEW</span>
+├── docs/
+│   └── ENTERPRISE-STANDARDS.md
+├── knowledge/
+│   ├── __init__.py
+│   ├── ingest_wiki.py
+│   └── search.py
+├── memory/
+│   ├── __init__.py
+│   ├── session.py
+│   └── task.py <span class="ver-badge badge-new">NEW</span>
+├── skills/
+│   ├── __init__.py
+│   ├── finance.py
+│   └── registry.py
+├── tools/
+│   ├── finance/
+│   │   ├── __init__.py
+│   │   ├── financial_report.py
+│   │   └── market_data.py
+│   ├── __init__.py
+│   ├── file_tools.py
+│   ├── registry.py
+│   ├── search_tool.py
+│   ├── subagent_tool.py <span class="ver-badge badge-new">NEW</span>
+│   ├── task_tool.py <span class="ver-badge badge-new">NEW</span>
+│   ├── terminal_tool.py <span class="ver-badge badge-mod">MOD</span>
+│   └── time_tool.py
+├── CONVENTIONS.md
+├── main.py <span class="ver-badge badge-mod">MOD</span>
+└── pyproject.toml
 </div>
-<div class="card" data-versions="v010 v020 v030"><div class="card-title">文件目录</div><div class="toc">
-<a class="toc-item" data-versions="v010 v020 v030" href="#core-__init__-py">core/__init__.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#core-agent-py">core/agent.py</a>
-<a class="toc-item" data-versions="v030" href="#core-context-py">core/context.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#core-errors-py">core/errors.py</a>
-<a class="toc-item" data-versions="v030" href="#core-prompt-py">core/prompt.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#core-retry-py">core/retry.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#knowledge-__init__-py">knowledge/__init__.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#knowledge-ingest_wiki-py">knowledge/ingest_wiki.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#knowledge-search-py">knowledge/search.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#main-py">main.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#memory-__init__-py">memory/__init__.py</a>
-<a class="toc-item" data-versions="v020 v030" href="#memory-session-py">memory/session.py</a>
-<a class="toc-item" data-versions="v030" href="#skills-__init__-py">skills/__init__.py</a>
-<a class="toc-item" data-versions="v030" href="#skills-finance-py">skills/finance.py</a>
-<a class="toc-item" data-versions="v030" href="#skills-registry-py">skills/registry.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#tools-__init__-py">tools/__init__.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#tools-file_tools-py">tools/file_tools.py</a>
-<a class="toc-item" data-versions="v030" href="#tools-finance-__init__-py">tools/finance/__init__.py</a>
-<a class="toc-item" data-versions="v030" href="#tools-finance-financial_report-py">tools/finance/financial_report.py</a>
-<a class="toc-item" data-versions="v030" href="#tools-finance-market_data-py">tools/finance/market_data.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#tools-registry-py">tools/registry.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#tools-search_tool-py">tools/search_tool.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#tools-terminal_tool-py">tools/terminal_tool.py</a>
-<a class="toc-item" data-versions="v010 v020 v030" href="#tools-time_tool-py">tools/time_tool.py</a>
+</div>
+<div class="card" data-versions="v010 v020 v030 v040"><div class="card-title">文件目录</div><div class="toc">
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#core-__init__-py">core/__init__.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#core-agent-py">core/agent.py</a>
+<a class="toc-item" data-versions="v030 v040" href="#core-context-py">core/context.py</a>
+<a class="toc-item" data-versions="v020 v030 v040" href="#core-errors-py">core/errors.py</a>
+<a class="toc-item" data-versions="v030 v040" href="#core-prompt-py">core/prompt.py</a>
+<a class="toc-item" data-versions="v020 v030 v040" href="#core-retry-py">core/retry.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#knowledge-__init__-py">knowledge/__init__.py</a>
+<a class="toc-item" data-versions="v020 v030 v040" href="#knowledge-ingest_wiki-py">knowledge/ingest_wiki.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#knowledge-search-py">knowledge/search.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#main-py">main.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#memory-__init__-py">memory/__init__.py</a>
+<a class="toc-item" data-versions="v020 v030 v040" href="#memory-session-py">memory/session.py</a>
+<a class="toc-item" data-versions="v030 v040" href="#skills-__init__-py">skills/__init__.py</a>
+<a class="toc-item" data-versions="v030 v040" href="#skills-finance-py">skills/finance.py</a>
+<a class="toc-item" data-versions="v030 v040" href="#skills-registry-py">skills/registry.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#tools-__init__-py">tools/__init__.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#tools-file_tools-py">tools/file_tools.py</a>
+<a class="toc-item" data-versions="v030 v040" href="#tools-finance-__init__-py">tools/finance/__init__.py</a>
+<a class="toc-item" data-versions="v030 v040" href="#tools-finance-financial_report-py">tools/finance/financial_report.py</a>
+<a class="toc-item" data-versions="v030 v040" href="#tools-finance-market_data-py">tools/finance/market_data.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#tools-registry-py">tools/registry.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#tools-search_tool-py">tools/search_tool.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#tools-terminal_tool-py">tools/terminal_tool.py</a>
+<a class="toc-item" data-versions="v010 v020 v030 v040" href="#tools-time_tool-py">tools/time_tool.py</a>
+
+<a class="toc-item" data-versions="v040" href="#core-logging-py">core/logging.py</a>
+<a class="toc-item" data-versions="v040" href="#core-security-py">core/security.py</a>
+<a class="toc-item" data-versions="v040" href="#core-fallback-py">core/fallback.py</a>
+<a class="toc-item" data-versions="v040" href="#tools-subagent_tool-py">tools/subagent_tool.py</a>
+<a class="toc-item" data-versions="v040" href="#tools-task_tool-py">tools/task_tool.py</a>
+<a class="toc-item" data-versions="v040" href="#memory-task-py">memory/task.py</a>
+
+<a class="toc-item" data-versions="v030 v040" href="#CONVENTIONS-md">CONVENTIONS.md</a>
+<a class="toc-item" data-versions="v030 v040" href="#pyproject.toml">pyproject.toml</a>
+<a class="toc-item" data-versions="v030 v040" href="#docs-ENTERPRISE-STANDARDS-md">docs/ENTERPRISE-STANDARDS.md</a>
 </div></div>
-<div class="card" id="core-__init__-py" data-versions="v010 v020 v030">
+<div class="card" id="core-__init__-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">core/__init__.py </div>
 <div class="card-desc"></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block"></div></div>
 </div>
-<div class="card" id="core-agent-py" data-versions="v010 v020 v030">
+<div class="card" id="core-agent-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">core/agent.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
 <div class="card-desc">Agent Loop — 消息循环 + 工具调用</div>
 <div data-versions="v010"><div class="code-label">v0.1.0 — 103 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 核心 — Agent Loop。不关心工具有哪些，只从注册表读取。&quot;&quot;&quot;
@@ -487,6 +542,252 @@ def chat():
             print(f&quot;未预期错误: {type(e).__name__}: {e}&quot;)
             del messages[snapshot:]
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0 — Agent Loop — 流式/非流式双模式 + fallback 集成</div><div class="code-block">"""NsAgent 核心 — Agent Loop。不关心工具有哪些，只从注册表读取。"""
+
+import json
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv  # pyright: ignore
+from openai import OpenAI
+
+from core.context import compress, count_messages_tokens
+from core.errors import NsAgentError
+from core.fallback import call_with_fallback
+from core.logging import get_logger, new_trace_id, setup_logging
+from core.prompt import build_prompt
+from core.retry import call_with_retry
+from memory import session as sess
+from memory.task import init_db as init_task_db
+from skills.registry import inject_skills, match_skills
+from tools.registry import execute, get_tool_definitions
+
+# 加载 .env（agent.py 在 core/ 下，.env 在项目根目录）
+load_dotenv(Path(__file__).parent.parent / ".env")
+
+# 初始化结构化日志
+setup_logging(dev_mode=True)
+
+client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com")
+
+
+def _stream_response(messages, tools, log):
+    """流式调用 LLM，逐 token 打印，累积 tool_calls。
+
+    Returns:
+        (content, tool_calls): content 为累积文本，tool_calls 为工具调用列表。
+    """
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=messages,
+        tools=tools,
+        temperature=0.7,
+        stream=True,
+        stream_options={"include_usage": True},
+    )
+
+    collected = ""
+    tool_calls = []
+    current_idx = -1
+
+    for chunk in response:
+        delta = chunk.choices[0].delta if chunk.choices else None
+        if not delta:
+            continue
+
+        # 文本：逐 token 打印
+        if delta.content:
+            collected += delta.content
+            print(delta.content, end="", flush=True)
+
+        # 工具调用：累积 delta
+        if delta.tool_calls:
+            for tc_delta in delta.tool_calls:
+                idx = tc_delta.index
+                if idx &gt; current_idx:
+                    tool_calls.append({
+                        "id": tc_delta.id or "",
+                        "type": "function",
+                        "function": {"name": "", "arguments": ""},
+                    })
+                    current_idx = idx
+
+                tc = tool_calls[idx]
+                if tc_delta.id:
+                    tc["id"] = tc_delta.id
+                if tc_delta.function:
+                    if tc_delta.function.name:
+                        tc["function"]["name"] += tc_delta.function.name
+                    if tc_delta.function.arguments:
+                        tc["function"]["arguments"] += tc_delta.function.arguments
+
+    return collected, tool_calls
+
+
+def run(messages=None, session_id=None, log=None, stream=True):
+    """启动 Agent Loop。messages 为初始消息列表。"""
+    if log is None:
+        log = get_logger()
+
+    if messages is None:
+        messages = [{"role": "system", "content": build_prompt()}]
+
+    tools = get_tool_definitions()
+    log.info("agent.tools_loaded", count=len(tools))
+
+    while True:
+        token_count = count_messages_tokens(messages)
+        if token_count &gt; 4000:
+            messages, summary = compress(messages)
+            if summary:
+                new_count = count_messages_tokens(messages)
+                log.info("agent.compressed", before=token_count, after=new_count)
+
+        log.info("agent.llm_request", messages=len(messages))
+
+        if stream:
+            # ── 流式模式：逐 token 打印 ──
+            content, tool_calls = _stream_response(
+                messages, tools if tools else None, log
+            )
+            print()  # 换行
+
+            if not tool_calls:
+                log.info("agent.response", content_length=len(content))
+                break
+
+            # 有工具调用：流式已累积完整参数
+            for tc in tool_calls:
+                name = tc["function"]["name"]
+                args = json.loads(tc["function"]["arguments"])
+                log.info("agent.tool_start", tool=name, args=args)
+
+                result = execute(name, args)
+                log.info("agent.tool_result", tool=name,
+                         result_preview=str(result)[:100])
+
+                messages.append({
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [tc],
+                })
+                if session_id:
+                    sess.save_message(session_id, messages[-1])
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc["id"],
+                    "content": str(result),
+                })
+                if session_id:
+                    sess.save_message(session_id, messages[-1])
+        else:
+            # ── 非流式模式（子Agent 用） ──
+            response = call_with_fallback(
+                messages=messages,
+                tools=tools if tools else None,
+                temperature=0.7,
+                logger=log,
+            )
+
+            msg = response.choices[0].message
+
+            if not msg.tool_calls:
+                log.info("agent.response", content_length=len(msg.content or ""))
+                print(f"\n{msg.content}\n")
+                break
+
+            for tc in msg.tool_calls:
+                name = tc.function.name
+                args = json.loads(tc.function.arguments)
+                log.info("agent.tool_start", tool=name, args=args)
+
+                result = execute(name, args)
+                log.info("agent.tool_result", tool=name,
+                         result_preview=str(result)[:100])
+
+                messages.append({
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [{
+                        "id": tc.id,
+                        "type": "function",
+                        "function": {
+                            "name": name,
+                            "arguments": tc.function.arguments,
+                        },
+                    }],
+                })
+                if session_id:
+                    sess.save_message(session_id, messages[-1])
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "content": str(result),
+                })
+                if session_id:
+                    sess.save_message(session_id, messages[-1])
+
+
+def chat():
+    """交互式 REPL。自动恢复 24h 内会话。"""
+    trace_id = new_trace_id()
+    log = get_logger(trace_id=trace_id, module="agent")
+
+    sess.init_db()
+    init_task_db()
+    session_id = sess.get_last_session()
+
+    if session_id:
+        old_messages = sess.load_session(session_id)
+        log.info("nsagent.start", version="0.4.0", session_id=session_id,
+                 restored=True, messages=len(old_messages))
+        print(f"NsAgent v0.4.0 — 恢复了上次会话（{len(old_messages)} 条消息）")
+        print("输入 /new 开始新会话，/exit 退出\n")
+        messages = old_messages
+    else:
+        messages = [{"role": "system", "content": build_prompt()}]
+        session_id = sess.create_session()
+        sess.save_message(session_id, messages[0])
+        log.info("nsagent.start", version="0.4.0", session_id=session_id, restored=False)
+        print("NsAgent v0.4.0 — 输入 /exit 退出\n")
+
+    while True:
+        user_input = input("你: ").strip()
+        if not user_input:
+            continue
+        if user_input == "/exit":
+            log.info("session.exit", session_id=session_id)
+            print(f"会话 {session_id} 已保存，再见。")
+            break
+        if user_input == "/new":
+            session_id = sess.create_session()
+            messages = [{"role": "system", "content": build_prompt()}]
+            sess.save_message(session_id, messages[0])
+            log.info("session.created", session_id=session_id)
+            print("新会话已开始。")
+            continue
+
+        snapshot = len(messages)
+        messages.append({"role": "user", "content": user_input})
+        sess.save_message(session_id, messages[-1])
+
+        matched = match_skills(user_input)
+        if matched:
+            skill_names = [s["description"] for s in matched]
+            log.info("skill.activated", skills=skill_names, count=len(matched))
+            messages = inject_skills(messages, matched)
+
+        try:
+            run(messages=messages, session_id=session_id, log=log.bind(phase="run"))
+        except NsAgentError as e:
+            log.error("agent.error", code=e.code, message=e.message)
+            print(f"NsAgent 错误 [{e.code}]: {e.message}")
+            del messages[snapshot:]
+        except Exception as e:
+            log.error("agent.unexpected_error", type=type(e).__name__, message=str(e))
+            print(f"未预期错误: {type(e).__name__}: {e}")
+            del messages[snapshot:]
+</div></div>
 </div>
 <div class="card" id="core-context-py" data-versions="v030">
 <div class="card-title">core/context.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
@@ -563,8 +864,80 @@ def _format_for_summary(messages: list[dict]) -&gt; str:
             lines.append(f&quot;[{role}] {short}&quot;)
     return &quot;\n&quot;.join(lines)
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""上下文压缩 — Token 计数 + 超限自动总结。"""
+
+import json
+
+
+def count_tokens(text: str) -&gt; int:
+    """粗略估算 token 数。
+
+    中文约 2 字符/token，英文约 4 字符/token。
+    用于判断是否触发压缩，不要求精确。
+    """
+    chinese = sum(1 for c in text if "\u4e00" &lt;= c &lt;= "\u9fff")
+    other = len(text) - chinese
+    return chinese // 2 + other // 4
+
+
+def count_messages_tokens(messages: list[dict]) -&gt; int:
+    """估算消息列表的总 token 数。"""
+    total = 0
+    for msg in messages:
+        content = msg.get("content") or ""
+        if isinstance(content, str):
+            total += count_tokens(content)
+        if msg.get("tool_calls"):
+            total += count_tokens(json.dumps(msg["tool_calls"], ensure_ascii=False))
+    return total
+
+
+def compress(
+    messages: list[dict],
+    max_tokens: int = 4000,
+    keep_last: int = 6,
+) -&gt; tuple[list[dict], str | None]:
+    """超过 max_tokens 时，压缩中间消息为摘要。
+
+    策略：
+    1. 保留 system 消息（第 0 条）
+    2. 保留最后 keep_last 条消息
+    3. 中间部分生成一段摘要，替换为一条 user 消息
+
+    返回：(压缩后的消息列表, 摘要文本或 None)
+    """
+    total = count_messages_tokens(messages)
+    if total &lt;= max_tokens or len(messages) &lt;= keep_last + 2:
+        return messages, None
+
+    # 中间部分：从 system 之后到倒数 keep_last 之前
+    middle = messages[1:-keep_last]
+    middle_text = _format_for_summary(middle)
+    summary = f"[上下文摘要] 以下为之前对话的关键信息：\n{middle_text[:2000]}"
+
+    # 重建消息列表
+    compressed = [
+        messages[0],  # system
+        {"role": "user", "content": summary},
+        *messages[-keep_last:],
+    ]
+    return compressed, summary
+
+
+def _format_for_summary(messages: list[dict]) -&gt; str:
+    """将消息列表格式化为可总结的文本。"""
+    lines = []
+    for msg in messages:
+        role = msg.get("role", "unknown")
+        content = msg.get("content") or ""
+        if isinstance(content, str) and content.strip():
+            # 截断过长内容
+            short = content[:500] + "..." if len(content) &gt; 500 else content
+            lines.append(f"[{role}] {short}")
+    return "\n".join(lines)
+</div></div>
 </div>
-<div class="card" id="core-errors-py" data-versions="v020 v030">
+<div class="card" id="core-errors-py" data-versions="v020 v030 v040">
 <div class="card-title">core/errors.py <span class="ver-badge badge-new" data-versions="v020">NEW v0.2.0</span></div>
 <div class="card-desc">统一异常 — NsAgentError 体系</div>
 <div data-versions="v020"><div class="code-label">v0.2.0 — 30 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 统一异常体系。&quot;&quot;&quot;
@@ -630,6 +1003,38 @@ class ToolError(NsAgentError):
 class ConfigError(NsAgentError):
     &quot;&quot;&quot;配置错误（缺少 API Key 等）。&quot;&quot;&quot;
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""NsAgent 统一异常体系。"""
+
+
+class NsAgentError(Exception):
+    """NsAgent 异常基类。"""
+
+    def __init__(self, message, code=None, details=None):
+        self.message = message
+        self.code = code  # 机器可读的错误码
+        self.details = details  # 额外上下文（dict）
+        super().__init__(message)
+
+    def to_dict(self):
+        d = {"error": self.message}
+        if self.code:
+            d["code"] = self.code
+        if self.details:
+            d["details"] = self.details
+        return d
+
+
+class APIError(NsAgentError):
+    """API 调用失败（网络、限流、服务端错误）。"""
+
+
+class ToolError(NsAgentError):
+    """工具执行失败（文件不存在、命令超时等）。"""
+
+
+class ConfigError(NsAgentError):
+    """配置错误（缺少 API Key 等）。"""
+</div></div>
 </div>
 <div class="card" id="core-prompt-py" data-versions="v030">
 <div class="card-title">core/prompt.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
@@ -670,8 +1075,44 @@ def build_prompt(skills_text: str = &quot;&quot;) -&gt; str:
         layers.append(skills_text)
     return &quot;\n\n&quot;.join(layers)
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""System Prompt 分层构建器 — 身份/工具/规则/安全四层可组合。"""
+
+IDENTITY = """你是 NsAgent，一个本地 AI 助手。
+你的知识库包含 A 股上市公司年报、Agent 工程文档和技术 Wiki。"""
+
+TOOLS_LAYER = """你有以下工具可以使用：
+- read_file: 读取文件
+- write_file: 写入文件
+- terminal: 执行终端命令
+- search_knowledge: 搜索本地知识库（年报、技术文档、Wiki）
+- get_current_time: 获取当前时间
+- get_stock_price: 查询 A 股实时行情
+- financial_report: 查询上市公司年报财务数据"""
+
+RULES = """工作原则：
+1. 先搜索知识库再回答，不要凭记忆编造数据
+2. 修改文件前先 read_file 确认内容
+3. 财务数据必须注明来源（年报/实时行情）
+4. 用中文回复，输出清晰有条理"""
+
+SAFETY = """安全规则：
+1. 不提供投资建议，财务数据仅供参考
+2. terminal 执行命令前确认无害
+3. 不修改系统文件或 .env"""
+
+
+def build_prompt(skills_text: str = "") -&gt; str:
+    """组装分层 System Prompt。
+
+    skills_text: 技能注入的额外内容（由 skills.registry 提供）。
+    """
+    layers = [IDENTITY, TOOLS_LAYER, RULES, SAFETY]
+    if skills_text:
+        layers.append(skills_text)
+    return "\n\n".join(layers)
+</div></div>
 </div>
-<div class="card" id="core-retry-py" data-versions="v020 v030">
+<div class="card" id="core-retry-py" data-versions="v020 v030 v040">
 <div class="card-title">core/retry.py <span class="ver-badge badge-new" data-versions="v020">NEW v0.2.0</span></div>
 <div class="card-desc">API 重试 — 指数退避</div>
 <div data-versions="v020"><div class="code-label">v0.2.0 — 36 行</div><div class="code-block">&quot;&quot;&quot;API 重试 — 指数退避，可重试错误自动重试。&quot;&quot;&quot;
@@ -750,10 +1191,59 @@ def call_with_retry(fn, *args, **kwargs):
         raise last_error
     raise RuntimeError(&quot;retry: unreachable&quot;)  # 理论上不会到这里
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0 — API 重试 — call_with_retry 支持 logger 参数</div><div class="code-block">"""API 重试 — 指数退避，可重试错误自动重试。"""
+
+import time
+
+from openai import (
+    APIConnectionError,
+    APITimeoutError,
+    InternalServerError,
+    RateLimitError,
+)
+
+MAX_RETRIES = 3
+BASE_DELAY = 1  # 秒：1 → 2 → 4
+
+RETRYABLE = (APIConnectionError, APITimeoutError, RateLimitError, InternalServerError)
+
+
+def call_with_retry(fn, *args, logger=None, **kwargs):
+    """调用函数，可重试错误自动重试（指数退避）。
+
+    不可重试的错误（400/401）直接抛出，不浪费重试次数。
+
+    logger: 可选的结构化 logger，用于记录重试事件。
+    """
+    last_error = None
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            return fn(*args, **kwargs)
+        except RETRYABLE as e:
+            last_error = e
+            if attempt &lt; MAX_RETRIES:
+                delay = BASE_DELAY * (2 ** (attempt - 1))
+                if logger:
+                    logger.warning(
+                        "retry.attempt",
+                        attempt=f"{attempt}/{MAX_RETRIES}",
+                        error=type(e).__name__,
+                        delay=delay,
+                    )
+                else:
+                    print(f"  [重试 {attempt}/{MAX_RETRIES}] {type(e).__name__}，{delay}s 后重试...")
+                time.sleep(delay)
+
+    # 所有重试耗尽
+    if last_error:
+        raise last_error
+    raise RuntimeError("retry: unreachable")  # 理论上不会到这里
+</div></div>
 </div>
-<div class="card" id="knowledge-__init__-py" data-versions="v010 v020 v030">
+<div class="card" id="knowledge-__init__-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">knowledge/__init__.py </div>
 <div class="card-desc"></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block"></div></div>
 </div>
 <div class="card" id="knowledge-ingest_wiki-py" data-versions="v020 v030">
 <div class="card-title">knowledge/ingest_wiki.py <span class="ver-badge badge-new" data-versions="v020">NEW v0.2.0</span></div>
@@ -935,8 +1425,97 @@ def ingest():
 if __name__ == &quot;__main__&quot;:
     ingest()
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""Wiki 入库 — 扫描 Wiki 目录 → 分块 → 向量化 → ChromaDB collection wiki_knowledge。"""
+
+from pathlib import Path
+import re
+
+from knowledge.search import _client, _embed_model  # 复用已有连接
+
+WIKI_ROOT = Path("/Users/ns/Wiki")
+EXCLUDE_DIRS = {"00.配置 Config", ".obsidian", ".git", ".trash"}
+COLLECTION_NAME = "wiki_knowledge"
+
+
+def list_md_files(root):
+    """递归收集所有 .md 文件，排除配置目录。"""
+    files = []
+    for path in root.rglob("*.md"):
+        # 跳过排除目录
+        parts = set(path.relative_to(root).parts)
+        if parts &amp; EXCLUDE_DIRS:
+            continue
+        files.append(path)
+    return sorted(files)
+
+
+def chunk_by_headers(text, source_path):
+    """按 ## 标题分块。没有标题的短文章整体作为一个块。
+
+    Yields: (chunk_text, metadata_dict)
+    """
+    relative = str(source_path.relative_to(WIKI_ROOT))
+    # 匹配二级标题（允许前后空格）
+    sections = re.split(r"\n(?=## )", text)
+
+    # 第一个 section 是 ## 之前的部分（如果有内容）
+    intro = sections[0].strip()
+    if intro:
+        yield intro, {"source": relative, "section": "(前言)"}
+
+    for sec in sections[1:]:
+        sec = sec.strip()
+        if not sec:
+            continue
+        # 提取标题
+        header_match = re.match(r"## (.+)", sec)
+        section_title = header_match.group(1).strip() if header_match else "(无标题)"
+        yield sec, {"source": relative, "section": section_title}
+
+
+def ingest():
+    """主流程：扫描 → 分块 → 向量化 → 入库。"""
+    files = list_md_files(WIKI_ROOT)
+    print(f"扫描到 {len(files)} 个 .md 文件")
+
+    # 获取或创建 collection
+    coll = _client.get_or_create_collection(COLLECTION_NAME)
+
+    total_chunks = 0
+    for fpath in files:
+        try:
+            text = fpath.read_text(encoding="utf-8")
+        except Exception as e:
+            print(f"  跳过 {fpath.name}：{e}")
+            continue
+
+        chunks = list(chunk_by_headers(text, fpath))
+        if not chunks:
+            continue
+
+        documents = []
+        metadatas = []
+        ids = []
+        for i, (chunk_text, meta) in enumerate(chunks):
+            documents.append(chunk_text)
+            metadatas.append(meta)
+            ids.append(f"{fpath.stem}_{i}")
+
+        # 向量化 + 入库（分批避免内存爆）
+        embeddings = _embed_model.encode(documents, show_progress_bar=False).tolist()
+        coll.add(documents=documents, embeddings=embeddings, metadatas=metadatas, ids=ids)
+
+        total_chunks += len(chunks)
+        print(f"  {fpath.relative_to(WIKI_ROOT)} → {len(chunks)} 块")
+
+    print(f"\n完成：{len(files)} 文件 → {total_chunks} 块 → collection '{COLLECTION_NAME}'")
+
+
+if __name__ == "__main__":
+    ingest()
+</div></div>
 </div>
-<div class="card" id="knowledge-search-py" data-versions="v010 v020 v030">
+<div class="card" id="knowledge-search-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">knowledge/search.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
 <div class="card-desc">统一多源搜索 — 年报+Agent工程+Wiki</div>
 <div data-versions="v010"><div class="code-label">v0.1.0 — 80 行</div><div class="code-block">&quot;&quot;&quot;统一多源搜索 — 一个查询并行搜索所有知识库。&quot;&quot;&quot;
@@ -1177,8 +1756,84 @@ def search_formatted(query, top_k=5):
 
     return &quot;\n&quot;.join(lines)
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""统一多源搜索 — 一个查询并行搜索所有知识库。"""
+
+import os
+from pathlib import Path
+
+# 离线模式，避免 sentence-transformers 直连 huggingface
+os.environ["HF_HUB_OFFLINE"] = "1"
+
+import chromadb
+from sentence_transformers import SentenceTransformer
+
+# === 初始化 ===
+
+CHROMA_PATH = str(Path(__file__).parent.parent.parent / "AI工程/rag-project/backend/chroma_data")
+
+_client = chromadb.PersistentClient(path=CHROMA_PATH)
+
+# 已知的集合（wiki_knowledge 待后续入库后加入）
+KNOWN_COLLECTIONS = ["annual_reports", "agent_engineering", "wiki_knowledge"]
+
+# bge 中文语义模型（384维）
+_embed_model = SentenceTransformer("BAAI/bge-small-zh-v1.5", local_files_only=True)
+
+
+# === 核心函数 ===
+
+
+def unified_search(query, top_k=5, collections=None):
+    """并行搜索知识库，按相关度合并返回。
+
+    collections: 要搜索的集合列表，默认搜全部。
+    """
+    if collections is None:
+        collections = KNOWN_COLLECTIONS
+
+    query_vec = _embed_model.encode(query).tolist()
+    all_results = []
+
+    for coll_name in collections:
+        try:
+            collection = _client.get_collection(coll_name)
+            results = collection.query(query_embeddings=[query_vec], n_results=top_k)
+            # results["documents"][0] 是 top_k 个文档列表
+            # results["distances"][0] 是对应的距离列表
+            for doc, dist in zip(results["documents"][0], results["distances"][0], strict=False):
+                all_results.append(
+                    {"source": coll_name, "content": doc, "distance": round(dist, 4)}
+                )
+        except Exception:
+            continue  # 集合不存在就跳过
+
+    # 按相关度排序（距离越小越相关）
+    all_results.sort(key=lambda x: x["distance"])
+    return all_results
+
+
+def search_formatted(query, top_k=5):
+    """搜索并格式化为 Agent 可读的文本。"""
+    results = unified_search(query, top_k)
+    if not results:
+        return "未找到相关知识。"
+
+    lines = [f"搜索「{query}」找到 {len(results)} 条结果：\n"]
+    for i, r in enumerate(results, 1):
+        source_label = {
+            "annual_reports": "年报",
+            "agent_engineering": "Agent工程",
+            "wiki_knowledge": "Wiki",
+        }
+        label = source_label.get(r["source"], r["source"])
+        lines.append(f"[{i}] 来源：{label}（距离 {r['distance']}）")
+        lines.append(f"    {r['content'][:300]}")
+        lines.append("")
+
+    return "\n".join(lines)
+</div></div>
 </div>
-<div class="card" id="main-py" data-versions="v010 v020 v030">
+<div class="card" id="main-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">main.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
 <div class="card-desc">入口脚本 — import 所有工具模块触发 register()</div>
 <div data-versions="v010"><div class="code-label">v0.1.0 — 11 行</div><div class="code-block">&quot;&quot;&quot;NsAgent 入口 — 加载工具 → 启动 Agent。&quot;&quot;&quot;
@@ -1220,10 +1875,66 @@ import tools.time_tool  # noqa: F401
 if __name__ == &quot;__main__&quot;:
     chat()
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0 — 入口 — REPL / --query 非交互模式 + SUBAGENT_PROMPT</div><div class="code-block">"""NsAgent 入口 — 加载工具 → 启动 Agent。
+
+用法：
+  python main.py              # 交互 REPL
+  python main.py --query "..." # 单次查询，非交互模式（子Agent用）
+"""
+
+import argparse
+
+from core.agent import build_prompt, run
+from core.logging import get_logger, new_trace_id, setup_logging
+
+# ── 导入工具模块 = 触发 register() 报到 ──
+import skills.finance  # noqa: F401
+import tools.file_tools  # noqa: F401
+import tools.finance.financial_report  # noqa: F401
+import tools.finance.market_data  # noqa: F401
+import tools.search_tool  # noqa: F401
+import tools.subagent_tool  # noqa: F401
+import tools.task_tool  # noqa: F401
+import tools.terminal_tool  # noqa: F401
+import tools.time_tool  # noqa: F401
+
+
+SUBAGENT_PROMPT = """你是 NsAgent 子Agent。你被主 Agent 分配了一个独立任务。
+规则：
+1. 直接完成任务，返回结果。不要反问、不要确认、不要闲聊。
+2. 用工具获取需要的信息，最后给出简洁的结论。
+3. 如果无法完成，直接说明原因，不要猜测。"""
+
+
+def single_query(query: str):
+    """非交互模式：处理一次查询并输出结果。"""
+    trace_id = new_trace_id()
+    log = get_logger(trace_id=trace_id, module="subagent")
+    setup_logging(dev_mode=False)  # 子Agent 用 JSON 日志避免污染输出
+
+    messages = [{"role": "system", "content": SUBAGENT_PROMPT}]
+    messages.append({"role": "user", "content": query})
+    log.info("subagent.start", query=query[:100])
+    run(messages=messages, log=log)
+    log.info("subagent.end")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="NsAgent — 统一 AI Agent 框架")
+    parser.add_argument("--query", "-q", help="单次查询模式，直接返回结果（用于子Agent调用）")
+    args = parser.parse_args()
+
+    if args.query:
+        single_query(args.query)
+    else:
+        from core.agent import chat
+        chat()
+</div></div>
 </div>
-<div class="card" id="memory-__init__-py" data-versions="v010 v020 v030">
+<div class="card" id="memory-__init__-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">memory/__init__.py </div>
 <div class="card-desc"></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block"></div></div>
 </div>
 <div class="card" id="memory-session-py" data-versions="v020 v030">
 <div class="card-title">memory/session.py <span class="ver-badge badge-new" data-versions="v020">NEW v0.2.0</span></div>
@@ -1464,10 +2175,127 @@ def get_last_session():
     conn.close()
     return row[&quot;id&quot;] if row else None
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""会话持久化 — SQLite 存储对话历史，启动时恢复。"""
+
+from datetime import datetime, timedelta
+import json
+from pathlib import Path
+import sqlite3
+import uuid
+
+DB_PATH = Path(__file__).parent.parent / "data" / "sessions.db"
+
+
+def _connect():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    """建表（幂等）。"""
+    conn = _connect()
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS sessions (
+            id TEXT PRIMARY KEY,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL,
+            role TEXT NOT NULL,
+            content TEXT,
+            tool_calls TEXT,
+            tool_call_id TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (session_id) REFERENCES sessions(id)
+        );
+    """)
+    conn.commit()
+    conn.close()
+
+
+def create_session():
+    """新建会话，返回 session_id。"""
+    sid = uuid.uuid4().hex[:12]
+    now = datetime.now().isoformat()
+    conn = _connect()
+    conn.execute(
+        "INSERT INTO sessions (id, created_at, updated_at) VALUES (?, ?, ?)", (sid, now, now)
+    )
+    conn.commit()
+    conn.close()
+    return sid
+
+
+def save_message(session_id, msg):
+    """保存一条消息。
+
+    msg 格式（OpenAI messages 列表中的一条）：
+      {"role": "user", "content": "你好"}
+      {"role": "assistant", "content": "你好！", "tool_calls": null}
+      {"role": "tool", "tool_call_id": "xxx", "content": "..."}
+    """
+    now = datetime.now().isoformat()
+    conn = _connect()
+    conn.execute(
+        """INSERT INTO messages (session_id, role, content, tool_calls, tool_call_id, created_at)
+           VALUES (?, ?, ?, ?, ?, ?)""",
+        (
+            session_id,
+            msg.get("role"),
+            msg.get("content"),
+            json.dumps(msg.get("tool_calls")) if msg.get("tool_calls") else None,
+            msg.get("tool_call_id"),
+            now,
+        ),
+    )
+    conn.execute("UPDATE sessions SET updated_at = ? WHERE id = ?", (now, session_id))
+    conn.commit()
+    conn.close()
+
+
+def load_session(session_id):
+    """从数据库恢复消息列表。"""
+    conn = _connect()
+    rows = conn.execute(
+        "SELECT role, content, tool_calls, tool_call_id FROM messages "
+        "WHERE session_id = ? ORDER BY id",
+        (session_id,),
+    ).fetchall()
+    conn.close()
+
+    messages = []
+    for row in rows:
+        msg = {"role": row["role"]}
+        if row["content"] is not None:
+            msg["content"] = row["content"]
+        if row["tool_calls"]:
+            msg["tool_calls"] = json.loads(row["tool_calls"])
+            msg["content"] = None  # OpenAI 格式要求
+        if row["tool_call_id"]:
+            msg["tool_call_id"] = row["tool_call_id"]
+        messages.append(msg)
+    return messages
+
+
+def get_last_session():
+    """获取最近 24 小时内的最新会话 ID，没有则返回 None。"""
+    cutoff = (datetime.now() - timedelta(hours=24)).isoformat()
+    conn = _connect()
+    row = conn.execute(
+        "SELECT id FROM sessions WHERE updated_at &gt;= ? ORDER BY updated_at DESC LIMIT 1", (cutoff,)
+    ).fetchone()
+    conn.close()
+    return row["id"] if row else None
+</div></div>
 </div>
 <div class="card" id="skills-__init__-py" data-versions="v030">
 <div class="card-title">skills/__init__.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
 <div class="card-desc"></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block"></div></div>
 </div>
 <div class="card" id="skills-finance-py" data-versions="v030">
 <div class="card-title">skills/finance.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
@@ -1489,6 +2317,26 @@ register_skill(
     name=&quot;financial_analysis&quot;,
     trigger=&quot;营收|利润|财报|年报|净利润|毛利率|资产负债|现金流&quot;,
     description=&quot;财报分析&quot;,
+    content=FINANCE_CONTENT,
+)
+</div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""财报分析技能 — 当用户查询财务数据时自动激活。"""
+
+from skills.registry import register_skill
+
+FINANCE_CONTENT = """你是财报分析专家。当用户查询财务数据时，遵循以下规范：
+
+1. **数据来源优先**：优先从 search_knowledge 或 search_financial 获取年报数据
+2. **结构化展示**：用表格展示关键指标（营收、净利润、毛利率、同比增长率）
+3. **单位统一**：年报数据通常是"千元"或"元"，换算为"亿元"展示
+4. **对比分析**：如有同比数据，自动计算增长率
+5. **归因分析**：解释数据变化的原因（行业趋势、公司战略、季节性因素）
+6. **风险提示**：最后加一句免责声明，数据仅供参考"""
+
+register_skill(
+    name="financial_analysis",
+    trigger="营收|利润|财报|年报|净利润|毛利率|资产负债|现金流",
+    description="财报分析",
     content=FINANCE_CONTENT,
 )
 </div></div>
@@ -1556,12 +2404,73 @@ def list_skills() -&gt; list[dict[str, str]]:
     &quot;&quot;&quot;列出所有已注册的技能（名称 + 描述）。&quot;&quot;&quot;
     return [{&quot;name&quot;: name, &quot;description&quot;: s[&quot;description&quot;]} for name, s in _skills.items()]
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""技能注册表 — 知识模块的注册、匹配、注入。
+
+工具 = LLM 调用的函数（function calling）
+技能 = 注入 System Prompt 的知识模块（关键词触发）
+"""
+
+from typing import Any
+
+_skills: dict[str, dict[str, Any]] = {}
+
+
+def register_skill(name: str, trigger: str, description: str, content: str) -&gt; None:
+    """注册一个技能。
+
+    name: 技能名（唯一标识）
+    trigger: 触发关键词（匹配用户输入）
+    description: 一句话描述（给开发者看的）
+    content: 注入到 System Prompt 的知识内容
+    """
+    _skills[name] = {
+        "trigger": trigger,
+        "description": description,
+        "content": content,
+    }
+
+
+def match_skills(user_input: str) -&gt; list[dict[str, Any]]:
+    """根据用户输入匹配已注册的技能。
+
+    匹配规则：trigger 中的任一关键词出现在用户输入中（不区分大小写）。
+    trigger 可用 `|` 分隔多个关键词。
+    """
+    matched = []
+    user_lower = user_input.lower()
+    for _name, skill in _skills.items():
+        keywords = skill["trigger"].split("|")
+        if any(kw.strip().lower() in user_lower for kw in keywords):
+            matched.append(skill)
+    return matched
+
+
+def inject_skills(
+    messages: list[dict[str, Any]], matched: list[dict[str, Any]]
+) -&gt; list[dict[str, Any]]:
+    """将匹配到的技能内容注入 System Prompt。
+
+    在第一条 system 消息末尾追加技能内容。
+    """
+    if not matched:
+        return messages
+
+    skill_text = "\n\n".join(f"## {s['description']}\n{s['content']}" for s in matched)
+    messages[0]["content"] += f"\n\n---\n## 已激活的知识模块\n{skill_text}"
+    return messages
+
+
+def list_skills() -&gt; list[dict[str, str]]:
+    """列出所有已注册的技能（名称 + 描述）。"""
+    return [{"name": name, "description": s["description"]} for name, s in _skills.items()]
+</div></div>
 </div>
-<div class="card" id="tools-__init__-py" data-versions="v010 v020 v030">
+<div class="card" id="tools-__init__-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">tools/__init__.py </div>
 <div class="card-desc"></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block"></div></div>
 </div>
-<div class="card" id="tools-file_tools-py" data-versions="v010 v020 v030">
+<div class="card" id="tools-file_tools-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">tools/file_tools.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
 <div class="card-desc">文件读写 — read_file + write_file</div>
 <div data-versions="v010"><div class="code-label">v0.1.0 — 70 行</div><div class="code-block">&quot;&quot;&quot;文件读写工具 — read_file 和 write_file。&quot;&quot;&quot;
@@ -1779,10 +2688,84 @@ WRITE_DEF = {
 register(&quot;read_file&quot;, READ_DEF, read_file)
 register(&quot;write_file&quot;, WRITE_DEF, write_file)
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""文件读写工具 — read_file 和 write_file。"""
+
+from pathlib import Path
+
+from tools.registry import register
+
+
+def read_file(path, offset=1, limit=200):
+    """读取文件内容。offset 和 limit 控制读取范围。"""
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        return f"错误：文件不存在 {path}"
+    try:
+        lines = p.read_text(encoding="utf-8").split("\n")
+        total = len(lines)
+        start = max(0, offset - 1)
+        end = min(total, start + limit)
+        result = []
+        for i in range(start, end):
+            result.append(f"{i + 1}|{lines[i]}")
+        header = f"文件 {path}（第 {start + 1}-{end} 行 / 共 {total} 行）\n"
+        return header + "\n".join(result)
+    except Exception as e:
+        return f"错误：读取失败 {e}"
+
+
+def write_file(path, content):
+    """写入文件内容（覆盖）。"""
+    p = Path(path).expanduser().resolve()
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content, encoding="utf-8")
+        return f"已写入 {path}（{len(content)} 字符）"
+    except Exception as e:
+        return f"错误：写入失败 {e}"
+
+
+READ_DEF = {
+    "type": "function",
+    "function": {
+        "name": "read_file",
+        "description": "读取文件内容，返回带行号的文本",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": "文件路径"},
+                "offset": {"type": "integer", "description": "起始行号（默认1）"},
+                "limit": {"type": "integer", "description": "读取行数（默认200）"},
+            },
+            "required": ["path"],
+        },
+    },
+}
+
+WRITE_DEF = {
+    "type": "function",
+    "function": {
+        "name": "write_file",
+        "description": "写入文件内容（覆盖模式）",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": "文件路径"},
+                "content": {"type": "string", "description": "要写入的内容"},
+            },
+            "required": ["path", "content"],
+        },
+    },
+}
+
+register("read_file", READ_DEF, read_file)
+register("write_file", WRITE_DEF, write_file)
+</div></div>
 </div>
 <div class="card" id="tools-finance-__init__-py" data-versions="v030">
 <div class="card-title">tools/finance/__init__.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
 <div class="card-desc"></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block"></div></div>
 </div>
 <div class="card" id="tools-finance-financial_report-py" data-versions="v030">
 <div class="card-title">tools/finance/financial_report.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
@@ -1858,6 +2841,77 @@ REPORT_DEF = {
 
 register(&quot;financial_report&quot;, REPORT_DEF, financial_report)
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""年报结构化报告工具 — 多指标并行搜索 → 整理文本 → 交 LLM 分析。"""
+
+from knowledge.search import unified_search
+from tools.registry import register
+
+
+def financial_report(stock_name):
+    """搜索指定公司的关键财务指标，返回整理后的年报数据。
+
+    搜索营收、净利润、增长率等核心指标，合并去重后返回结构化文本。
+    LLM 拿到整理好的数据后自行做分析和格式化。
+    """
+    try:
+        metrics = [
+            "营业收入 2024年",
+            "归属于上市公司股东的净利润",
+            "营业收入 同比增长",
+            "基本每股收益",
+        ]
+
+        all_chunks = []
+        seen = set()
+        for metric in metrics:
+            results = unified_search(
+                f"{stock_name} {metric}", top_k=3, collections=["annual_reports"]
+            )
+            for r in results:
+                # 去重：同一段文本不重复
+                key = r["content"][:80]
+                if key not in seen and r["content"].strip():
+                    seen.add(key)
+                    all_chunks.append(r)
+
+        if not all_chunks:
+            return f"年报库中未找到 {stock_name} 的财务数据"
+
+        # 按相关度排序
+        all_chunks.sort(key=lambda x: x["distance"])
+
+        lines = [f"{stock_name} 年报财务数据\n"]
+        for i, r in enumerate(all_chunks, 1):
+            lines.append(f"## 数据块 {i}（距离 {r['distance']}）")
+            lines.append(r["content"])
+            lines.append("---")
+
+        return "\n".join(lines)
+
+    except Exception as e:
+        return f"查询失败: {e}"
+
+
+REPORT_DEF = {
+    "type": "function",
+    "function": {
+        "name": "financial_report",
+        "description": "查询上市公司年报，搜索营业收入、净利润、增长率等核心财务指标，返回整理后的年报原文供分析",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "stock_name": {
+                    "type": "string",
+                    "description": "公司名称，如 贵州茅台、比亚迪",
+                },
+            },
+            "required": ["stock_name"],
+        },
+    },
+}
+
+register("financial_report", REPORT_DEF, financial_report)
+</div></div>
 </div>
 <div class="card" id="tools-finance-market_data-py" data-versions="v030">
 <div class="card-title">tools/finance/market_data.py <span class="ver-badge badge-new">NEW v0.3.0</span></div>
@@ -1905,8 +2959,51 @@ PRICE_DEF = {
 
 register(&quot;get_stock_price&quot;, PRICE_DEF, get_stock_price)
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""A 股实时行情查询工具。"""
+
+import akshare as ak
+
+from tools.registry import register
+
+
+def get_stock_price(code):
+    """查询 A 股实时价格"""
+    try:
+        df = ak.stock_zh_a_spot_em()
+        row = df[df["代码"] == code]
+        if row.empty:
+            return f"未找到股票代码 {code}"
+        r = row.iloc[0]
+        return (
+            f"{r['名称']}({code})\n"
+            f"最新价: {r['最新价']}\n"
+            f"涨跌幅: {r['涨跌幅']}%\n"
+            f"成交量: {r['成交量']}\n"
+            f"成交额: {r['成交额']}"
+        )
+    except Exception as e:
+        return f"查询失败: {e}"
+
+
+PRICE_DEF = {
+    "type": "function",
+    "function": {
+        "name": "get_stock_price",
+        "description": "查询 A 股实时行情，返回最新价、涨跌幅、成交量、成交额",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "code": {"type": "string", "description": "股票代码，如 600519（茅台）"}
+            },
+            "required": ["code"],
+        },
+    },
+}
+
+register("get_stock_price", PRICE_DEF, get_stock_price)
+</div></div>
 </div>
-<div class="card" id="tools-registry-py" data-versions="v010 v020 v030">
+<div class="card" id="tools-registry-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">tools/registry.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
 <div class="card-desc">工具注册表 — 中心枢纽</div>
 <div data-versions="v010"><div class="code-label">v0.1.0 — 20 行</div><div class="code-block">&quot;&quot;&quot;工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。&quot;&quot;&quot;
@@ -2005,8 +3102,46 @@ def execute(name, args):
 
 &quot;&quot;&quot;
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""工具注册表 — 所有工具在这里报到。加新工具不改 Agent Loop。"""
+
+_registry = {}  # {工具名: {"definition": {...}, "handler": 函数}}
+
+
+# 调用工具时,会自动来这报道.在tools里调用该函数
+def register(name, definition, handler):
+    """注册一个工具。definition 是给 LLM 看的 JSON Schema。"""
+    _registry[name] = {"definition": definition, "handler": handler}
+
+
+# 让LLM知道有哪些工具(main函数开具就调用了工具,所以可以直接让LLM知悉)
+def get_tool_definitions():
+    """返回所有工具的 definition 列表（给 LLM 的 tools 参数）。"""
+    return [item["definition"] for item in _registry.values()]
+
+
+# 执行工具
+def execute(name, args):
+    """根据工具名执行对应函数。"""
+    if name not in _registry:
+        return f"错误：未知工具 {name}"
+    return _registry[name]["handler"](**args)
+
+
+"""
+示例
+     _registry = {
+         "read_file":   {"definition": {...给LLM看的JSON...}, "handler": &lt;read_file函数&gt;},
+         "write_file":  {"definition": {...}, "handler": &lt;write_file函数&gt;},
+         "terminal":    {"definition": {...}, "handler": &lt;run_command函数&gt;},
+         ...
+     }
+
+ Agent Loop 只需要知道 get_tool_definitions() 和 execute() 两个入口，不关心注册表里有什么。
+
+"""
+</div></div>
 </div>
-<div class="card" id="tools-search_tool-py" data-versions="v010 v020 v030">
+<div class="card" id="tools-search_tool-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">tools/search_tool.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
 <div class="card-desc">知识搜索 — 调 knowledge.search</div>
 <div data-versions="v010"><div class="code-label">v0.1.0 — 26 行</div><div class="code-block">&quot;&quot;&quot;知识库搜索工具 — 调用 knowledge.search 统一搜索。&quot;&quot;&quot;
@@ -2089,8 +3224,34 @@ SEARCH_DEF = {
 
 register(&quot;search_knowledge&quot;, SEARCH_DEF, search_knowledge)
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""知识库搜索工具 — 调用 knowledge.search 统一搜索。"""
+
+from knowledge.search import search_formatted
+from tools.registry import register
+
+
+def search_knowledge(query):
+    """搜索知识库(年报 + Agent文档 + Wiki)，返回格式化结果。"""
+    return search_formatted(query)
+
+
+SEARCH_DEF = {
+    "type": "function",
+    "function": {
+        "name": "search_knowledge",
+        "description": "搜索本地知识库，包括年报、Agent工程文档等。用来查找事实、数据、技术方案。",
+        "parameters": {
+            "type": "object",
+            "properties": {"query": {"type": "string", "description": "搜索关键词或问题"}},
+            "required": ["query"],
+        },
+    },
+}
+
+register("search_knowledge", SEARCH_DEF, search_knowledge)
+</div></div>
 </div>
-<div class="card" id="tools-terminal_tool-py" data-versions="v010 v020 v030">
+<div class="card" id="tools-terminal_tool-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">tools/terminal_tool.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
 <div class="card-desc">终端执行 — subprocess.run</div>
 <div data-versions="v010"><div class="code-label">v0.1.0 — 39 行</div><div class="code-block">&quot;&quot;&quot;终端命令执行工具。&quot;&quot;&quot;
@@ -2219,8 +3380,2195 @@ TERMINAL_DEF = {
 
 register(&quot;terminal&quot;, TERMINAL_DEF, run_command)
 </div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0 — 终端命令执行 — 集成 check_command 安全审批</div><div class="code-block">"""终端命令执行工具 — 带安全审批。"""
+
+import subprocess
+
+from core.security import check_command
+from tools.registry import register
+
+
+def run_command(command, timeout=30):
+    """执行 shell 命令并返回输出。危险命令自动拦截。"""
+    # ── 安全检查 ──
+    safe, reason = check_command(command)
+    if not safe:
+        return f"[拦截] {reason}"
+
+    try:
+        result = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        output = result.stdout
+        if result.stderr:
+            output += "\n[stderr]\n" + result.stderr
+        return output or f"命令执行完毕（退出码 {result.returncode}）"
+    except subprocess.TimeoutExpired:
+        return f"错误：命令超时（&gt;{timeout}秒）"
+    except Exception as e:
+        return f"错误：{e}"
+
+
+TERMINAL_DEF = {
+    "type": "function",
+    "function": {
+        "name": "terminal",
+        "description": "在终端执行 shell 命令并返回输出。危险命令（rm -rf/sudo/chmod 777等）会被自动拦截。",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "command": {"type": "string", "description": "要执行的命令"},
+                "timeout": {"type": "integer", "description": "超时秒数（默认30）"},
+            },
+            "required": ["command"],
+        },
+    },
+}
+
+register("terminal", TERMINAL_DEF, run_command)
+</div></div>
 </div>
-<div class="card" id="tools-time_tool-py" data-versions="v010 v020 v030">
+<div class="card" id="core-logging-py" data-versions="v040">
+<div class="card-title">core/logging.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">structlog 结构化日志 — 彩色终端/JSON stderr 双模式，traceId 追踪</div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""NsAgent 结构化日志 — structlog + traceId。
+
+替换裸 print()，为每个会话生成唯一的 trace_id。
+开发环境用彩色 ConsoleRenderer，生产环境可切 JSONRenderer。
+"""
+
+import sys
+import structlog
+import uuid
+
+
+def setup_logging(dev_mode: bool = True):
+    """配置 structlog 全局参数。
+
+    dev_mode=True: 彩色终端输出（stdout），适合本地开发。
+    dev_mode=False: JSON 输出到 stderr，不污染主输出流（子Agent 模式用）。
+    """
+    processors = [
+        structlog.stdlib.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+    ]
+    if dev_mode:
+        processors.append(structlog.dev.ConsoleRenderer())
+        log_stream = sys.stdout
+    else:
+        processors.append(structlog.processors.JSONRenderer())
+        log_stream = sys.stderr
+
+    structlog.configure(
+        processors=processors,
+        context_class=dict,
+        logger_factory=structlog.PrintLoggerFactory(file=log_stream),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        cache_logger_on_first_use=True,
+    )
+
+
+def new_trace_id() -&gt; str:
+    """生成 8 位短 trace_id，用于追踪单次会话的所有日志。"""
+    return uuid.uuid4().hex[:8]
+
+
+def get_logger(**ctx) -&gt; structlog.stdlib.BoundLogger:
+    """获取绑定上下文的 logger。每次调用可追加新字段。
+
+    用法：
+        log = get_logger(trace_id="abc123", module="agent")
+        log.info("nsagent.start", session_id="xxx")
+    """
+    return structlog.get_logger(**ctx)
+</div></div>
+</div>
+
+<div class="card" id="core-security-py" data-versions="v040">
+<div class="card-title">core/security.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">危险命令拦截（16条正则）+ 路径沙箱限制</div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""NsAgent 安全模块 — 危险命令拦截 + 沙箱路径限制。
+
+不搞交互式审批（那会打断 Agent Loop 自动流程）。
+危险命令直接拒绝，返回拦截原因。
+"""
+
+import os
+import re
+
+# ── 危险命令模式 ──
+
+DANGEROUS_PATTERNS = [
+    (r"\brm\s+(-[rRf]+\s+)+[/~]", "递归强制删除文件/目录"),
+    (r"\bsudo\b", "提权操作"),
+    (r"\bchmod\s+777", "开放所有权限"),
+    (r"\bchmod\s+[0-7]*7\b", "开放执行权限"),
+    (r"\bchown\b", "修改文件所有权"),
+    (r"\bmkfs\b", "格式化磁盘"),
+    (r"\bdd\s+if=", "磁盘直接写入"),
+    (r"&gt;\s*/dev/", "写入设备文件"),
+    (r"\bcurl.*\|.*(ba)?sh", "远程下载并执行脚本"),
+    (r"\bwget.*\|.*(ba)?sh", "远程下载并执行脚本"),
+    (r"\bgit\s+clone.*\|.*sh", "克隆仓库后直接执行"),
+    (r"\bkill\s+-9", "强制终止进程"),
+    (r"\breboot\b", "重启系统"),
+    (r"\bshutdown\b", "关机"),
+    (r"\b:\(\)\s*{\s*:\|:&amp;\s*}\s*;\s*:", "Fork 炸弹（拒绝服务）"),
+    (r"\.\./\.\./\.\./", "多级目录穿越（可疑）"),
+]
+
+# ── 沙箱路径 ──
+
+ALLOWED_ROOTS = [
+    os.path.expanduser("~/Projects"),
+    os.path.expanduser("~/Wiki"),
+    os.path.expanduser("~/Documents"),
+    "/tmp",
+    "/var/tmp",
+]
+
+
+def check_command(command: str) -&gt; tuple[bool, str]:
+    """检查命令是否包含危险操作。
+
+    Returns:
+        (safe, reason): safe=False 表示被安全策略拦截，reason 说明原因。
+    """
+    for pattern, desc in DANGEROUS_PATTERNS:
+        if re.search(pattern, command):
+            return False, f"安全策略拦截：{desc}。如需执行，请在终端手动操作。"
+    return True, ""
+
+
+def check_path(path: str) -&gt; bool:
+    """检查路径是否在沙箱允许范围内。
+
+    用于限制文件读写的有效范围，防止越权访问敏感目录。
+    """
+    abs_path = os.path.abspath(os.path.expanduser(path))
+    for root in ALLOWED_ROOTS:
+        root_abs = os.path.abspath(root)
+        if abs_path.startswith(root_abs):
+            return True
+    return False
+</div></div>
+</div>
+
+<div class="card" id="core-fallback-py" data-versions="v040">
+<div class="card-title">core/fallback.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">多模型优先级链 — .env 配置 FALLBACK_MODELS JSON 扩展</div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""多模型 Fallback 链 — 按优先级尝试多个模型，任一可用即返回。
+
+配置方式：在 .env 中设置 FALLBACK_MODELS（JSON 格式）：
+  FALLBACK_MODELS='[{"model":"deepseek-chat","base_url":"...","api_key":"..."}, ...]'
+
+未配置时默认只用 DeepSeek。
+"""
+
+import json
+import os
+
+from dotenv import load_dotenv  # pyright: ignore
+from openai import OpenAI
+from pathlib import Path
+
+from core.retry import RETRYABLE
+
+# 加载 .env
+load_dotenv(Path(__file__).parent.parent / ".env")
+
+DEFAULT_CHAIN = [
+    {
+        "model": "deepseek-chat",
+        "base_url": "https://api.deepseek.com",
+        "api_key": os.getenv("DEEPSEEK_API_KEY", ""),
+    }
+]
+
+
+def _load_chain() -&gt; list[dict]:
+    """从环境变量加载模型链。"""
+    raw = os.getenv("FALLBACK_MODELS", "")
+    if raw:
+        try:
+            chain = json.loads(raw)
+            if chain:
+                return chain
+        except json.JSONDecodeError:
+            pass
+    return DEFAULT_CHAIN
+
+
+def call_with_fallback(messages, tools, temperature=0.7, logger=None):
+    """按优先级尝试模型链，第一个成功的结果直接返回。
+
+    所有模型都失败时抛出最后一个错误。
+    """
+    chain = _load_chain()
+    last_error = None
+
+    for i, cfg in enumerate(chain):
+        model = cfg["model"]
+        try:
+            client = OpenAI(
+                api_key=cfg.get("api_key") or os.getenv("DEEPSEEK_API_KEY"),
+                base_url=cfg["base_url"],
+            )
+            if logger:
+                logger.info("fallback.try", model=model, index=i, total=len(chain))
+
+            return client.chat.completions.create(
+                model=model,
+                messages=messages,
+                tools=tools,
+                temperature=temperature,
+            )
+
+        except RETRYABLE as e:
+            last_error = e
+            if logger:
+                logger.warning(
+                    "fallback.switch",
+                    from_model=model,
+                    error=type(e).__name__,
+                    remaining=len(chain) - i - 1,
+                )
+            continue
+        except Exception as e:
+            # 不可重试的错误（如 401）不 fallback
+            raise
+
+    # 所有模型均失败
+    if last_error:
+        raise last_error
+    raise RuntimeError("fallback: no models configured")
+</div></div>
+</div>
+
+<div class="card" id="tools-subagent_tool-py" data-versions="v040">
+<div class="card-title">tools/subagent_tool.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">子Agent 工具 — terminal 调 python main.py --query 生成子进程</div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""子 Agent 工具 — 通过 terminal 调自身处理子任务。"""
+
+from tools.registry import register
+
+
+def delegate_task(goal: str, context: str = "") -&gt; str:
+    """生成一个子 NsAgent 处理独立任务，返回其结果。
+
+    通过 terminal 调 python main.py --query 实现。
+    子Agent 有独立的 30 秒超时。
+    """
+    import subprocess
+    import os
+
+    # 拼接查询：context 作为背景，goal 是具体任务
+    query = goal
+    if context:
+        query = f"{context}\\n\\n任务：{goal}"
+
+    # 转义引号防止 shell 注入
+    safe_query = query.replace("'", "'\\''")
+
+    cmd = (
+        f"cd {os.path.dirname(os.path.dirname(os.path.abspath(__file__)))} &amp;&amp; "
+        f".venv/bin/python3 main.py --query '{safe_query}'"
+    )
+
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=60,
+            env={**os.environ, "PYTHONUNBUFFERED": "1"},
+        )
+        output = result.stdout.strip()
+        if result.stderr:
+            # 过滤掉 bge 模型加载的进度条
+            stderr_clean = "\\n".join(
+                line for line in result.stderr.split("\\n")
+                if "Loading weights" not in line and "it/s" not in line
+            )
+            if stderr_clean.strip():
+                output += f"\\n[子Agent stderr]\\n{stderr_clean.strip()}"
+        return output or f"子Agent 无输出（退出码 {result.returncode}）"
+    except subprocess.TimeoutExpired:
+        return "错误：子Agent 超时（&gt;60秒）"
+    except Exception as e:
+        return f"子Agent 错误：{e}"
+
+
+SUBAGENT_DEF = {
+    "type": "function",
+    "function": {
+        "name": "delegate_task",
+        "description": (
+            "生成一个子 NsAgent 处理独立的子任务。子Agent 有自己的工具和上下文。"
+            "适合需要独立分析、多步骤搜索或复杂计算的场景。"
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "goal": {
+                    "type": "string",
+                    "description": "子Agent 要完成的具体任务。直接描述要什么结果，不要加指令性废话。",
+                },
+                "context": {
+                    "type": "string",
+                    "description": "子Agent 需要的背景信息（可选）。给子Agent 提供必要的数据或上下文。",
+                },
+            },
+            "required": ["goal"],
+        },
+    },
+}
+
+register("delegate_task", SUBAGENT_DEF, delegate_task)
+</div></div>
+</div>
+
+<div class="card" id="tools-task_tool-py" data-versions="v040">
+<div class="card-title">tools/task_tool.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">任务管理 — task_create/update/list 三个 function calling 工具</div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""任务管理工具 — 创建、更新、查看任务列表。
+
+Agent 用这些工具把复杂任务拆成步骤，跟踪进度。
+"""
+
+from memory.task import create, get, list_active, format_task, update
+from tools.registry import register
+
+
+def task_create(title: str, items: list[str]) -&gt; str:
+    """创建一个新的任务列表。"""
+    task_id = create(title, items)
+    task = get(task_id)
+    if task is None:
+        return f"错误：任务 {task_id} 创建后无法读取"
+    return f"已创建任务 [{task_id}]：\n{format_task(task)}"
+
+
+def task_update(task_id: str, item_index: int, status: str) -&gt; str:
+    """更新任务步骤状态。"""
+    return update(task_id, item_index, status)
+
+
+def task_list() -&gt; str:
+    """查看当前活跃任务。"""
+    tasks = list_active()
+    if not tasks:
+        return "没有活跃任务。"
+    return "\n\n".join(
+        f"[{t['id']}] {format_task(t)}" for t in tasks
+    )
+
+
+# ── 工具定义 ──
+
+TASK_CREATE_DEF = {
+    "type": "function",
+    "function": {
+        "name": "task_create",
+        "description": (
+            "创建一个任务列表，把复杂任务拆成步骤。"
+            "每步一句话，3-7步为宜。返回 task_id 用于后续更新。"
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "title": {"type": "string", "description": "任务名称"},
+                "items": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "步骤列表，每项一句话描述",
+                },
+            },
+            "required": ["title", "items"],
+        },
+    },
+}
+
+TASK_UPDATE_DEF = {
+    "type": "function",
+    "function": {
+        "name": "task_update",
+        "description": "更新任务中某一步的状态。status 可用：in_progress / completed / cancelled。",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "task_id": {"type": "string", "description": "任务ID（task_create 返回的）"},
+                "item_index": {"type": "integer", "description": "步骤序号（从0开始）"},
+                "status": {"type": "string", "description": "新状态：in_progress / completed / cancelled"},
+            },
+            "required": ["task_id", "item_index", "status"],
+        },
+    },
+}
+
+TASK_LIST_DEF = {
+    "type": "function",
+    "function": {
+        "name": "task_list",
+        "description": "查看所有活跃任务及进度。",
+        "parameters": {"type": "object", "properties": {}},
+    },
+}
+
+register("task_create", TASK_CREATE_DEF, task_create)
+register("task_update", TASK_UPDATE_DEF, task_update)
+register("task_list", TASK_LIST_DEF, task_list)
+</div></div>
+</div>
+
+<div class="card" id="memory-task-py" data-versions="v040">
+<div class="card-title">memory/task.py <span class="ver-badge badge-new">NEW</span></div>
+<div class="card-desc">任务持久化 — SQLite 存储，跨会话追踪任务进度</div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""任务持久化 — SQLite 存储任务列表，支持增删改查。
+
+独立于会话（session）：任务跨会话存在，直到主动删除。
+"""
+
+import json
+import sqlite3
+import uuid
+from datetime import datetime
+from pathlib import Path
+
+DB_PATH = Path(__file__).parent.parent / "data" / "tasks.db"
+
+
+def _connect():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    """建表（幂等）。"""
+    conn = _connect()
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS tasks (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            items TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+    """)
+    conn.commit()
+    conn.close()
+
+
+def create(title: str, items: list[str]) -&gt; str:
+    """创建任务列表，返回 task_id。
+
+    items: ["查茅台净利润", "查比亚迪净利润", "汇总对比"]
+    """
+    task_id = uuid.uuid4().hex[:8]
+    now = datetime.now().isoformat()
+    items_json = json.dumps(
+        [{"content": item, "status": "pending"} for item in items],
+        ensure_ascii=False,
+    )
+    conn = _connect()
+    conn.execute(
+        "INSERT INTO tasks (id, title, items, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+        (task_id, title, items_json, now, now),
+    )
+    conn.commit()
+    conn.close()
+    return task_id
+
+
+def update(task_id: str, item_index: int, status: str) -&gt; str:
+    """更新某一步的状态。status: pending / in_progress / completed / cancelled。
+
+    返回：更新后的那一步描述，或错误信息。
+    """
+    conn = _connect()
+    row = conn.execute("SELECT items FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    if not row:
+        conn.close()
+        return f"错误：任务 {task_id} 不存在"
+
+    items = json.loads(row["items"])
+    if item_index &lt; 0 or item_index &gt;= len(items):
+        conn.close()
+        return f"错误：序号 {item_index} 超出范围（共 {len(items)} 步）"
+
+    old_status = items[item_index]["status"]
+    if old_status == "completed":
+        conn.close()
+        return f"步骤 {item_index} 已完成，无需重复标记"
+
+    items[item_index]["status"] = status
+    now = datetime.now().isoformat()
+    conn.execute(
+        "UPDATE tasks SET items = ?, updated_at = ? WHERE id = ?",
+        (json.dumps(items, ensure_ascii=False), now, task_id),
+    )
+    conn.commit()
+    conn.close()
+
+    return (
+        f"任务「{row['title']}」步骤 {item_index} "
+        f"「{items[item_index]['content']}」→ {status}"
+    )
+
+
+def get(task_id: str) -&gt; dict | None:
+    """获取单个任务详情。"""
+    conn = _connect()
+    row = conn.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    conn.close()
+    if not row:
+        return None
+    return {
+        "id": row["id"],
+        "title": row["title"],
+        "items": json.loads(row["items"]),
+        "created_at": row["created_at"],
+        "updated_at": row["updated_at"],
+    }
+
+
+def list_active() -&gt; list[dict]:
+    """列出所有未全部完成的任务。"""
+    conn = _connect()
+    rows = conn.execute("SELECT * FROM tasks ORDER BY updated_at DESC").fetchall()
+    conn.close()
+
+    result = []
+    for row in rows:
+        items = json.loads(row["items"])
+        all_done = all(item["status"] == "completed" for item in items)
+        if all_done:
+            continue
+        done = sum(1 for item in items if item["status"] == "completed")
+        result.append({
+            "id": row["id"],
+            "title": row["title"],
+            "items": items,
+            "progress": f"{done}/{len(items)}",
+            "created_at": row["created_at"],
+        })
+    return result
+
+
+def format_task(task: dict) -&gt; str:
+    """格式化任务为可读文本。"""
+    lines = [f"任务：{task['title']}  [{task.get('progress', '')}]"]
+    for i, item in enumerate(task["items"]):
+        icon = {"pending": " ", "in_progress": "▸", "completed": "✓"}.get(item["status"], " ")
+        lines.append(f"  [{icon}] {i}. {item['content']}")
+    return "\n".join(lines)
+</div></div>
+</div>
+
+<div class="card" id="CONVENTIONS-md" data-versions="v030 v040">
+<div class="card-title">CONVENTIONS.md</div>
+<div class="card-desc"></div>
+<div data-versions="v030"><div class="code-label">v0.3.0</div><div class="code-block"># NsAgent 编码规范
+
+&gt; 从现有 16 个源文件中提取的写作约定。新增文件必须遵循本文档。
+
+---
+
+## 1. 文件结构
+
+### 1.1 模块文档字符串
+
+每个 `.py` 文件**必须**以模块级 docstring 开头，用中文简要说明职责：
+
+```python
+"""文件职责的一句话描述。"""
+```
+
+| 文件类型 | 示例 |
+|----------|------|
+| 工具文件 | `"""获取当前时间的工具。"""` |
+| 核心模块 | `"""NsAgent 核心 — Agent Loop。..."""` |
+| 入口文件 | `"""NsAgent 入口 — 加载工具 → 启动 Agent。"""` |
+
+分隔符统一用 `—`（全角破折号）。
+
+### 1.2 导入顺序
+
+1. **标准库**（stdlib）
+2. **第三方库**（pip install 的）
+3. **项目内部模块**（`from tools.xxx import`、`from core.xxx import`）
+
+每组之间空一行。示例：
+
+```python
+import json
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+from tools.registry import get_tool_definitions, execute
+from memory import session as sess
+```
+
+**禁止**：`from module import *`（通配符导入）。
+
+### 1.3 `__init__.py`
+
+空文件，仅作为包识别标记。不加任何代码。
+
+---
+
+## 2. 命名
+
+| 类型 | 规则 | 示例 |
+|------|------|------|
+| 函数 | `snake_case` | `get_stock_price`、`run_command` |
+| 变量 | `snake_case` | `session_id`、`query_vec` |
+| 常量 | `UPPER_CASE` | `MAX_RETRIES`、`CHROMA_PATH` |
+| 类 | `PascalCase` | `NsAgentError`、`APIError` |
+| 私有模块级变量 | `_prefix` | `_registry`、`_client` |
+| 私有函数 | `_prefix` | `_connect()` |
+
+---
+
+## 3. 工具定义规范
+
+### 3.1 定义常量
+
+每个工具配一个 JSON Schema 定义常量，命名 `XXX_DEF`：
+
+```python
+PRICE_DEF = {
+    "type": "function",
+    "function": {
+        "name": "get_stock_price",
+        "description": "查询 A 股实时行情，返回最新价、涨跌幅、成交量、成交额",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "description": "股票代码，如 600519（茅台）"
+                }
+            },
+            "required": ["code"]
+        }
+    }
+}
+```
+
+**要点**：
+- 常量名 = `功能名大写_DEF`（如 `PRICE_DEF`、`SEARCH_DEF`、`TERMINAL_DEF`）
+- `description` 用中文，清晰说明工具做什么
+- `parameters` 的 `description` 用中文
+- `required` 列出必填参数
+
+### 3.2 处理函数
+
+函数签名直接接收关键字参数（因为 `execute()` 用 `**args` 展开）：
+
+```python
+def get_stock_price(code):
+    """查询 A 股实时价格"""
+    ...
+```
+
+**不需要** `def get_stock_price(args)` 再自己取 `args.get("code")`。
+
+### 3.3 注册
+
+文件末尾一行注册：
+
+```python
+register("get_stock_price", PRICE_DEF, get_stock_price)
+```
+
+### 3.4 错误处理
+
+工具函数**返回错误字符串**，不抛异常：
+
+```python
+try:
+    ...
+except Exception as e:
+    return f"查询失败: {e}"
+```
+
+---
+
+## 4. 文档字符串
+
+所有公共函数必须有 docstring：
+
+```python
+def unified_search(query, top_k=5):
+    """并行搜索所有知识库，按相关度合并返回。
+
+    返回格式：
+    [
+        {"source": "annual_reports", "content": "...", "distance": 0.23},
+    ]
+    """
+```
+
+- 单行功能 → 一行 docstring
+- 复杂功能 → 多行，首行概述，空一行后详细说明
+
+---
+
+## 5. 注释
+
+| 用途 | 风格 |
+|------|------|
+| 代码区块 | `# === 初始化 ===`（前后等号，居中对齐） |
+| 解释原因 | `# 离线模式，避免 sentence-transformers 直连 huggingface` |
+| 参数说明 | 行内 `# 秒：1 → 2 → 4` |
+
+**不写**「这行做了什么」（代码自解释），**写**「为什么这样做」。
+
+---
+
+## 6. 入口文件 main.py
+
+`main.py` 只做两件事：
+1. `import` 所有工具模块 → 触发 `register()`
+2. 调用 `chat()`
+
+```python
+"""NsAgent 入口 — 加载工具 → 启动 Agent。"""
+import tools.time_tool       # noqa: F401
+import tools.file_tools      # noqa: F401
+import tools.finance.market_data  # noqa: F401
+
+from core.agent import chat
+
+if __name__ == "__main__":
+    chat()
+```
+
+新增工具后只需加一行 `import`。
+
+---
+
+## 7. 间距与格式
+
+- 顶层函数之间：**2 个空行**
+- 类内方法之间：**1 个空行**
+- 导入组之间：**1 个空行**
+- 行尾不要空格
+- 所有字符串用双引号 `"`
+
+---
+
+## 8. 配置与环境
+
+- API 密钥：`.env` 文件 + `python-dotenv`，不硬编码
+- 路径：用 `Path(__file__).parent` 相对计算，不写死绝对路径
+- 私有连接：模块级 `_client`、`_embed_model` 懒初始化
+
+---
+
+## 9. 新增文件检查清单
+
+- [ ] 模块 docstring 已在第一行
+- [ ] 导入顺序：stdlib → 第三方 → 项目内
+- [ ] 命名：函数 snake_case，常量 UPPER，类 PascalCase
+- [ ] 工具：XXX_DEF + handler 函数 + register()
+- [ ] handler 签名匹配 `execute()` 的 `**args` 展开方式
+- [ ] 错误返回字符串，不抛异常（工具层）
+- [ ] main.py 已加 import
+- [ ] 无通配符导入、无 trailing whitespace
+
+---
+
+## 10. 模块依赖原则
+
+### 工具层不得直接访问 ChromaDB
+
+任何涉及知识库搜索的工具，**必须**调用 `knowledge/search.py` 的公开接口（`unified_search()` 或 `search_formatted()`），**禁止**直接 `import chromadb` 或操作 `_client`、`_embed_model`。
+
+```python
+# ✓ 正确：薄封装，不重复搜索逻辑
+from knowledge.search import unified_search
+
+# ✗ 错误：重复造轮子
+import chromadb
+from knowledge.search import _client, _embed_model
+```
+
+**原因**：搜索逻辑的唯一真相源是 `knowledge/search.py`。未来换模型、换向量库、调参数只改一处。工具层只做薄封装（调搜索 + 格式化输出）。
+
+### 新增工具前先问
+
+写任何新工具前，先回答三个问题：
+1. 有没有已有模块能做这件事？（如搜索 → `unified_search`）
+2. 我这个工具是「新能力」还是「薄封装」？
+3. 如果是薄封装，调了哪个已有接口？
+</div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block"># NsAgent 编码规范
+
+&gt; 从现有 16 个源文件中提取的写作约定。新增文件必须遵循本文档。
+
+---
+
+## 1. 文件结构
+
+### 1.1 模块文档字符串
+
+每个 `.py` 文件**必须**以模块级 docstring 开头，用中文简要说明职责：
+
+```python
+"""文件职责的一句话描述。"""
+```
+
+| 文件类型 | 示例 |
+|----------|------|
+| 工具文件 | `"""获取当前时间的工具。"""` |
+| 核心模块 | `"""NsAgent 核心 — Agent Loop。..."""` |
+| 入口文件 | `"""NsAgent 入口 — 加载工具 → 启动 Agent。"""` |
+
+分隔符统一用 `—`（全角破折号）。
+
+### 1.2 导入顺序
+
+1. **标准库**（stdlib）
+2. **第三方库**（pip install 的）
+3. **项目内部模块**（`from tools.xxx import`、`from core.xxx import`）
+
+每组之间空一行。示例：
+
+```python
+import json
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+from tools.registry import get_tool_definitions, execute
+from memory import session as sess
+```
+
+**禁止**：`from module import *`（通配符导入）。
+
+### 1.3 `__init__.py`
+
+空文件，仅作为包识别标记。不加任何代码。
+
+---
+
+## 2. 命名
+
+| 类型 | 规则 | 示例 |
+|------|------|------|
+| 函数 | `snake_case` | `get_stock_price`、`run_command` |
+| 变量 | `snake_case` | `session_id`、`query_vec` |
+| 常量 | `UPPER_CASE` | `MAX_RETRIES`、`CHROMA_PATH` |
+| 类 | `PascalCase` | `NsAgentError`、`APIError` |
+| 私有模块级变量 | `_prefix` | `_registry`、`_client` |
+| 私有函数 | `_prefix` | `_connect()` |
+
+---
+
+## 3. 工具定义规范
+
+### 3.1 定义常量
+
+每个工具配一个 JSON Schema 定义常量，命名 `XXX_DEF`：
+
+```python
+PRICE_DEF = {
+    "type": "function",
+    "function": {
+        "name": "get_stock_price",
+        "description": "查询 A 股实时行情，返回最新价、涨跌幅、成交量、成交额",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "description": "股票代码，如 600519（茅台）"
+                }
+            },
+            "required": ["code"]
+        }
+    }
+}
+```
+
+**要点**：
+- 常量名 = `功能名大写_DEF`（如 `PRICE_DEF`、`SEARCH_DEF`、`TERMINAL_DEF`）
+- `description` 用中文，清晰说明工具做什么
+- `parameters` 的 `description` 用中文
+- `required` 列出必填参数
+
+### 3.2 处理函数
+
+函数签名直接接收关键字参数（因为 `execute()` 用 `**args` 展开）：
+
+```python
+def get_stock_price(code):
+    """查询 A 股实时价格"""
+    ...
+```
+
+**不需要** `def get_stock_price(args)` 再自己取 `args.get("code")`。
+
+### 3.3 注册
+
+文件末尾一行注册：
+
+```python
+register("get_stock_price", PRICE_DEF, get_stock_price)
+```
+
+### 3.4 错误处理
+
+工具函数**返回错误字符串**，不抛异常：
+
+```python
+try:
+    ...
+except Exception as e:
+    return f"查询失败: {e}"
+```
+
+---
+
+## 4. 文档字符串
+
+所有公共函数必须有 docstring：
+
+```python
+def unified_search(query, top_k=5):
+    """并行搜索所有知识库，按相关度合并返回。
+
+    返回格式：
+    [
+        {"source": "annual_reports", "content": "...", "distance": 0.23},
+    ]
+    """
+```
+
+- 单行功能 → 一行 docstring
+- 复杂功能 → 多行，首行概述，空一行后详细说明
+
+---
+
+## 5. 注释
+
+| 用途 | 风格 |
+|------|------|
+| 代码区块 | `# === 初始化 ===`（前后等号，居中对齐） |
+| 解释原因 | `# 离线模式，避免 sentence-transformers 直连 huggingface` |
+| 参数说明 | 行内 `# 秒：1 → 2 → 4` |
+
+**不写**「这行做了什么」（代码自解释），**写**「为什么这样做」。
+
+---
+
+## 6. 入口文件 main.py
+
+`main.py` 只做两件事：
+1. `import` 所有工具模块 → 触发 `register()`
+2. 调用 `chat()`
+
+```python
+"""NsAgent 入口 — 加载工具 → 启动 Agent。"""
+import tools.time_tool       # noqa: F401
+import tools.file_tools      # noqa: F401
+import tools.finance.market_data  # noqa: F401
+
+from core.agent import chat
+
+if __name__ == "__main__":
+    chat()
+```
+
+新增工具后只需加一行 `import`。
+
+---
+
+## 7. 间距与格式
+
+- 顶层函数之间：**2 个空行**
+- 类内方法之间：**1 个空行**
+- 导入组之间：**1 个空行**
+- 行尾不要空格
+- 所有字符串用双引号 `"`
+
+---
+
+## 8. 配置与环境
+
+- API 密钥：`.env` 文件 + `python-dotenv`，不硬编码
+- 路径：用 `Path(__file__).parent` 相对计算，不写死绝对路径
+- 私有连接：模块级 `_client`、`_embed_model` 懒初始化
+
+---
+
+## 9. 新增文件检查清单
+
+- [ ] 模块 docstring 已在第一行
+- [ ] 导入顺序：stdlib → 第三方 → 项目内
+- [ ] 命名：函数 snake_case，常量 UPPER，类 PascalCase
+- [ ] 工具：XXX_DEF + handler 函数 + register()
+- [ ] handler 签名匹配 `execute()` 的 `**args` 展开方式
+- [ ] 错误返回字符串，不抛异常（工具层）
+- [ ] main.py 已加 import
+- [ ] 无通配符导入、无 trailing whitespace
+
+---
+
+## 10. 模块依赖原则
+
+### 工具层不得直接访问 ChromaDB
+
+任何涉及知识库搜索的工具，**必须**调用 `knowledge/search.py` 的公开接口（`unified_search()` 或 `search_formatted()`），**禁止**直接 `import chromadb` 或操作 `_client`、`_embed_model`。
+
+```python
+# ✓ 正确：薄封装，不重复搜索逻辑
+from knowledge.search import unified_search
+
+# ✗ 错误：重复造轮子
+import chromadb
+from knowledge.search import _client, _embed_model
+```
+
+**原因**：搜索逻辑的唯一真相源是 `knowledge/search.py`。未来换模型、换向量库、调参数只改一处。工具层只做薄封装（调搜索 + 格式化输出）。
+
+### 新增工具前先问
+
+写任何新工具前，先回答三个问题：
+1. 有没有已有模块能做这件事？（如搜索 → `unified_search`）
+2. 我这个工具是「新能力」还是「薄封装」？
+3. 如果是薄封装，调了哪个已有接口？
+</div></div>
+</div>
+<div class="card" id="pyproject.toml" data-versions="v030 v040">
+<div class="card-title">pyproject.toml</div>
+<div class="card-desc"></div>
+<div data-versions="v030"><div class="code-label">v0.3.0</div><div class="code-block">[project]
+name = "ns-agent"
+version = "0.3.0"
+description = "NsAgent 统一 AI Agent 框架 — 1 个 Agent + N 个工具集"
+readme = "README.md"
+requires-python = "&gt;=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Nuan-shu" }]
+keywords = ["ai-agent", "llm", "rag", "tool-calling"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "openai&gt;=2.0",
+    "python-dotenv&gt;=1.0",
+    "chromadb&gt;=1.5",
+    "sentence-transformers&gt;=5.0",
+    "akshare&gt;=1.18",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff&gt;=0.12",
+    "pytest&gt;=8",
+    "pytest-cov&gt;=6",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes (unused imports, undefined names)
+    "I",     # isort (import ordering)
+    "N",     # pep8-naming
+    "UP",    # pyupgrade (use modern Python syntax)
+    "B",     # flake8-bugbear (common bugs)
+    "SIM",   # flake8-simplify (simplify code)
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["core", "tools", "knowledge", "memory"]
+force-sort-within-sections = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["core", "tools", "knowledge", "memory"]
+omit = ["tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_also = [
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
+</div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">[project]
+name = "ns-agent"
+version = "0.3.0"
+description = "NsAgent 统一 AI Agent 框架 — 1 个 Agent + N 个工具集"
+readme = "README.md"
+requires-python = "&gt;=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Nuan-shu" }]
+keywords = ["ai-agent", "llm", "rag", "tool-calling"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "openai&gt;=2.0",
+    "python-dotenv&gt;=1.0",
+    "chromadb&gt;=1.5",
+    "sentence-transformers&gt;=5.0",
+    "akshare&gt;=1.18",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff&gt;=0.12",
+    "pytest&gt;=8",
+    "pytest-cov&gt;=6",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes (unused imports, undefined names)
+    "I",     # isort (import ordering)
+    "N",     # pep8-naming
+    "UP",    # pyupgrade (use modern Python syntax)
+    "B",     # flake8-bugbear (common bugs)
+    "SIM",   # flake8-simplify (simplify code)
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["core", "tools", "knowledge", "memory"]
+force-sort-within-sections = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["core", "tools", "knowledge", "memory"]
+omit = ["tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_also = [
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
+</div></div>
+</div>
+<div class="card" id="docs-ENTERPRISE-STANDARDS-md" data-versions="v030 v040">
+<div class="card-title">docs/ENTERPRISE-STANDARDS.md</div>
+<div class="card-desc"></div>
+<div data-versions="v030"><div class="code-label">v0.3.0</div><div class="code-block"># NsAgent 企业级开发规范化报告
+
+&gt; 2026-06-16 · 对照 ns-agent v0.3.0 现状，逐项分析差距与行动方案。
+
+---
+
+## 总览
+
+企业级开发不是「大公司才做的事」，而是一套**让代码不腐烂**的工程实践。ns-agent 当前在 8 个维度存在差距：
+
+| 维度 | ns-agent 现状 | 企业级标准 | 严重程度 |
+|------|-------------|-----------|---------|
+| 测试 | 无 | 单元+集成+CI | 高 |
+| 类型注解 | 无 | 全覆盖 + mypy | 高 |
+| 依赖管理 | 无文件记录 | pyproject.toml + lock | **已修复** |
+| 代码检查 | 无 | ruff + pre-commit | **已修复** |
+| 日志 | print() | structlog 结构化 | 中 |
+| CI/CD | 无 | GitHub Actions | 中 |
+| 错误处理 | 基础 try/except | 分层异常 + 错误码 | 中 |
+| 项目结构 | 代码测试混放 | src/tests 分离 | 低 |
+
+---
+
+## 1. 测试 — 防屎山第一道防线
+
+### 为什么最重要
+
+没有测试 = 每次改代码都在赌。你今天改了 `registry.py` 的 `execute()` 函数，你**确信** 7 个工具都还能正常调用吗？你能做的是手动跑一遍——一次、两次可以，第 20 次呢？
+
+测试的价值不是「证明代码正确」，而是**当代码被改坏时，第一时间告诉你**。
+
+### 现状
+
+```
+ns-agent 测试覆盖: 0%
+└── 测试文件: 0 个
+└── 测试框架: 未安装
+└── 验证方式: python -c "..." 手动
+```
+
+### 企业级做法
+
+```
+测试金字塔:
+     ┌──────────┐
+     │  E2E 测试 │  ← 少而精（启动 Agent，对话一轮）
+     ├──────────┤
+     │ 集成测试   │  ← 搜年报 → LLM 生成回答（不走真 API）
+     ├──────────┤
+     │ 单元测试   │  ← 每个函数独立测（占 70%）
+     └──────────┘
+```
+
+**单元测试示例**（ns-agent 场景）：
+
+```python
+# tests/test_registry.py
+from tools.registry import register, execute, get_tool_definitions
+
+def test_register_and_execute():
+    def hello(name):
+        return f"你好 {name}"
+
+    register("hello", {"type": "function", "function": {"name": "hello", ...}}, hello)
+    result = execute("hello", {"name": "世界"})
+    assert result == "你好 世界"
+
+def test_execute_unknown_tool():
+    result = execute("不存在的工具", {})
+    assert "未知工具" in result
+```
+
+```python
+# tests/test_search.py
+from knowledge.search import unified_search
+
+def test_search_annual_reports():
+    results = unified_search("茅台 营业收入", top_k=3)
+    assert len(results) &gt; 0
+    assert all(r["source"] in ("annual_reports", "agent_engineering", "wiki_knowledge") for r in results)
+```
+
+### 行动方案
+
+1. 安装：`pip install pytest pytest-cov`
+2. 创建 `tests/` 目录
+3. 先测 3 个核心函数：`execute()`、`unified_search()`、`call_with_retry()`
+4. 以后每加一个新工具，同时加它的测试
+5. 覆盖率目标：先到 50%，月 3 到 80%
+
+---
+
+## 2. 类型注解 — 第二道防线
+
+### 为什么重要
+
+```python
+# 没有类型注解：你不知道 args 是什么
+def execute(name, args):
+    ...
+
+# 有类型注解：一目了然
+def execute(name: str, args: dict[str, str]) -&gt; str:
+    ...
+```
+
+类型注解做三件事：
+1. **IDE 自动补全** — 输入 `result.` 时弹出可用方法
+2. **静态检查** — mypy 在你运行前就发现 `execute(123, None)` 这样的错误
+3. **活文档** — 不需要翻源码就知道参数格式
+
+### 现状
+
+```
+ns-agent 类型注解覆盖: 0%
+└── 17 个 .py 文件，0 个函数有类型注解
+```
+
+### 企业级做法
+
+```python
+# 完整注解示例（ns-agent 风格）
+from typing import Any
+
+def execute(name: str, args: dict[str, Any]) -&gt; str:
+    """根据工具名执行对应函数。"""
+    if name not in _registry:
+        return f"错误：未知工具 {name}"
+    return _registry[name]["handler"](**args)
+
+def register(
+    name: str,
+    definition: dict[str, Any],
+    handler: callable
+) -&gt; None:
+    """注册一个工具。"""
+    _registry[name] = {"definition": definition, "handler": handler}
+```
+
+### 行动方案
+
+1. 从新文件开始强制要求
+2. 逐步给核心模块补（`registry.py` → `agent.py` → `search.py`）
+3. 安装 `mypy` 作为 CI 检查项
+4. 不用追求 100%，核心公开接口有就行
+
+---
+
+## 3. 依赖管理 — 已修复
+
+### 做了什么
+
+创建 `pyproject.toml`，记录了所有直接依赖：
+
+```toml
+[project]
+name = "ns-agent"
+version = "0.3.0"
+requires-python = "&gt;=3.12"
+
+dependencies = [
+    "openai&gt;=2.0",
+    "python-dotenv&gt;=1.0",
+    "chromadb&gt;=1.5",
+    "sentence-transformers&gt;=5.0",
+    "akshare&gt;=1.18",
+]
+```
+
+### 为什么重要
+
+- 换机器只需 `pip install -e .` 一键恢复
+- `pyproject.toml` 是现代 Python 项目的标准入口
+- 区分了 `dependencies`（运行时）和 `[dev]`（开发时，如 ruff/pytest）
+
+---
+
+## 4. 代码检查 — 已修复
+
+### 做了什么
+
+安装 `ruff`，配置了 7 类检查规则，自动修复了 26 个问题。
+
+### 规则说明
+
+| 规则 | 用途 | 示例 |
+|------|------|------|
+| `E/W` | pycodestyle 格式 | 空行尾随空格 |
+| `F` | pyflakes 逻辑错误 | 定义了变量但没用 |
+| `I` | isort 导入排序 | stdlib → 第三方 → 项目内 |
+| `N` | pep8-naming 命名 | 类名应用 PascalCase |
+| `UP` | pyupgrade 语法升级 | `f"{x}"` 替代 `"{}".format(x)` |
+| `B` | flake8-bugbear 常见 bug | `zip()` 不加 `strict=` |
+| `SIM` | 简化代码 | `if a: return True; return False` → `return bool(a)` |
+
+### 执行结果
+
+```
+ruff check .  → 28 问题 → 自动修复 26 个 → 手动修 2 个 → 全部通过
+ruff format . → 14 文件重新格式化
+```
+
+### 下一步：pre-commit 钩子
+
+```bash
+pip install pre-commit
+# 创建 .pre-commit-config.yaml，提交前自动跑 ruff + mypy
+```
+
+效果：代码不通过检查**根本提交不了**，从源头堵住屎山。
+
+---
+
+## 5. 日志 — 从 print() 到 structlog
+
+### 现状
+
+```python
+# core/agent.py — 混在一起的 print
+print(f"[NsAgent] 已加载 {len(tools)} 个工具\n")     # 这是什么级别？info？
+print(f"  [重试 {attempt}/{MAX_RETRIES}] ...")        # 这是 warn？
+print(f"NsAgent 错误 [{e.code}]: {e.message}")        # 这是 error？
+```
+
+问题：无法区分调试信息、正常日志、警告和错误。排查问题时只能全文搜索。
+
+### 企业级做法
+
+```python
+import structlog
+
+logger = structlog.get_logger()
+
+# 使用
+logger.info("工具已加载", tool_count=len(tools))
+logger.warning("API 重试", attempt=attempt, max_retries=MAX_RETRIES)
+logger.error("工具执行失败", tool_name=name, error=str(e))
+```
+
+输出带时间戳和结构化字段：
+
+```
+2026-06-16 10:30:00 [info] 工具已加载 tool_count=7
+2026-06-16 10:30:05 [warning] API 重试 attempt=2 max_retries=3
+```
+
+### 为什么不用 print()
+
+1. **级别过滤** — 生产环境只看 error，开发环境看 debug
+2. **结构化** — `tool_count=7` 可被日志系统搜索聚合
+3. **trace_id** — 一次请求贯串所有日志，定位问题秒级
+
+### 行动方案
+
+1. 安装 `pip install structlog`
+2. 替换 `agent.py` + `retry.py` 的 `print()`
+3. 定义日志级别：debug（开发）/ info（正常）/ warning（重试）/ error（失败）
+
+---
+
+## 6. CI/CD — 自动化门禁
+
+### 现状
+
+```
+git push → 人工检查 → 可能漏
+```
+
+### 企业级做法
+
+```
+git push → GitHub Actions:
+  ├── ruff check（格式检查，不过直接拒绝）
+  ├── mypy（类型检查）
+  ├── pytest（跑所有测试）
+  └── 三项全过 → 允许合并
+```
+
+### GitHub Actions 配置示例
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install ruff
+      - run: ruff check .
+      - run: ruff format --check .
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e ".[dev]"
+      - run: pytest --cov
+```
+
+### 为什么 CI 防屎山
+
+- **阻止坏代码入库** — 不跑 CI 不合并，坏代码连仓库都进不去
+- **历史可追溯** — 每次提交都有绿灯/红灯记录，谁引入的 bug 一查便知
+- **减少 review 负担** — 格式问题机器检查，人只关注逻辑
+
+---
+
+## 7. 错误处理 — 分层防御
+
+### 现状
+
+ns-agent 有 `NsAgentError` 体系但只用了一小部分：
+
+```
+NsAgentError               ← 定义了但只用基类
+├── APIError               ← 定义了但 retry.py 还在裸 raise
+├── ToolError              ← 定义了但工具层返回字符串而非抛异常
+└── ConfigError            ← 未使用
+```
+
+### 企业级做法
+
+```
+三层防御:
+
+第 1 层 — 工具层：抛 ToolError
+  def get_stock_price(code):
+      try:
+          ...
+      except akshare.NetworkError as e:
+          raise ToolError(f"行情查询网络失败: {e}", code="FINANCE_NETWORK")
+
+第 2 层 — Agent Loop：捕获 NsAgentError → 友好输出
+  try:
+      run(messages=messages)
+  except NsAgentError as e:
+      print(f"[{e.code}] {e.message}")  # 不崩，继续运行
+
+第 3 层 — 入口：捕获所有 Exception → 记录 + 优雅退出
+  try:
+      chat()
+  except Exception as e:
+      logger.critical("未预期崩溃", error=str(e))
+```
+
+### 为什么这样设计
+
+- **工具层不该直接返回字符串** — 上游不知道这是正常结果还是出错
+- **Agent Loop 不该崩** — 一个工具失败，换另一个工具重试
+- **入口层必须兜底** — 真的崩了也要留下日志
+
+---
+
+## 8. 项目结构 — 代码与测试分离
+
+### 现状
+
+```
+ns-agent/
+├── main.py
+├── core/          ← 生产代码
+├── tools/         ← 生产代码
+├── knowledge/     ← 生产代码
+├── memory/        ← 生产代码
+├── data/          ← 运行时数据
+└── CONVENTIONS.md ← 规范文档
+```
+
+### 企业级做法
+
+```
+ns-agent/
+├── src/
+│   └── ns_agent/          ← 所有生产代码
+│       ├── __init__.py
+│       ├── main.py
+│       ├── core/
+│       ├── tools/
+│       ├── knowledge/
+│       └── memory/
+├── tests/                 ← 测试代码（镜像 src 结构）
+│   ├── test_registry.py
+│   ├── test_search.py
+│   └── tools/
+│       └── test_market_data.py
+├── config/                ← 环境配置（dev/staging/prod）
+├── docs/                  ← 设计文档、ADR
+├── pyproject.toml
+├── CONVENTIONS.md
+└── README.md
+```
+
+### 为什么分离
+
+- `src/` 布局避免 Python 路径陷阱（`import ns_agent` 而非 `import core`）
+- `tests/` 镜像结构让测试文件秒找
+- `config/` 环境分离：dev 连本地 ChromaDB，prod 连远程
+
+### 行动方案
+
+这个不用现在做——目录迁移影响所有 import。等月 3 产品化时一并重构。
+
+---
+
+## 防屎山核心原则
+
+### 1. 让机器检查，别靠人脑记
+
+```
+CONVENTIONS.md → 人看，人会忘
+ruff + mypy    → 机器执行，机器不忘
+```
+
+### 2. 改代码必改测试
+
+每加一个工具，同时加它的测试。测试不是负担——它是唯一能告诉你「改坏了」的东西。
+
+### 3. 接口稳定，实现可变
+
+```python
+# 工具都走同一个注册接口
+register("name", DEF, handler)
+
+# Agent Loop 不看具体工具，只看注册表
+tools = get_tool_definitions()
+```
+
+好处：加 10 个工具，Agent Loop 一行不用改。
+
+### 4. 分层隔离
+
+```
+入口层 → 不关心工具细节，只调 Agent Loop
+Loop 层 → 不关心搜索细节，只调 execute()
+工具层 → 不关心 ChromaDB 细节，只调 unified_search()
+搜索层 → 唯一真相源，换模型只改这里
+```
+
+每层只知道自己下面一层，不看隔壁层。
+
+### 5. 三不原则
+
+- **不信任输入** — 工具函数永远校验参数
+- **不吞异常** — `except Exception: pass` 是屎山之源
+- **不硬编码** — 路径、密钥、阈值全部从配置读
+
+---
+
+## 实施路线图
+
+```
+已做（Day 10）:
+  [x] pyproject.toml — 依赖声明
+  [x] ruff — 代码检查 + 自动格式化
+  [x] CONVENTIONS.md — 编码规范
+
+本周（Week 4）:
+  [ ] pytest — 3 个核心函数单元测试
+  [ ] 新文件加类型注解
+  [ ] pre-commit 钩子（提交前自动 ruff）
+
+下周（Week 5）:
+  [ ] mypy — 类型检查
+  [ ] GitHub Actions CI（push 自动跑 lint + test）
+  [ ] structlog 替换 print()
+
+月 3（产品化）:
+  [ ] src/tests 目录分离
+  [ ] 测试覆盖率 &gt; 80%
+  [ ] 错误码体系完善
+  [ ] 日志 + 指标 + 告警
+```
+</div></div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block"># NsAgent 企业级开发规范化报告
+
+&gt; 2026-06-16 · 对照 ns-agent v0.3.0 现状，逐项分析差距与行动方案。
+
+---
+
+## 总览
+
+企业级开发不是「大公司才做的事」，而是一套**让代码不腐烂**的工程实践。ns-agent 当前在 8 个维度存在差距：
+
+| 维度 | ns-agent 现状 | 企业级标准 | 严重程度 |
+|------|-------------|-----------|---------|
+| 测试 | 无 | 单元+集成+CI | 高 |
+| 类型注解 | 无 | 全覆盖 + mypy | 高 |
+| 依赖管理 | 无文件记录 | pyproject.toml + lock | **已修复** |
+| 代码检查 | 无 | ruff + pre-commit | **已修复** |
+| 日志 | print() | structlog 结构化 | 中 |
+| CI/CD | 无 | GitHub Actions | 中 |
+| 错误处理 | 基础 try/except | 分层异常 + 错误码 | 中 |
+| 项目结构 | 代码测试混放 | src/tests 分离 | 低 |
+
+---
+
+## 1. 测试 — 防屎山第一道防线
+
+### 为什么最重要
+
+没有测试 = 每次改代码都在赌。你今天改了 `registry.py` 的 `execute()` 函数，你**确信** 7 个工具都还能正常调用吗？你能做的是手动跑一遍——一次、两次可以，第 20 次呢？
+
+测试的价值不是「证明代码正确」，而是**当代码被改坏时，第一时间告诉你**。
+
+### 现状
+
+```
+ns-agent 测试覆盖: 0%
+└── 测试文件: 0 个
+└── 测试框架: 未安装
+└── 验证方式: python -c "..." 手动
+```
+
+### 企业级做法
+
+```
+测试金字塔:
+     ┌──────────┐
+     │  E2E 测试 │  ← 少而精（启动 Agent，对话一轮）
+     ├──────────┤
+     │ 集成测试   │  ← 搜年报 → LLM 生成回答（不走真 API）
+     ├──────────┤
+     │ 单元测试   │  ← 每个函数独立测（占 70%）
+     └──────────┘
+```
+
+**单元测试示例**（ns-agent 场景）：
+
+```python
+# tests/test_registry.py
+from tools.registry import register, execute, get_tool_definitions
+
+def test_register_and_execute():
+    def hello(name):
+        return f"你好 {name}"
+
+    register("hello", {"type": "function", "function": {"name": "hello", ...}}, hello)
+    result = execute("hello", {"name": "世界"})
+    assert result == "你好 世界"
+
+def test_execute_unknown_tool():
+    result = execute("不存在的工具", {})
+    assert "未知工具" in result
+```
+
+```python
+# tests/test_search.py
+from knowledge.search import unified_search
+
+def test_search_annual_reports():
+    results = unified_search("茅台 营业收入", top_k=3)
+    assert len(results) &gt; 0
+    assert all(r["source"] in ("annual_reports", "agent_engineering", "wiki_knowledge") for r in results)
+```
+
+### 行动方案
+
+1. 安装：`pip install pytest pytest-cov`
+2. 创建 `tests/` 目录
+3. 先测 3 个核心函数：`execute()`、`unified_search()`、`call_with_retry()`
+4. 以后每加一个新工具，同时加它的测试
+5. 覆盖率目标：先到 50%，月 3 到 80%
+
+---
+
+## 2. 类型注解 — 第二道防线
+
+### 为什么重要
+
+```python
+# 没有类型注解：你不知道 args 是什么
+def execute(name, args):
+    ...
+
+# 有类型注解：一目了然
+def execute(name: str, args: dict[str, str]) -&gt; str:
+    ...
+```
+
+类型注解做三件事：
+1. **IDE 自动补全** — 输入 `result.` 时弹出可用方法
+2. **静态检查** — mypy 在你运行前就发现 `execute(123, None)` 这样的错误
+3. **活文档** — 不需要翻源码就知道参数格式
+
+### 现状
+
+```
+ns-agent 类型注解覆盖: 0%
+└── 17 个 .py 文件，0 个函数有类型注解
+```
+
+### 企业级做法
+
+```python
+# 完整注解示例（ns-agent 风格）
+from typing import Any
+
+def execute(name: str, args: dict[str, Any]) -&gt; str:
+    """根据工具名执行对应函数。"""
+    if name not in _registry:
+        return f"错误：未知工具 {name}"
+    return _registry[name]["handler"](**args)
+
+def register(
+    name: str,
+    definition: dict[str, Any],
+    handler: callable
+) -&gt; None:
+    """注册一个工具。"""
+    _registry[name] = {"definition": definition, "handler": handler}
+```
+
+### 行动方案
+
+1. 从新文件开始强制要求
+2. 逐步给核心模块补（`registry.py` → `agent.py` → `search.py`）
+3. 安装 `mypy` 作为 CI 检查项
+4. 不用追求 100%，核心公开接口有就行
+
+---
+
+## 3. 依赖管理 — 已修复
+
+### 做了什么
+
+创建 `pyproject.toml`，记录了所有直接依赖：
+
+```toml
+[project]
+name = "ns-agent"
+version = "0.3.0"
+requires-python = "&gt;=3.12"
+
+dependencies = [
+    "openai&gt;=2.0",
+    "python-dotenv&gt;=1.0",
+    "chromadb&gt;=1.5",
+    "sentence-transformers&gt;=5.0",
+    "akshare&gt;=1.18",
+]
+```
+
+### 为什么重要
+
+- 换机器只需 `pip install -e .` 一键恢复
+- `pyproject.toml` 是现代 Python 项目的标准入口
+- 区分了 `dependencies`（运行时）和 `[dev]`（开发时，如 ruff/pytest）
+
+---
+
+## 4. 代码检查 — 已修复
+
+### 做了什么
+
+安装 `ruff`，配置了 7 类检查规则，自动修复了 26 个问题。
+
+### 规则说明
+
+| 规则 | 用途 | 示例 |
+|------|------|------|
+| `E/W` | pycodestyle 格式 | 空行尾随空格 |
+| `F` | pyflakes 逻辑错误 | 定义了变量但没用 |
+| `I` | isort 导入排序 | stdlib → 第三方 → 项目内 |
+| `N` | pep8-naming 命名 | 类名应用 PascalCase |
+| `UP` | pyupgrade 语法升级 | `f"{x}"` 替代 `"{}".format(x)` |
+| `B` | flake8-bugbear 常见 bug | `zip()` 不加 `strict=` |
+| `SIM` | 简化代码 | `if a: return True; return False` → `return bool(a)` |
+
+### 执行结果
+
+```
+ruff check .  → 28 问题 → 自动修复 26 个 → 手动修 2 个 → 全部通过
+ruff format . → 14 文件重新格式化
+```
+
+### 下一步：pre-commit 钩子
+
+```bash
+pip install pre-commit
+# 创建 .pre-commit-config.yaml，提交前自动跑 ruff + mypy
+```
+
+效果：代码不通过检查**根本提交不了**，从源头堵住屎山。
+
+---
+
+## 5. 日志 — 从 print() 到 structlog
+
+### 现状
+
+```python
+# core/agent.py — 混在一起的 print
+print(f"[NsAgent] 已加载 {len(tools)} 个工具\n")     # 这是什么级别？info？
+print(f"  [重试 {attempt}/{MAX_RETRIES}] ...")        # 这是 warn？
+print(f"NsAgent 错误 [{e.code}]: {e.message}")        # 这是 error？
+```
+
+问题：无法区分调试信息、正常日志、警告和错误。排查问题时只能全文搜索。
+
+### 企业级做法
+
+```python
+import structlog
+
+logger = structlog.get_logger()
+
+# 使用
+logger.info("工具已加载", tool_count=len(tools))
+logger.warning("API 重试", attempt=attempt, max_retries=MAX_RETRIES)
+logger.error("工具执行失败", tool_name=name, error=str(e))
+```
+
+输出带时间戳和结构化字段：
+
+```
+2026-06-16 10:30:00 [info] 工具已加载 tool_count=7
+2026-06-16 10:30:05 [warning] API 重试 attempt=2 max_retries=3
+```
+
+### 为什么不用 print()
+
+1. **级别过滤** — 生产环境只看 error，开发环境看 debug
+2. **结构化** — `tool_count=7` 可被日志系统搜索聚合
+3. **trace_id** — 一次请求贯串所有日志，定位问题秒级
+
+### 行动方案
+
+1. 安装 `pip install structlog`
+2. 替换 `agent.py` + `retry.py` 的 `print()`
+3. 定义日志级别：debug（开发）/ info（正常）/ warning（重试）/ error（失败）
+
+---
+
+## 6. CI/CD — 自动化门禁
+
+### 现状
+
+```
+git push → 人工检查 → 可能漏
+```
+
+### 企业级做法
+
+```
+git push → GitHub Actions:
+  ├── ruff check（格式检查，不过直接拒绝）
+  ├── mypy（类型检查）
+  ├── pytest（跑所有测试）
+  └── 三项全过 → 允许合并
+```
+
+### GitHub Actions 配置示例
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install ruff
+      - run: ruff check .
+      - run: ruff format --check .
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e ".[dev]"
+      - run: pytest --cov
+```
+
+### 为什么 CI 防屎山
+
+- **阻止坏代码入库** — 不跑 CI 不合并，坏代码连仓库都进不去
+- **历史可追溯** — 每次提交都有绿灯/红灯记录，谁引入的 bug 一查便知
+- **减少 review 负担** — 格式问题机器检查，人只关注逻辑
+
+---
+
+## 7. 错误处理 — 分层防御
+
+### 现状
+
+ns-agent 有 `NsAgentError` 体系但只用了一小部分：
+
+```
+NsAgentError               ← 定义了但只用基类
+├── APIError               ← 定义了但 retry.py 还在裸 raise
+├── ToolError              ← 定义了但工具层返回字符串而非抛异常
+└── ConfigError            ← 未使用
+```
+
+### 企业级做法
+
+```
+三层防御:
+
+第 1 层 — 工具层：抛 ToolError
+  def get_stock_price(code):
+      try:
+          ...
+      except akshare.NetworkError as e:
+          raise ToolError(f"行情查询网络失败: {e}", code="FINANCE_NETWORK")
+
+第 2 层 — Agent Loop：捕获 NsAgentError → 友好输出
+  try:
+      run(messages=messages)
+  except NsAgentError as e:
+      print(f"[{e.code}] {e.message}")  # 不崩，继续运行
+
+第 3 层 — 入口：捕获所有 Exception → 记录 + 优雅退出
+  try:
+      chat()
+  except Exception as e:
+      logger.critical("未预期崩溃", error=str(e))
+```
+
+### 为什么这样设计
+
+- **工具层不该直接返回字符串** — 上游不知道这是正常结果还是出错
+- **Agent Loop 不该崩** — 一个工具失败，换另一个工具重试
+- **入口层必须兜底** — 真的崩了也要留下日志
+
+---
+
+## 8. 项目结构 — 代码与测试分离
+
+### 现状
+
+```
+ns-agent/
+├── main.py
+├── core/          ← 生产代码
+├── tools/         ← 生产代码
+├── knowledge/     ← 生产代码
+├── memory/        ← 生产代码
+├── data/          ← 运行时数据
+└── CONVENTIONS.md ← 规范文档
+```
+
+### 企业级做法
+
+```
+ns-agent/
+├── src/
+│   └── ns_agent/          ← 所有生产代码
+│       ├── __init__.py
+│       ├── main.py
+│       ├── core/
+│       ├── tools/
+│       ├── knowledge/
+│       └── memory/
+├── tests/                 ← 测试代码（镜像 src 结构）
+│   ├── test_registry.py
+│   ├── test_search.py
+│   └── tools/
+│       └── test_market_data.py
+├── config/                ← 环境配置（dev/staging/prod）
+├── docs/                  ← 设计文档、ADR
+├── pyproject.toml
+├── CONVENTIONS.md
+└── README.md
+```
+
+### 为什么分离
+
+- `src/` 布局避免 Python 路径陷阱（`import ns_agent` 而非 `import core`）
+- `tests/` 镜像结构让测试文件秒找
+- `config/` 环境分离：dev 连本地 ChromaDB，prod 连远程
+
+### 行动方案
+
+这个不用现在做——目录迁移影响所有 import。等月 3 产品化时一并重构。
+
+---
+
+## 防屎山核心原则
+
+### 1. 让机器检查，别靠人脑记
+
+```
+CONVENTIONS.md → 人看，人会忘
+ruff + mypy    → 机器执行，机器不忘
+```
+
+### 2. 改代码必改测试
+
+每加一个工具，同时加它的测试。测试不是负担——它是唯一能告诉你「改坏了」的东西。
+
+### 3. 接口稳定，实现可变
+
+```python
+# 工具都走同一个注册接口
+register("name", DEF, handler)
+
+# Agent Loop 不看具体工具，只看注册表
+tools = get_tool_definitions()
+```
+
+好处：加 10 个工具，Agent Loop 一行不用改。
+
+### 4. 分层隔离
+
+```
+入口层 → 不关心工具细节，只调 Agent Loop
+Loop 层 → 不关心搜索细节，只调 execute()
+工具层 → 不关心 ChromaDB 细节，只调 unified_search()
+搜索层 → 唯一真相源，换模型只改这里
+```
+
+每层只知道自己下面一层，不看隔壁层。
+
+### 5. 三不原则
+
+- **不信任输入** — 工具函数永远校验参数
+- **不吞异常** — `except Exception: pass` 是屎山之源
+- **不硬编码** — 路径、密钥、阈值全部从配置读
+
+---
+
+## 实施路线图
+
+```
+已做（Day 10）:
+  [x] pyproject.toml — 依赖声明
+  [x] ruff — 代码检查 + 自动格式化
+  [x] CONVENTIONS.md — 编码规范
+
+本周（Week 4）:
+  [ ] pytest — 3 个核心函数单元测试
+  [ ] 新文件加类型注解
+  [ ] pre-commit 钩子（提交前自动 ruff）
+
+下周（Week 5）:
+  [ ] mypy — 类型检查
+  [ ] GitHub Actions CI（push 自动跑 lint + test）
+  [ ] structlog 替换 print()
+
+月 3（产品化）:
+  [ ] src/tests 目录分离
+  [ ] 测试覆盖率 &gt; 80%
+  [ ] 错误码体系完善
+  [ ] 日志 + 指标 + 告警
+```
+</div></div>
+</div>
+<div class="card" id="tools-time_tool-py" data-versions="v010 v020 v030 v040">
 <div class="card-title">tools/time_tool.py <span class="ver-badge badge-mod">MOD v0.3.0</span></div>
 <div class="card-desc">时间工具 — datetime.now()</div>
 <div data-versions="v010"><div class="code-label">v0.1.0 — 20 行</div><div class="code-block">&quot;&quot;&quot;获取当前时间的工具。&quot;&quot;&quot;
@@ -2289,9 +5637,32 @@ TOOL_DEFINITION = {
 register(&quot;get_current_time&quot;, TOOL_DEFINITION, get_current_time)
 </div></div>
 </div>
+<div data-versions="v040"><div class="code-label">v0.4.0</div><div class="code-block">"""获取当前时间的工具。"""
+
+from datetime import datetime
+
+from tools.registry import register
+
+
+def get_current_time():
+    """返回当前日期时间字符串。"""
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+TOOL_DEFINITION = {
+    "type": "function",
+    "function": {
+        "name": "get_current_time",
+        "description": "获取当前日期和时间",
+        "parameters": {"type": "object", "properties": {}},
+    },
+}
+
+register("get_current_time", TOOL_DEFINITION, get_current_time)
+</div></div>
 </div>
 <script>
-function switchVersion(v){["v010","v020","v030"].forEach(function(x){document.getElementById("btn-"+x).classList.toggle("active",v===x)});var L={v010:"v0.1.0",v020:"v0.2.0",v030:"v0.3.0"},S={v010:"9 文件",v020:"16 文件",v030:"24 文件"};document.getElementById("ver-info").innerHTML="当前 <b>"+L[v]+"</b> — "+S[v];document.querySelectorAll("[data-versions]").forEach(function(el){var vs=el.getAttribute("data-versions");if(vs.indexOf(v)===-1)el.classList.add("hidden-version");else el.classList.remove("hidden-version")});document.body.className=v+"-view"}switchVersion("v030");
+function switchVersion(v){["v010","v020","v030","v040"].forEach(function(x){document.getElementById("btn-"+x).classList.toggle("active",v===x)});var L={v010:"v0.1.0",v020:"v0.2.0",v030:"v0.3.0",v040:"v0.4.0"},S={v010:"9 文件",v020:"16 文件",v030:"24 文件",v040:"33 文件"};document.getElementById("ver-info").innerHTML="当前 <b>"+L[v]+"</b> - "+S[v];document.querySelectorAll("[data-versions]").forEach(function(el){var vs=el.getAttribute("data-versions");if(vs.indexOf(v)===-1)el.classList.add("hidden-version");else el.classList.remove("hidden-version")});document.body.className=v+"-view"}switchVersion("v040");
 </script>
 </body>
 </html>

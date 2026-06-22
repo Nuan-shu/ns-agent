@@ -8,59 +8,36 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'PingFang SC','Microsoft YaHei',-apple-system,sans-serif; background: #f1f5f9; color: #334155; overflow: hidden; }
-
   #header { height: 52px; background: #fff; display: flex; align-items: center; padding: 0 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); z-index: 10; position: relative; gap: 12px; flex-shrink: 0; }
   #header h1 { font-size: 17px; font-weight: 700; color: #0f172a; }
-
   .version-switch { display: flex; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
   .version-switch button { padding: 4px 16px; font-size: 12px; border: none; cursor: pointer; font-weight: 500; font-family: inherit; transition: all 0.2s; background: #f8fafc; color: #64748b; }
   .version-switch button:first-child { border-right: 1px solid #e2e8f0; }
   .version-switch button.active { background: #3b6df0; color: #fff; }
   .version-switch button:not(.active):hover { background: #eff6ff; color: #3b6df0; }
-
   #header .badge { font-size: 11px; background: #3b6df0; color: #fff; padding: 2px 10px; border-radius: 10px; font-weight: 500; }
   #header .stats { font-size: 12px; color: #94a3b8; margin-left: auto; display: flex; gap: 16px; }
   #header .stats b { color: #334155; }
-
   #main { display: flex; height: calc(100vh - 52px); }
-
   #left-panel { width: 200px; background: #fff; border-right: 1px solid #e2e8f0; padding: 16px; overflow-y: auto; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
   #left-panel h3 { font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
   .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; margin: 6px 0; }
   .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
   .legend-line { width: 16px; height: 2px; border-radius: 1px; flex-shrink: 0; }
-  .legend-item .star { color: #eab308; font-size: 13px; margin-right: -2px; }
-  .stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 2px 0; }
-  .stat-row .val { font-weight: 600; }
-
   #graph { flex: 1; background: #fafbfc; background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px); background-size: 24px 24px; }
-
   #right-panel { width: 440px; background: #fff; border-left: 1px solid #e2e8f0; overflow-y: auto; flex-shrink: 0; padding: 0; }
   .panel-version { display: none; }
   .panel-version.active { display: block; }
-
   #right-panel h2 { font-size: 15px; color: #0f172a; padding: 16px 20px 12px; position: sticky; top: 0; background: #fff; z-index: 2; border-bottom: 2px solid #3b6df0; margin: 0; }
   .pkg-section { padding: 0 20px; }
   .pkg-title { font-size: 13px; font-weight: 700; color: #64748b; padding: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 44px; background: #fff; z-index: 1; margin: 0; border-bottom: 1px solid #f1f5f9; }
-  .file-section { padding: 8px 0; border-bottom: 1px solid #f1f5f9; transition: background 0.3s; }
-  .file-section.highlight { background: #eff6ff; margin: 0 -20px; padding: 8px 20px; border-radius: 4px; }
+  .file-section { padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
   .file-name { font-size: 13px; font-weight: 600; color: #1e293b; font-family: 'SF Mono','Fira Code','Menlo',monospace; padding: 4px 0; }
   .func-card { margin: 8px 0 12px 12px; padding: 10px 12px; background: #f8fafc; border-radius: 6px; border-left: 3px solid #3b6df0; font-size: 12px; line-height: 1.6; }
   .func-card .sig { font-family: 'SF Mono','Fira Code','Menlo',monospace; font-weight: 600; font-size: 13px; color: #0f172a; }
   .func-card .desc { color: #475569; margin: 4px 0; font-size: 12px; }
-  .func-card .io { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
-  .func-card .io .tag { padding: 2px 8px; border-radius: 4px; font-size: 11px; white-space: nowrap; }
-  .func-card .io .in-tag  { background: #dbeafe; color: #1d4ed8; }
-  .func-card .io .out-tag { background: #dcfce7; color: #166534; }
-  .func-card .calls { margin-top: 6px; font-size: 11px; }
-  .func-card .calls .call-item { padding: 3px 8px; margin: 2px 0; border-radius: 3px; font-family: 'SF Mono','Fira Code','Menlo',monospace; font-size: 11px; }
-  .call-runtime { background: #eff6ff; color: #1d4ed8; }
-  .call-register { background: #f1f5f9; color: #64748b; }
-  .empty-badge { color: #94a3b8; font-style: italic; font-size: 12px; padding: 8px 0; }
   .new-badge { display: inline-block; font-size: 10px; background: #10b981; color: #fff; padding: 1px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500; }
   .mod-badge { display: inline-block; font-size: 10px; background: #f59e0b; color: #fff; padding: 1px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500; }
-  .section-note { margin: 4px 0 12px 12px; font-size: 11px; color: #94a3b8; padding: 6px 10px; background: #fffbeb; border-radius: 4px; border-left: 2px solid #f59e0b; }
-
   .history-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 4px; }
   .history-table td { padding: 4px 2px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
   .history-table .ver { font-weight: 700; color: #3b6df0; white-space: nowrap; font-family: 'SF Mono',monospace; }
@@ -68,26 +45,24 @@
   .history-table .desc { color: #475569; line-height: 1.4; }
   .history-table .delta { color: #10b981; white-space: nowrap; font-size: 10px; font-weight: 600; }
   .history-table tr.current { background: #eff6ff; }
-  .history-table tr.current .ver { color: #2563eb; }
 </style>
 </head>
 <body>
-
 <div id="header">
   <h1>NsAgent 架构网络图</h1>
   <div class="version-switch">
     <button id="btn-v010" onclick="switchVersion('v010')">v0.1.0</button>
     <button id="btn-v020" onclick="switchVersion('v020')">v0.2.0</button>
-    <button id="btn-v030" class="active" onclick="switchVersion('v030')">v0.3.0</button>
+    <button id="btn-v030" onclick="switchVersion('v030')">v0.3.0</button>
+    <button id="btn-v040" class="active" onclick="switchVersion('v040')">v0.4.0</button>
   </div>
-  <span class="badge" id="active-badge">v0.3.0</span>
+  <span class="badge" id="active-badge">v0.4.0</span>
   <div class="stats" id="stats-display">
-    <span>文件 <b>24</b></span>
-    <span>函数 <b>35</b></span>
+    <span>文件 <b>33</b></span>
+    <span>函数 <b>60</b></span>
     <span>调用 <b>19</b></span>
   </div>
 </div>
-
 <div id="main">
   <div id="left-panel">
     <div>
@@ -103,331 +78,178 @@
     </div>
     <div>
       <h3>节点标记</h3>
-      <div class="legend-item"><span class="star">★</span> 当前版本新增</div>
-      <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> 当前版本修改</div>
+      <div class="legend-item"><span style="color:#eab308;font-size:13px;">★</span> 新增</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> 修改</div>
       <div class="legend-item"><span class="legend-line" style="background:#3b6df0;"></span> 运行时调用</div>
       <div class="legend-item"><span class="legend-line" style="background:#94a3b8;border:1px dashed #94a3b8;height:0;"></span> import 注册</div>
     </div>
     <div>
       <h3>版本历史</h3>
-      <table class="history-table" id="history-table">
-        <tr id="hist-v030" class="current">
-          <td class="ver">v0.3.0</td><td class="date">06-16</td>
-          <td class="desc">金融工具集 + 技能系统 + Prompt分层 + 上下文压缩</td><td class="delta">+11 -1</td>
-        </tr>
-        <tr id="hist-v020">
-          <td class="ver">v0.2.0</td><td class="date">06-12</td>
-          <td class="desc">三源统合 + 会话持久化 + API重试</td><td class="delta">+4 +9</td>
-        </tr>
-        <tr id="hist-v010">
-          <td class="ver">v0.1.0</td><td class="date">06-11</td>
-          <td class="desc">框架筑基 — 工具注册表 + 多源搜索</td><td class="delta">9 12</td>
-        </tr>
-        <tr style="background:#f0fdf4;">
-          <td class="ver" style="color:#10b981;">阶段一</td><td class="date">06-15</td>
-          <td class="desc">验收通过 — 8/8 完成，三源统合 1972 块</td><td class="delta" style="color:#10b981;">✓</td>
-        </tr>
+      <table class="history-table">
+        <tr id="hist-v040" class="current"><td class="ver">v0.4.0</td><td class="date">06-22</td><td class="desc">企业级特性：日志/安全/子Agent/流式/任务/Fallback</td><td class="delta">+6</td></tr>
+        <tr id="hist-v030" class=""><td class="ver">v0.3.0</td><td class="date">06-16</td><td class="desc">金融工具集 + 技能系统 + Prompt分层 + 上下文压缩</td><td class="delta">+11 -1</td></tr>
+        <tr id="hist-v020" class=""><td class="ver">v0.2.0</td><td class="date">06-12</td><td class="desc">三源统合 + 会话持久化 + API重试</td><td class="delta">+4 +9</td></tr>
+        <tr id="hist-v010" class=""><td class="ver">v0.1.0</td><td class="date">06-11</td><td class="desc">框架筑基 — 工具注册表 + 多源搜索</td><td class="delta">9 文件</td></tr>
       </table>
     </div>
   </div>
-
   <div id="graph"></div>
-
   <div id="right-panel">
-    <!-- ============ v0.1.0 面板 ============ -->
+    <div class="panel-version active" id="panel-v040">
+      <h2>v0.4.0 — 文件清单</h2>
+      <div class="file-section"><div class="file-name">CONVENTIONS.md</div></div>
+      <div class="file-section"><div class="file-name">core/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">core/agent.py</div></div>
+      <div class="file-section"><div class="file-name">core/context.py</div></div>
+      <div class="file-section"><div class="file-name">core/errors.py</div></div>
+      <div class="file-section"><div class="file-name">core/fallback.py</div></div>
+      <div class="file-section"><div class="file-name">core/logging.py</div></div>
+      <div class="file-section"><div class="file-name">core/prompt.py</div></div>
+      <div class="file-section"><div class="file-name">core/retry.py</div></div>
+      <div class="file-section"><div class="file-name">core/security.py</div></div>
+      <div class="file-section"><div class="file-name">docs/ENTERPRISE-STANDARDS.md</div></div>
+      <div class="file-section"><div class="file-name">knowledge/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">knowledge/ingest_wiki.py</div></div>
+      <div class="file-section"><div class="file-name">knowledge/search.py</div></div>
+      <div class="file-section"><div class="file-name">main.py</div></div>
+      <div class="file-section"><div class="file-name">memory/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">memory/session.py</div></div>
+      <div class="file-section"><div class="file-name">memory/task.py</div></div>
+      <div class="file-section"><div class="file-name">pyproject.toml</div></div>
+      <div class="file-section"><div class="file-name">skills/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">skills/finance.py</div></div>
+      <div class="file-section"><div class="file-name">skills/registry.py</div></div>
+      <div class="file-section"><div class="file-name">tools/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">tools/file_tools.py</div></div>
+      <div class="file-section"><div class="file-name">tools/finance/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">tools/finance/financial_report.py</div></div>
+      <div class="file-section"><div class="file-name">tools/finance/market_data.py</div></div>
+      <div class="file-section"><div class="file-name">tools/registry.py</div></div>
+      <div class="file-section"><div class="file-name">tools/search_tool.py</div></div>
+      <div class="file-section"><div class="file-name">tools/subagent_tool.py</div></div>
+      <div class="file-section"><div class="file-name">tools/task_tool.py</div></div>
+      <div class="file-section"><div class="file-name">tools/terminal_tool.py</div></div>
+      <div class="file-section"><div class="file-name">tools/time_tool.py</div></div>
+    </div>
+    <div class="panel-version" id="panel-v030">
+      <h2>v0.3.0 — 文件清单</h2>
+      <div class="file-section"><div class="file-name">CONVENTIONS.md</div></div>
+      <div class="file-section"><div class="file-name">core/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">core/agent.py</div></div>
+      <div class="file-section"><div class="file-name">core/context.py</div></div>
+      <div class="file-section"><div class="file-name">core/errors.py</div></div>
+      <div class="file-section"><div class="file-name">core/prompt.py</div></div>
+      <div class="file-section"><div class="file-name">core/retry.py</div></div>
+      <div class="file-section"><div class="file-name">docs/ENTERPRISE-STANDARDS.md</div></div>
+      <div class="file-section"><div class="file-name">knowledge/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">knowledge/ingest_wiki.py</div></div>
+      <div class="file-section"><div class="file-name">knowledge/search.py</div></div>
+      <div class="file-section"><div class="file-name">main.py</div></div>
+      <div class="file-section"><div class="file-name">memory/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">memory/session.py</div></div>
+      <div class="file-section"><div class="file-name">pyproject.toml</div></div>
+      <div class="file-section"><div class="file-name">skills/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">skills/finance.py</div></div>
+      <div class="file-section"><div class="file-name">skills/registry.py</div></div>
+      <div class="file-section"><div class="file-name">tools/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">tools/file_tools.py</div></div>
+      <div class="file-section"><div class="file-name">tools/finance/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">tools/finance/financial_report.py</div></div>
+      <div class="file-section"><div class="file-name">tools/finance/market_data.py</div></div>
+      <div class="file-section"><div class="file-name">tools/registry.py</div></div>
+      <div class="file-section"><div class="file-name">tools/search_tool.py</div></div>
+      <div class="file-section"><div class="file-name">tools/terminal_tool.py</div></div>
+      <div class="file-section"><div class="file-name">tools/time_tool.py</div></div>
+    </div>
+    <div class="panel-version" id="panel-v020">
+      <h2>v0.2.0 — 文件清单</h2>
+      <div class="file-section"><div class="file-name">core/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">core/agent.py</div></div>
+      <div class="file-section"><div class="file-name">core/errors.py</div></div>
+      <div class="file-section"><div class="file-name">core/retry.py</div></div>
+      <div class="file-section"><div class="file-name">knowledge/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">knowledge/ingest_wiki.py</div></div>
+      <div class="file-section"><div class="file-name">knowledge/search.py</div></div>
+      <div class="file-section"><div class="file-name">main.py</div></div>
+      <div class="file-section"><div class="file-name">memory/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">memory/session.py</div></div>
+      <div class="file-section"><div class="file-name">tools/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">tools/file_tools.py</div></div>
+      <div class="file-section"><div class="file-name">tools/registry.py</div></div>
+      <div class="file-section"><div class="file-name">tools/search_tool.py</div></div>
+      <div class="file-section"><div class="file-name">tools/terminal_tool.py</div></div>
+      <div class="file-section"><div class="file-name">tools/time_tool.py</div></div>
+    </div>
     <div class="panel-version" id="panel-v010">
-      <h2>v0.1.0 — 函数详情</h2>
-      <div class="pkg-section">
-        <p class="pkg-title">main.py</p>
-        <div class="file-section" id="detail-v010-main.py">
-          <div class="file-name">main.py</div>
-          <div class="func-card"><div class="sig">(模块顶层)</div><div class="desc">导入 4 个工具模块触发 <code>register()</code>，启动 <code>chat()</code> REPL</div></div>
-        </div>
-      </div>
-      <div class="pkg-section">
-        <p class="pkg-title">core</p>
-        <div class="file-section" id="detail-v010-core/agent.py">
-          <div class="file-name">core/agent.py</div>
-          <div class="func-card"><div class="sig">run(messages=None)</div><div class="desc">Agent 主循环 — 发送消息给 DeepSeek，有 tool_calls 则执行工具并继续，否则输出回复。</div></div>
-          <div class="func-card"><div class="sig">chat()</div><div class="desc">交互式 REPL，支持 /exit 退出。</div></div>
-        </div>
-      </div>
-      <div class="pkg-section">
-        <p class="pkg-title">tools</p>
-        <div class="file-section" id="detail-v010-tools/registry.py">
-          <div class="file-name">tools/registry.py — 工具注册表</div>
-          <div class="func-card"><div class="sig">register(name, definition, handler)</div><div class="desc">注册工具到全局 <code>_registry</code> 字典。</div></div>
-          <div class="func-card"><div class="sig">get_tool_definitions()</div><div class="desc">返回所有已注册工具的 JSON Schema 列表。</div></div>
-          <div class="func-card"><div class="sig">execute(name, args)</div><div class="desc">根据工具名查表执行，查不到返回错误字符串。</div></div>
-        </div>
-        <div class="file-section" id="detail-v010-tools/search_tool.py">
-          <div class="file-name">tools/search_tool.py — 知识搜索</div>
-          <div class="func-card"><div class="sig">search_knowledge(query)</div><div class="desc">多源联合搜索（年报 + Agent文档），返回格式化文本。</div></div>
-        </div>
-        <div class="file-section" id="detail-v010-tools/file_tools.py">
-          <div class="file-name">tools/file_tools.py — 文件读写</div>
-          <div class="func-card"><div class="sig">read_file(path, ...)</div><div class="desc">读取文件，返回带行号的文本。</div></div>
-          <div class="func-card"><div class="sig">write_file(path, content)</div><div class="desc">覆盖写入文件。</div></div>
-        </div>
-        <div class="file-section" id="detail-v010-tools/terminal_tool.py">
-          <div class="file-name">tools/terminal_tool.py — 终端执行</div>
-          <div class="func-card"><div class="sig">run_command(command, timeout=30)</div><div class="desc">执行 shell 命令。</div></div>
-        </div>
-        <div class="file-section" id="detail-v010-tools/time_tool.py">
-          <div class="file-name">tools/time_tool.py — 时间工具</div>
-          <div class="func-card"><div class="sig">get_current_time()</div><div class="desc">返回当前日期时间字符串。</div></div>
-        </div>
-      </div>
-      <div class="pkg-section">
-        <p class="pkg-title">knowledge</p>
-        <div class="file-section" id="detail-v010-knowledge/search.py">
-          <div class="file-name">knowledge/search.py — 多源搜索</div>
-          <div class="func-card"><div class="sig">unified_search(query, top_k=5)</div><div class="desc">ChromaDB 二源搜索（年报 1683 + Agent工程 27）。</div></div>
-          <div class="func-card"><div class="sig">search_formatted(query, top_k=5)</div><div class="desc">格式化搜索结果。</div></div>
-        </div>
-      </div>
-      <div class="pkg-section">
-        <p class="pkg-title">memory</p>
-        <div class="file-section" id="detail-v010-memory/__init__.py">
-          <div class="file-name">memory/__init__.py</div>
-          <div class="empty-badge">（空占位 — 规划中）</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============ v0.3.0 面板 ============ -->
-    <div class="panel-version active" id="panel-v030">
-      <h2>v0.3.0 — 函数详情 <span style="font-size:12px;color:#94a3b8;font-weight:400;">— <span class="new-badge" style="font-size:11px">NEW</span> 新增 <span class="mod-badge" style="font-size:11px">MOD</span> 修改</span></h2>
-
-      <div class="pkg-section">
-        <p class="pkg-title">core（新增）</p>
-        <div class="file-section">
-          <div class="file-name">core/prompt.py <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">build_prompt(skills_text="")</div><div class="desc">组装分层 System Prompt：身份/工具/规则/安全四层，支持技能内容动态注入。</div></div>
-        </div>
-        <div class="file-section">
-          <div class="file-name">core/context.py <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">count_tokens(text)</div><div class="desc">粗略估算 token 数（中文 2 字符/token，英文 4 字符/token）。</div></div>
-          <div class="func-card"><div class="sig">compress(messages, max_tokens, keep_last)</div><div class="desc">对话超限时自动将中间消息压缩为摘要，保留 system + 摘要 + 最后 N 条。</div></div>
-        </div>
-      </div>
-
-      <div class="pkg-section">
-        <p class="pkg-title">skills（新增）</p>
-        <div class="file-section">
-          <div class="file-name">skills/registry.py <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">register_skill(name, trigger, description, content)</div><div class="desc">注册技能，trigger 用 | 分隔多关键词。</div></div>
-          <div class="func-card"><div class="sig">match_skills(user_input)</div><div class="desc">根据用户输入匹配已注册技能。</div></div>
-          <div class="func-card"><div class="sig">inject_skills(messages, matched)</div><div class="desc">将匹配技能的内容注入 System Prompt。</div></div>
-        </div>
-        <div class="file-section">
-          <div class="file-name">skills/finance.py <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">(模块顶层)</div><div class="desc">注册"财报分析"技能：触发词=营收/利润/年报等，注入财报分析规范。</div></div>
-        </div>
-      </div>
-
-      <div class="pkg-section">
-        <p class="pkg-title">tools/finance（新增）</p>
-        <div class="file-section">
-          <div class="file-name">tools/finance/market_data.py <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">get_stock_price(code)</div><div class="desc">调用 akshare 查 A 股实时行情：最新价、涨跌幅、成交量、成交额。</div></div>
-        </div>
-        <div class="file-section">
-          <div class="file-name">tools/finance/financial_report.py <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">financial_report(stock_name)</div><div class="desc">多指标并行搜索年报：营收/净利润/增长率/每股收益，去重后返回结构化数据。</div></div>
-        </div>
-      </div>
-
-      <div class="pkg-section">
-        <p class="pkg-title">修改模块</p>
-        <div class="file-section">
-          <div class="file-name">knowledge/search.py <span class="mod-badge">MOD</span></div>
-          <div class="func-card"><div class="sig">unified_search(query, top_k, collections=None)</div><div class="desc">新增 collections 参数支持定向搜索指定知识库。</div></div>
-        </div>
-        <div class="file-section">
-          <div class="file-name">core/agent.py <span class="mod-badge">MOD</span></div>
-          <div class="func-card"><div class="sig">(模块顶层)</div><div class="desc">集成技能注入（match/inject 到 chat 循环）+ 上下文压缩（run 循环前检查 token 数）。</div></div>
-        </div>
-      </div>
-
-      <div class="pkg-section">
-        <p class="pkg-title">基础设施</p>
-        <div class="file-section">
-          <div class="file-name">pyproject.toml <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">(配置文件)</div><div class="desc">项目依赖声明 + ruff/pytest 配置，区分运行时与开发依赖。</div></div>
-        </div>
-        <div class="file-section">
-          <div class="file-name">CONVENTIONS.md <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">(规范文档)</div><div class="desc">10 章编码规范：文件结构/命名/工具定义/注释/Prompt/依赖原则。</div></div>
-        </div>
-      </div>
-
-      <div class="section-note">★ v0.3.0 删除：tools/finance/financial_search.py（被 financial_report 替代）</div>
-    </div>
-
-
-    <!-- ============ v0.2.0 面板 ============ -->
-    <div class="panel-version active" id="panel-v020">
-      <h2>v0.2.0 — 函数详情 <span style="font-size:12px;color:#94a3b8;font-weight:400;">— <span class="new-badge" style="font-size:11px">NEW</span> 新增 <span class="mod-badge" style="font-size:11px">MOD</span> 修改</span></h2>
-      <div class="pkg-section">
-        <p class="pkg-title">main.py</p>
-        <div class="file-section" id="detail-v020-main.py">
-          <div class="file-name">main.py</div>
-          <div class="func-card"><div class="sig">(模块顶层)</div><div class="desc">导入 4 个工具模块触发 <code>register()</code>，启动 <code>chat()</code> REPL</div></div>
-        </div>
-      </div>
-      <div class="pkg-section">
-        <p class="pkg-title">core</p>
-        <div class="file-section" id="detail-v020-core/agent.py">
-          <div class="file-name">core/agent.py <span class="mod-badge">MOD</span></div>
-          <div class="section-note">接入会话持久化 + API 重试 + 统一错误处理；新增 /new 命令</div>
-          <div class="func-card"><div class="sig">run(messages=None, session_id=None) <span class="mod-badge">MOD</span></div><div class="desc">Agent 主循环 — <code>call_with_retry</code> 调用 LLM，tool_calls 执行后同步保存 SQLite。</div></div>
-          <div class="func-card"><div class="sig">chat() <span class="mod-badge">MOD</span></div><div class="desc">启动时 <code>init_db()</code> + 24h 自动恢复会话；<code>/new</code> 新会话；<code>/exit</code> 输出 session_id。</div></div>
-        </div>
-        <div class="file-section" id="detail-v020-core/retry.py">
-          <div class="file-name">core/retry.py <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">call_with_retry(fn, *args, **kwargs)</div><div class="desc">指数退避重试（1s→2s→4s，最多 3 次）。只重试可恢复错误。</div></div>
-        </div>
-        <div class="file-section" id="detail-v020-core/errors.py">
-          <div class="file-name">core/errors.py <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">NsAgentError(message, code=None, details=None)</div><div class="desc">统一异常基类。子类：APIError / ToolError / ConfigError。</div></div>
-        </div>
-      </div>
-      <div class="pkg-section">
-        <p class="pkg-title">tools</p>
-        <div class="file-section" id="detail-v020-tools/registry.py"><div class="file-name">tools/registry.py</div><div class="func-card"><div class="sig">register / get_tool_definitions / execute</div><div class="desc">工具注册表 — 中心枢纽。</div></div></div>
-        <div class="file-section" id="detail-v020-tools/search_tool.py"><div class="file-name">tools/search_tool.py</div><div class="func-card"><div class="sig">search_knowledge(query)</div><div class="desc">三源联合搜索（年报 + Agent工程 + Wiki）。</div></div></div>
-        <div class="file-section" id="detail-v020-tools/file_tools.py"><div class="file-name">tools/file_tools.py</div><div class="func-card"><div class="sig">read_file / write_file</div><div class="desc">文件读写工具。</div></div></div>
-        <div class="file-section" id="detail-v020-tools/terminal_tool.py"><div class="file-name">tools/terminal_tool.py</div><div class="func-card"><div class="sig">run_command(command, timeout=30)</div><div class="desc">执行 shell 命令。</div></div></div>
-        <div class="file-section" id="detail-v020-tools/time_tool.py"><div class="file-name">tools/time_tool.py</div><div class="func-card"><div class="sig">get_current_time()</div><div class="desc">返回当前时间。</div></div></div>
-      </div>
-      <div class="pkg-section">
-        <p class="pkg-title">knowledge</p>
-        <div class="file-section" id="detail-v020-knowledge/search.py">
-          <div class="file-name">knowledge/search.py <span class="mod-badge">MOD</span></div>
-          <div class="section-note">二源→三源（+ wiki_knowledge 262块）</div>
-          <div class="func-card"><div class="sig">unified_search(query, top_k=5) <span class="mod-badge">MOD</span></div><div class="desc">三源并行搜索（年报 1683 + Agent工程 27 + Wiki 262 = 1972 块）。</div></div>
-          <div class="func-card"><div class="sig">search_formatted(query, top_k=5)</div><div class="desc">格式化结果（年报/Agent工程/Wiki）。</div></div>
-        </div>
-        <div class="file-section" id="detail-v020-knowledge/ingest_wiki.py">
-          <div class="file-name">knowledge/ingest_wiki.py <span class="new-badge">NEW</span></div>
-          <div class="func-card"><div class="sig">list_md_files / chunk_by_headers / ingest</div><div class="desc">Wiki 46篇→262块→ChromaDB wiki_knowledge。</div></div>
-        </div>
-      </div>
-      <div class="pkg-section">
-        <p class="pkg-title">memory</p>
-        <div class="file-section" id="detail-v020-memory/session.py">
-          <div class="file-name">memory/session.py <span class="new-badge">NEW</span></div>
-          <div class="section-note">v0.1.0 空占位 → v0.2.0 完整 CRUD + 24h 恢复</div>
-          <div class="func-card"><div class="sig">init_db / create_session / save_message / load_session / get_last_session</div><div class="desc">SQLite 会话持久化，兼容 system/user/assistant/tool 四种消息格式。</div></div>
-        </div>
-      </div>
+      <h2>v0.1.0 — 文件清单</h2>
+      <div class="file-section"><div class="file-name">core/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">core/agent.py</div></div>
+      <div class="file-section"><div class="file-name">knowledge/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">knowledge/search.py</div></div>
+      <div class="file-section"><div class="file-name">main.py</div></div>
+      <div class="file-section"><div class="file-name">memory/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">tools/__init__.py</div></div>
+      <div class="file-section"><div class="file-name">tools/file_tools.py</div></div>
+      <div class="file-section"><div class="file-name">tools/registry.py</div></div>
+      <div class="file-section"><div class="file-name">tools/search_tool.py</div></div>
+      <div class="file-section"><div class="file-name">tools/terminal_tool.py</div></div>
+      <div class="file-section"><div class="file-name">tools/time_tool.py</div></div>
     </div>
   </div>
 </div>
-
 <script>
-// ============================
-// 所有节点（统一数据集，固定坐标）
-// 坐标规则: L0 x=-500 | L1 x=-200 | L2 x=100 | L3 x=400
-// ============================
 const allNodes = new vis.DataSet([
-  // L0 入口
-  { id:"main.py",               group:"entry",     x:-500, y:0,   versions:["v010","v020","v030"], status:{v010:"new",v020:"existing"} },
-  // L1 核心
-  { id:"core/agent.py",         group:"core",      x:-200, y:-150,versions:["v010","v020","v030"], status:{v010:"new",v020:"modified"} },
-  { id:"core/retry.py",         group:"core",      x:-200, y:0,   versions:["v020","v030"],       status:{v020:"new"} },
-  { id:"core/errors.py",        group:"core",      x:-200, y:150, versions:["v020","v030"],       status:{v020:"new"} },
-  // L2 工具
-  { id:"tools/registry.py",     group:"tools",     x:100,  y:-200,versions:["v010","v020","v030"], status:{v010:"new",v020:"existing"} },
-  { id:"tools/search_tool.py",  group:"tools",     x:100,  y:-100,versions:["v010","v020","v030"], status:{v010:"new",v020:"existing"} },
-  { id:"tools/file_tools.py",   group:"tools",     x:100,  y:0,   versions:["v010","v020","v030"], status:{v010:"new",v020:"existing"} },
-  { id:"tools/terminal_tool.py",group:"tools",     x:100,  y:100, versions:["v010","v020","v030"], status:{v010:"new",v020:"existing"} },
-  { id:"tools/time_tool.py",    group:"tools",     x:100,  y:200, versions:["v010","v020","v030"], status:{v010:"new",v020:"existing"} },
-  // L3 数据层
-  { id:"knowledge/search.py",   group:"knowledge", x:400,  y:-150,versions:["v010","v020","v030"], status:{v010:"new",v020:"modified"} },
-  { id:"knowledge/ingest_wiki.py",group:"knowledge",x:400, y:0,   versions:["v020","v030"],       status:{v020:"new"} },
-  { id:"memory/__init__.py",    group:"memory",    x:400,  y:150, versions:["v010","v030"],       status:{v010:"new"} },
-  { id:"memory/session.py",     group:"memory",    x:400,  y:150, versions:["v020","v030"],       status:{v020:"new"} },
-  { id:"core/prompt.py",         group:"core",    x:-100, y:300,  versions:["v030"], status:{v030:"new"} },
-  { id:"core/context.py",        group:"core",    x:50,   y:300,  versions:["v030"], status:{v030:"new"} },
-  { id:"skills/registry.py",     group:"skills",  x:200,  y:300,  versions:["v030"], status:{v030:"new"} },
-  { id:"skills/finance.py",      group:"skills",  x:200,  y:380,  versions:["v030"], status:{v030:"new"} },
-  { id:"tools/finance/market_data.py",   group:"tools", x:350, y:300,  versions:["v030"], status:{v030:"new"} },
-  { id:"tools/finance/financial_report.py",group:"tools", x:500, y:300,  versions:["v030"],status:{v030:"new"} },
-  { id:"pyproject.toml",         group:"infra",   x:550,  y:200,  versions:["v030"], status:{v030:"new"} },
-  { id:"CONVENTIONS.md",         group:"infra",   x:600,  y:280,  versions:["v030"], status:{v030:"new"} },
+  { id:"core/__init__.py", group:"core", x:-250, y:-200, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"existing",v030:"existing",v040:"existing"} },  { id:"core/agent.py", group:"core", x:-250, y:-100, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"modified",v030:"modified",v040:"modified"} },  { id:"core/context.py", group:"core", x:-250, y:0, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"core/errors.py", group:"core", x:-250, y:100, versions:["v020", "v030", "v040"], status:{v020:"new",v030:"existing",v040:"existing"} },  { id:"core/fallback.py", group:"core", x:-250, y:200, versions:["v040"], status:{v040:"new"} },  { id:"core/logging.py", group:"core", x:-250, y:300, versions:["v040"], status:{v040:"new"} },  { id:"core/prompt.py", group:"core", x:-250, y:400, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"core/retry.py", group:"core", x:-250, y:500, versions:["v020", "v030", "v040"], status:{v020:"new",v030:"existing",v040:"modified"} },  { id:"core/security.py", group:"core", x:-250, y:600, versions:["v040"], status:{v040:"new"} },  { id:"main.py", group:"entry", x:-500, y:-200, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"existing",v030:"modified",v040:"modified"} },  { id:"tools/finance/__init__.py", group:"finance", x:480, y:-200, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"tools/finance/financial_report.py", group:"finance", x:480, y:-100, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"tools/finance/market_data.py", group:"finance", x:480, y:0, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"CONVENTIONS.md", group:"infra", x:900, y:-200, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"docs/ENTERPRISE-STANDARDS.md", group:"infra", x:900, y:-100, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"pyproject.toml", group:"infra", x:900, y:0, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"knowledge/__init__.py", group:"knowledge", x:650, y:-200, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"existing",v030:"existing",v040:"existing"} },  { id:"knowledge/ingest_wiki.py", group:"knowledge", x:650, y:-100, versions:["v020", "v030", "v040"], status:{v020:"new",v030:"existing",v040:"existing"} },  { id:"knowledge/search.py", group:"knowledge", x:650, y:0, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"modified",v030:"modified",v040:"existing"} },  { id:"memory/__init__.py", group:"memory", x:800, y:-200, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"existing",v030:"existing",v040:"existing"} },  { id:"memory/session.py", group:"memory", x:800, y:-100, versions:["v020", "v030", "v040"], status:{v020:"new",v030:"modified",v040:"existing"} },  { id:"memory/task.py", group:"memory", x:800, y:0, versions:["v040"], status:{v040:"new"} },  { id:"skills/__init__.py", group:"skills", x:300, y:-200, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"skills/finance.py", group:"skills", x:300, y:-100, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"skills/registry.py", group:"skills", x:300, y:0, versions:["v030", "v040"], status:{v030:"new",v040:"existing"} },  { id:"tools/__init__.py", group:"tools", x:100, y:-200, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"existing",v030:"existing",v040:"existing"} },  { id:"tools/file_tools.py", group:"tools", x:100, y:-100, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"existing",v030:"modified",v040:"existing"} },  { id:"tools/registry.py", group:"tools", x:100, y:0, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"existing",v030:"modified",v040:"existing"} },  { id:"tools/search_tool.py", group:"tools", x:100, y:100, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"existing",v030:"modified",v040:"existing"} },  { id:"tools/subagent_tool.py", group:"tools", x:100, y:200, versions:["v040"], status:{v040:"new"} },  { id:"tools/task_tool.py", group:"tools", x:100, y:300, versions:["v040"], status:{v040:"new"} },  { id:"tools/terminal_tool.py", group:"tools", x:100, y:400, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"existing",v030:"modified",v040:"modified"} },  { id:"tools/time_tool.py", group:"tools", x:100, y:500, versions:["v010", "v020", "v030", "v040"], status:{v010:"new",v020:"existing",v030:"modified",v040:"existing"} }
 ]);
-
-// ============================
-// 所有边（统一数据集）
-// ============================
 const allEdges = new vis.DataSet([
-  { from:"main.py",to:"core/agent.py",                versions:["v010","v020","v030"], label:"chat()",                   color:{color:"#3b6df0"},width:2.5 },
-  { from:"core/agent.py",to:"tools/registry.py",       versions:["v010","v020","v030"], label:"get_tool_defs\nexecute()",color:{color:"#3b6df0"},width:2.5 },
-  { from:"core/agent.py",to:"core/retry.py",           versions:["v020","v030"],       label:"call_with_retry()",       color:{color:"#10b981"},width:2   },
-  { from:"core/agent.py",to:"core/errors.py",          versions:["v020","v030"],       label:"NsAgentError",            color:{color:"#6366f1"},width:1.5,dashes:true },
-  { from:"core/agent.py",to:"memory/session.py",       versions:["v020","v030"],       label:"init/create\nsave/load",  color:{color:"#10b981"},width:2   },
-  { from:"tools/search_tool.py",to:"tools/registry.py",versions:["v010","v020","v030"],label:"register()",              color:{color:"#94a3b8"},width:1,  dashes:true },
-  { from:"tools/file_tools.py",to:"tools/registry.py", versions:["v010","v020","v030"],label:"register() x2",           color:{color:"#94a3b8"},width:1,  dashes:true },
-  { from:"tools/terminal_tool.py",to:"tools/registry.py",versions:["v010","v020","v030"],label:"register()",           color:{color:"#94a3b8"},width:1,  dashes:true },
-  { from:"tools/time_tool.py",to:"tools/registry.py",  versions:["v010","v020","v030"],label:"register()",              color:{color:"#94a3b8"},width:1,  dashes:true },
-  { from:"tools/search_tool.py",to:"knowledge/search.py",versions:["v010","v020","v030"],label:"search_formatted()",    color:{color:"#10b981"},width:2   },
-  { from:"knowledge/ingest_wiki.py",to:"knowledge/search.py",versions:["v020","v030"], label:"_client\n_embed_model",   color:{color:"#f59e0b"},width:1.5 },
-  { from:"core/agent.py",to:"core/prompt.py",            versions:["v030"], label:"build_prompt()",       color:{color:"#3b6df0"},width:2 },
-  { from:"core/agent.py",to:"core/context.py",           versions:["v030"], label:"compress()",           color:{color:"#3b6df0"},width:2 },
-  { from:"core/agent.py",to:"skills/registry.py",        versions:["v030"], label:"match/inject",         color:{color:"#10b981"},width:2 },
-  { from:"skills/finance.py",to:"skills/registry.py",    versions:["v030"], label:"register_skill()",     color:{color:"#94a3b8"},width:1,dashes:true },
-  { from:"tools/finance/market_data.py",to:"tools/registry.py",versions:["v030"],label:"register()",    color:{color:"#94a3b8"},width:1,dashes:true },
-  { from:"tools/finance/financial_report.py",to:"tools/registry.py",versions:["v030"],label:"register()",color:{color:"#94a3b8"},width:1,dashes:true },
-  { from:"tools/finance/financial_report.py",to:"knowledge/search.py",versions:["v030"],label:"unified_search()",color:{color:"#10b981"},width:2 },
-  { from:"tools/finance/market_data.py",to:"knowledge/search.py",versions:["v030"],label:"(akshare)",   color:{color:"#6366f1"},width:1.5 },
+  { from:"main.py",to:"core/agent.py", versions:["v010", "v020", "v030", "v040"], label:"chat()", color:{color:"#3b6df0"},width:2.5,dashes:false },  { from:"core/agent.py",to:"tools/registry.py", versions:["v010", "v020", "v030", "v040"], label:"get_tool_defs/nexecute()", color:{color:"#3b6df0"},width:2.5,dashes:false },  { from:"core/agent.py",to:"core/retry.py", versions:["v020", "v030", "v040"], label:"call_with_retry()", color:{color:"#10b981"},width:2,dashes:false },  { from:"core/agent.py",to:"core/errors.py", versions:["v020", "v030"], label:"NsAgentError", color:{color:"#6366f1"},width:1.5,dashes:true },  { from:"core/agent.py",to:"memory/session.py", versions:["v020", "v030", "v040"], label:"init/create/nsave/load", color:{color:"#10b981"},width:2,dashes:false },  { from:"tools/search_tool.py",to:"tools/registry.py", versions:["v010", "v020", "v030"], label:"register()", color:{color:"#94a3b8"},width:1,dashes:true },  { from:"tools/file_tools.py",to:"tools/registry.py", versions:["v010", "v020", "v030"], label:"register() x2", color:{color:"#94a3b8"},width:1,dashes:true },  { from:"tools/terminal_tool.py",to:"tools/registry.py", versions:["v010", "v020", "v030"], label:"register()", color:{color:"#94a3b8"},width:1,dashes:true },  { from:"tools/time_tool.py",to:"tools/registry.py", versions:["v010", "v020", "v030"], label:"register()", color:{color:"#94a3b8"},width:1,dashes:true },  { from:"tools/search_tool.py",to:"knowledge/search.py", versions:["v010", "v020", "v030"], label:"search_formatted()", color:{color:"#10b981"},width:2,dashes:false },  { from:"knowledge/ingest_wiki.py",to:"knowledge/search.py", versions:["v020", "v030"], label:"_client/n_embed_model", color:{color:"#f59e0b"},width:1.5,dashes:false },  { from:"core/agent.py",to:"core/prompt.py", versions:["v030", "v040"], label:"build_prompt()", color:{color:"#3b6df0"},width:2,dashes:false },  { from:"core/agent.py",to:"core/context.py", versions:["v030", "v040"], label:"compress()", color:{color:"#3b6df0"},width:2,dashes:false },  { from:"core/agent.py",to:"skills/registry.py", versions:["v030", "v040"], label:"match/inject", color:{color:"#10b981"},width:2,dashes:false },  { from:"skills/finance.py",to:"skills/registry.py", versions:["v030", "v040"], label:"register_skill()", color:{color:"#94a3b8"},width:1,dashes:true },  { from:"tools/finance/market_data.py",to:"tools/registry.py", versions:["v030", "v040"], label:"register()", color:{color:"#94a3b8"},width:1,dashes:true },  { from:"tools/finance/financial_report.py",to:"tools/registry.py", versions:["v030", "v040"], label:"register()", color:{color:"#94a3b8"},width:1,dashes:true },  { from:"tools/finance/financial_report.py",to:"knowledge/search.py", versions:["v030", "v040"], label:"unified_search()", color:{color:"#10b981"},width:2,dashes:false },  { from:"tools/finance/market_data.py",to:"knowledge/search.py", versions:["v030", "v040"], label:"(akshare)", color:{color:"#6366f1"},width:1.5,dashes:false },  { from:"core/agent.py",to:"core/logging.py", versions:["v040"], label:"setup_logging()/nget_logger()", color:{color:"#3b6df0"},width:2,dashes:false },  { from:"core/agent.py",to:"core/fallback.py", versions:["v040"], label:"call_with_fallback()", color:{color:"#3b6df0"},width:2,dashes:false },  { from:"tools/terminal_tool.py",to:"core/security.py", versions:["v040"], label:"check_command()", color:{color:"#10b981"},width:2,dashes:false },  { from:"tools/subagent_tool.py",to:"tools/registry.py", versions:["v040"], label:"register()", color:{color:"#94a3b8"},width:1,dashes:true },  { from:"tools/task_tool.py",to:"tools/registry.py", versions:["v040"], label:"register() x3", color:{color:"#94a3b8"},width:1,dashes:true },  { from:"tools/task_tool.py",to:"memory/task.py", versions:["v040"], label:"create/update/list", color:{color:"#10b981"},width:2,dashes:false },  { from:"tools/subagent_tool.py",to:"tools/terminal_tool.py", versions:["v040"], label:"subprocess/nself-invoke", color:{color:"#6366f1"},width:1.5,dashes:false }
 ]);
-
-// 版本统计
-const versionStats = {
-  v010: { files:9,  funcs:12, calls:8 },
-  v020: { files:12, funcs:21, calls:11 },
-  v030: { files:24, funcs:35, calls:19 },
-};
-
-// 节点基础标签
+const versionStats = {"v010": {"files": 12, "funcs": 20, "calls": 7}, "v020": {"files": 16, "funcs": 28, "calls": 11}, "v030": {"files": 27, "funcs": 48, "calls": 19}, "v040": {"files": 33, "funcs": 60, "calls": 19}};
 const nodeLabels = {
-  "main.py":                 "main.py\n─────\n入口脚本",
-  "core/agent.py":           "agent.py\n─────\nAgent Loop",
-  "core/retry.py":           "retry.py\n─────\nAPI 重试",
-  "core/errors.py":          "errors.py\n─────\n统一异常",
-  "tools/registry.py":       "registry.py\n─────\n工具注册表",
-  "tools/search_tool.py":    "search_tool.py\n─────\n知识搜索",
-  "tools/file_tools.py":     "file_tools.py\n─────\n文件读写",
-  "tools/terminal_tool.py":  "terminal_tool.py\n─────\n终端执行",
-  "tools/time_tool.py":      "time_tool.py\n─────\n时间工具",
-  "knowledge/search.py":     "search.py\n─────\n多源搜索",
-  "knowledge/ingest_wiki.py":"ingest_wiki.py\n─────\nWiki 入库",
-  "memory/__init__.py":      "__init__.py\n─────\n（空占位）",
-  "core/prompt.py":         "prompt.py\n─────\nPrompt分层",
-  "core/context.py":        "context.py\n─────\n上下文压缩",
-  "skills/registry.py":     "registry.py\n─────\n技能注册表",
-  "skills/finance.py":      "finance.py\n─────\n财报分析",
-  "tools/finance/market_data.py":   "market_data.py\n─────\n实时行情",
-  "tools/finance/financial_report.py":"fin_report.py\n─────\n年报报告",
-  "pyproject.toml":         "pyproject.toml\n─────\n项目配置",
-  "CONVENTIONS.md":         "CONVENTIONS.md\n─────\n编码规范",
-  "memory/session.py":       "session.py\n─────\n会话持久化",
+  "core/__init__.py": "__init__.py\n─────\ncore",
+  "core/agent.py": "agent.py\n─────\ncore",
+  "core/context.py": "context.py\n─────\ncore",
+  "core/errors.py": "errors.py\n─────\ncore",
+  "core/fallback.py": "fallback.py\n─────\ncore",
+  "core/logging.py": "logging.py\n─────\ncore",
+  "core/prompt.py": "prompt.py\n─────\ncore",
+  "core/retry.py": "retry.py\n─────\ncore",
+  "core/security.py": "security.py\n─────\ncore",
+  "main.py": "main.py\n─────\n",
+  "tools/finance/__init__.py": "__init__.py\n─────\ntools/finance",
+  "tools/finance/financial_report.py": "financial_report.py\n─────\ntools/finance",
+  "tools/finance/market_data.py": "market_data.py\n─────\ntools/finance",
+  "CONVENTIONS.md": "CONVENTIONS.md\n─────\n",
+  "docs/ENTERPRISE-STANDARDS.md": "ENTERPRISE-STANDARDS.md\n─────\ndocs",
+  "pyproject.toml": "pyproject.toml\n─────\n",
+  "knowledge/__init__.py": "__init__.py\n─────\nknowledge",
+  "knowledge/ingest_wiki.py": "ingest_wiki.py\n─────\nknowledge",
+  "knowledge/search.py": "search.py\n─────\nknowledge",
+  "memory/__init__.py": "__init__.py\n─────\nmemory",
+  "memory/session.py": "session.py\n─────\nmemory",
+  "memory/task.py": "task.py\n─────\nmemory",
+  "skills/__init__.py": "__init__.py\n─────\nskills",
+  "skills/finance.py": "finance.py\n─────\nskills",
+  "skills/registry.py": "registry.py\n─────\nskills",
+  "tools/__init__.py": "__init__.py\n─────\ntools",
+  "tools/file_tools.py": "file_tools.py\n─────\ntools",
+  "tools/registry.py": "registry.py\n─────\ntools",
+  "tools/search_tool.py": "search_tool.py\n─────\ntools",
+  "tools/subagent_tool.py": "subagent_tool.py\n─────\ntools",
+  "tools/task_tool.py": "task_tool.py\n─────\ntools",
+  "tools/terminal_tool.py": "terminal_tool.py\n─────\ntools",
+  "tools/time_tool.py": "time_tool.py\n─────\ntools",
 };
-
-let currentVersion = "v030";
-
+let currentVersion = "v040";
 function buildLabel(nodeId, version) {
   const base = nodeLabels[nodeId] || nodeId;
   const node = allNodes.get(nodeId);
   if (!node || !node.status) return base;
   const st = node.status[version];
-  if (st === "new")      return "★ " + base;
+  if (st === "new") return "\u2605 " + base;
   if (st === "modified") return "* " + base;
   return base;
 }
-
 function buildColor(nodeId, version) {
   const node = allNodes.get(nodeId);
   const groupColors = {
@@ -443,28 +265,24 @@ function buildColor(nodeId, version) {
   const gc = groupColors[node.group] || groupColors.core;
   if (!node || !node.status) return { background:gc.bg, border:gc.bd, highlight:{border:gc.hi.bd,background:gc.hi.bg} };
   const st = node.status[version];
-  if (st === "new")      return { background:gc.bg, border:"#eab308", highlight:{border:"#ca8a04",background:gc.hi.bg} };
+  if (st === "new") return { background:gc.bg, border:"#eab308", highlight:{border:"#ca8a04",background:gc.hi.bg} };
   if (st === "modified") return { background:gc.bg, border:"#f59e0b", highlight:{border:"#d97706",background:gc.hi.bg} };
   return { background:gc.bg, border:gc.bd, highlight:{border:gc.hi.bd,background:gc.hi.bg} };
 }
-
 function getVersionData(version) {
   const nodeArr = allNodes.get({ filter: n => n.versions.includes(version) });
   const edgeArr = allEdges.get({ filter: e => e.versions.includes(version) });
-
   const nodesOut = nodeArr.map(n => ({
     id: n.id, group: n.group, x: n.x, y: n.y, fixed: { x: true, y: true },
     label: buildLabel(n.id, version),
     color: buildColor(n.id, version),
-    title: n.id,
-    shape: "box",
+    title: n.id, shape: "box",
     margin: { top:10, bottom:10, left:14, right:14 },
     font: { size:12, face:"PingFang SC", color:"#334155", multi:true },
     borderWidth: 2,
     widthConstraint: { minimum:130, maximum:170 },
     shadow: { enabled:true, size:3, color:"rgba(0,0,0,0.06)" }
   }));
-
   const edgesOut = edgeArr.map(e => ({
     from: e.from, to: e.to, label: e.label, arrows: "to",
     color: e.color, width: e.width,
@@ -472,104 +290,43 @@ function getVersionData(version) {
     smooth: { type:"curvedCCW", roundness:0.2 },
     font: { size:10, color:"#64748b", face:"PingFang SC", background:"#fff", strokeWidth:2 }
   }));
-
   return { nodes: new vis.DataSet(nodesOut), edges: new vis.DataSet(edgesOut) };
 }
-
-// ============================
-// 初始化网络（physics 仅用于首版布局，随后冻结）
-// ============================
 const container = document.getElementById("graph");
-let { nodes: initNodes, edges: initEdges } = getVersionData("v030");
-
+let { nodes: initNodes, edges: initEdges } = getVersionData("v040");
 const options = {
-  physics: {
-    enabled: true,
-    stabilization: { iterations: 50, fit: true }
-  },
-  edges: {
-    smooth: { type:"curvedCCW", roundness:0.2 },
-    font: { size:10, color:"#64748b", face:"PingFang SC", background:"#fff", strokeWidth:2 }
-  },
-  nodes: {
-    shape: "box",
-    margin: { top:10, bottom:10, left:14, right:14 },
-    font: { size:12, face:"PingFang SC", color:"#334155", multi:true },
-    borderWidth: 2,
-    widthConstraint: { minimum:130, maximum:170 },
-    shadow: { enabled:true, size:3, color:"rgba(0,0,0,0.06)" }
-  },
+  physics: { enabled: true, stabilization: { iterations: 50, fit: true } },
+  edges: { smooth: { type:"curvedCCW", roundness:0.2 }, font: { size:10, color:"#64748b", face:"PingFang SC", background:"#fff", strokeWidth:2 } },
+  nodes: { shape: "box", margin: { top:10, bottom:10, left:14, right:14 }, font: { size:12, face:"PingFang SC", color:"#334155", multi:true }, borderWidth: 2, widthConstraint: { minimum:130, maximum:170 }, shadow: { enabled:true, size:3, color:"rgba(0,0,0,0.06)" } },
   interaction: { hover:true, navigationButtons:true, keyboard:true }
 };
-
 const network = new vis.Network(container, { nodes: initNodes, edges: initEdges }, options);
-
-// 首版稳定后冻结物理，此后的版本切换不再移动节点
 network.once("stabilized", function() {
-  // 记录第一版稳定后的实际位置，后续所有版本复用
   const positions = network.getPositions();
-  allNodes.forEach(n => {
-    if (positions[n.id]) {
-      allNodes.update({ id: n.id, x: positions[n.id].x, y: positions[n.id].y });
-    }
-  });
+  allNodes.forEach(n => { if (positions[n.id]) allNodes.update({ id: n.id, x: positions[n.id].x, y: positions[n.id].y }); });
   network.setOptions({ physics: false });
 });
-
-// ============================
-// 版本切换
-// ============================
 function switchVersion(version) {
   if (version === currentVersion) return;
   currentVersion = version;
-
   document.getElementById("btn-v010").classList.toggle("active", version==="v010");
   document.getElementById("btn-v020").classList.toggle("active", version==="v020");
   document.getElementById("btn-v030").classList.toggle("active", version==="v030");
-
+  document.getElementById("btn-v040").classList.toggle("active", version==="v040");
   const st = versionStats[version];
-  const labels = {v010:"v0.1.0", v020:"v0.2.0", v030:"v0.3.0"};
+  const labels = {v010:"v0.1.0", v020:"v0.2.0", v030:"v0.3.0", v040:"v0.4.0"};
   document.getElementById("active-badge").textContent = labels[version];
-  document.getElementById("stats-display").innerHTML =
-    '<span>文件 <b>'+st.files+'</b></span><span>函数 <b>'+st.funcs+'</b></span><span>调用 <b>'+st.calls+'</b></span>';
-
-  // 版本历史高亮
+  document.getElementById("stats-display").innerHTML = '<span>\u6587\u4ef6 <b>'+st.files+'</b></span><span>\u51fd\u6570 <b>'+st.funcs+'</b></span><span>\u8c03\u7528 <b>'+st.calls+'</b></span>';
   document.querySelectorAll("#history-table tr").forEach(tr=>tr.classList.remove("current"));
   const hr = document.getElementById("hist-"+version);
   if (hr) hr.classList.add("current");
-
-  // 切换面板
-  document.getElementById("panel-v010").classList.toggle("active", version==="v010");
-  document.getElementById("panel-v020").classList.toggle("active", version==="v020");
-  document.getElementById("panel-v030").classList.toggle("active", version==="v030");
-
-  // 切换图数据（位置冻结）
+  document.querySelectorAll(".panel-version").forEach(el=>el.classList.remove("active"));
+  const panel = document.getElementById("panel-"+version);
+  if (panel) panel.classList.add("active");
   const { nodes: newNodes, edges: newEdges } = getVersionData(version);
   network.setOptions({ physics: false });
   network.setData({ nodes: newNodes, edges: newEdges });
-
-  // 清除高亮
-  document.querySelectorAll(".file-section.highlight").forEach(el=>el.classList.remove("highlight"));
 }
-
-// ============================
-// 点击节点 → 滚动右侧面板
-// ============================
-network.on("click", function(params) {
-  document.querySelectorAll(".file-section.highlight").forEach(el=>el.classList.remove("highlight"));
-  if (params.nodes.length === 0) return;
-  const nodeId = params.nodes[0];
-  const detailId = "detail-" + currentVersion + "-" + nodeId;
-  const target = document.getElementById(detailId);
-  if (target) {
-    target.classList.add("highlight");
-    target.scrollIntoView({ behavior:"smooth", block:"start" });
-  }
-});
-
-network.on("deselectNode", function() {
-  document.querySelectorAll(".file-section.highlight").forEach(el=>el.classList.remove("highlight"));
-});
 </script>
 </body>
 </html>

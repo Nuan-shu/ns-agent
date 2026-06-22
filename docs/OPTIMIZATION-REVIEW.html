@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NsAgent 代码优化建议报告 · v0.3.0</title>
+<style>
+  /* === 重置 === */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  /* === 基础 === */
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f8f9fa;
+    color: #334155;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* === 顶部导航 === */
+  #header {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 18px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  #header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  #header .badge {
+    font-size: 11px;
+    background: #3b6df0;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+  #header .meta {
+    margin-left: auto;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  /* === 主体容器 === */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+  }
+
+  /* === 文档头 === */
+  .doc-intro {
+    background: #fff;
+    border-radius: 10px;
+    padding: 32px;
+    margin-bottom: 32px;
+    border: 1px solid #e2e8f0;
+  }
+  .doc-intro h2 {
+    font-size: 24px;
+    color: #0f172a;
+    margin-bottom: 12px;
+  }
+  .doc-intro p {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .doc-intro .quote {
+    background: #f1f5f9;
+    border-left: 3px solid #3b6df0;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    color: #475569;
+    font-size: 13px;
+    margin-top: 16px;
+  }
+
+  /* === 概览表格 === */
+  .overview {
+    background: #fff;
+    border-radius: 10px;
+    padding: 0;
+    margin-bottom: 40px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+  .overview h3 {
+    font-size: 14px;
+    color: #0f172a;
+    padding: 18px 24px 12px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .overview table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .overview th, .overview td {
+    text-align: left;
+    padding: 12px 24px;
+    font-size: 13px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .overview th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .overview tr:last-child td { border-bottom: none; }
+
+  /* === 优先级徽章 === */
+  .pri {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
+  }
+  .pri-p0 { background: #fee2e2; color: #b91c1c; }
+  .pri-p1 { background: #fef3c7; color: #b45309; }
+  .pri-p2 { background: #dbeafe; color: #1d4ed8; }
+
+  /* === 章节 === */
+  .section {
+    margin-bottom: 48px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .section-header h2 {
+    font-size: 20px;
+    color: #0f172a;
+  }
+  .section-header .count {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-left: auto;
+  }
+
+  /* === 问题卡片 === */
+  .issue {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .issue:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    border-color: #cbd5e1;
+  }
+  .issue-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .issue-title h3 {
+    font-size: 16px;
+    color: #0f172a;
+    font-weight: 600;
+  }
+  .issue-title .num {
+    font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
+    font-size: 12px;
+    color: #94a3b8;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .issue-loc {
+    font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
+    font-size: 12px;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+  .issue-desc {
+    color: #475569;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .issue-desc ul {
+    margin-left: 20px;
+    margin-top: 6px;
+  }
+  .issue-desc li {
+    margin-bottom: 4px;
+  }
+
+  /* === 代码块 === */
+  .code-wrap {
+    position: relative;
+    margin: 12px 0;
+  }
+  .code-label {
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .code-label.bad { color: #b91c1c; }
+  .code-label.good { color: #166534; }
+  pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+  pre .c { color: #64748b; font-style: italic; }      /* 注释 */
+  pre .k { color: #93c5fd; }                          /* 关键字 */
+  pre .s { color: #86efac; }                          /* 字符串 */
+  pre .n { color: #fca5a5; }                          /* 数字 */
+  pre .f { color: #fbbf24; }                          /* 函数名 */
+  pre .h { color: #c4b5fd; }                          /* 高亮行 */
+
+  /* === 修复建议块 === */
+  .fix {
+    background: #f0fdf4;
+    border-left: 3px solid #22c55e;
+    padding: 14px 18px;
+    border-radius: 0 6px 6px 0;
+    margin: 12px 0;
+    font-size: 13.5px;
+    color: #166534;
+  }
+  .fix .fix-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #15803d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .fix code {
+    background: #dcfce7;
+    color: #14532d;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
+    font-size: 12px;
+  }
+
+  /* === 路线图 === */
+  .roadmap {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 40px;
+  }
+  .roadmap h3 {
+    font-size: 18px;
+    color: #0f172a;
+    margin-bottom: 20px;
+  }
+  .wave {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .wave-card {
+    flex: 1;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 18px 20px;
+    border-top: 3px solid #3b6df0;
+  }
+  .wave-card.w1 { border-top-color: #ef4444; }
+  .wave-card.w2 { border-top-color: #f59e0b; }
+  .wave-card.w3 { border-top-color: #3b6df0; }
+  .wave-card h4 {
+    font-size: 14px;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+  .wave-card .wave-time {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 10px;
+  }
+  .wave-card ul {
+    list-style: none;
+    font-size: 13px;
+    color: #475569;
+  }
+  .wave-card ul li {
+    padding: 4px 0;
+    border-bottom: 1px dashed #e2e8f0;
+  }
+  .wave-card ul li:last-child { border-bottom: none; }
+  .wave-card ul li::before {
+    content: "·";
+    color: #3b6df0;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+
+  /* === 验证清单 === */
+  .checklist {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px;
+    border: 1px solid #e2e8f0;
+  }
+  .checklist h3 {
+    font-size: 18px;
+    color: #0f172a;
+    margin-bottom: 16px;
+  }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13.5px;
+    color: #475569;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item::before {
+    content: "▢";
+    color: #3b6df0;
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  .check-item code {
+    font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
+    background: #f1f5f9;
+    color: #334155;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+
+  /* === 脚注 === */
+  #footer {
+    background: #fff;
+    border-top: 1px solid #e2e8f0;
+    padding: 24px 0;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 12px;
+  }
+  #footer a {
+    color: #3b6df0;
+    text-decoration: none;
+  }
+  #footer a:hover { text-decoration: underline; }
+
+  /* === 响应式 === */
+  @media (max-width: 768px) {
+    .header-inner { padding: 0 16px; }
+    .container { padding: 24px 16px 60px; }
+    .doc-intro, .issue, .overview, .roadmap, .checklist { padding: 20px; }
+    .wave { flex-direction: column; }
+    .overview th:nth-child(3), .overview td:nth-child(3) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ 顶部导航 ============ -->
+<div id="header">
+  <div class="header-inner">
+    <h1>NsAgent 代码优化建议报告</h1>
+    <span class="badge">v0.3.0</span>
+    <span class="meta">2026-06-17 · 24 个文件 · 979 行</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ============ 文档头 ============ -->
+  <div class="doc-intro">
+    <h2>NsAgent 代码优化建议报告</h2>
+    <p>对照 <code>CONVENTIONS.md</code>（10 节规范 + 9 项检查清单）+ ruff / pyright + 通读 24 个源文件（979 行），逐项审计。</p>
+    <p>适用版本：v0.3.0（<code>pyproject.toml</code>）</p>
+    <div class="quote">
+      ruff check 通过、ruff format 通过 — 基础规范没问题。本报告聚焦<strong>实质性问题</strong>，按优先级 P0 / P1 / P2 排序。
+    </div>
+  </div>
+
+  <!-- ============ 概览 ============ -->
+  <div class="overview">
+    <h3>总览</h3>
+    <table>
+      <thead>
+        <tr><th>优先级</th><th>类别</th><th>数量</th><th>一句话说明</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pri pri-p0">P0</span></td>
+          <td>必修（规范违反 / 潜在 bug）</td>
+          <td>4</td>
+          <td>硬编码路径、版本号错乱、命名不符、静默截断</td>
+        </tr>
+        <tr>
+          <td><span class="pri pri-p1">P1</span></td>
+          <td>强烈建议（可维护性）</td>
+          <td>5</td>
+          <td>缺 logging、错误体系死代码、技能误激活、prompt 双源、客户端全局副作用</td>
+        </tr>
+        <tr>
+          <td><span class="pri pri-p2">P2</span></td>
+          <td>锦上添花（工程改进）</td>
+          <td>9</td>
+          <td>import 排序、测试缺失、错误信息不一致、触发抖动等</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ P0 ============ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="pri pri-p0">P0</span>
+      <h2>必修</h2>
+      <span class="count">4 项</span>
+    </div>
+
+    <!-- 1. 版本号错乱 -->
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#1</span>
+        <h3>chat() 版本号错乱</h3>
+        <span class="pri pri-p0">P0</span>
+      </div>
+      <span class="issue-loc">core/agent.py:95, 102</span>
+      <div class="issue-desc">
+        <p>REPL 启动横幅打印 <code>v0.1.0</code>，但 <code>pyproject.toml</code> 已是 <code>0.3.0</code>，<code>README.md</code> 写 <code>v0.3.0</code>。用户首次启动会困惑「这到底是不是最新版本」。</p>
+      </div>
+      <div class="code-wrap">
+        <div class="code-label bad">问题代码</div>
+<pre><span class="c"># core/agent.py</span>
+<span class="k">print</span>(<span class="s">"NsAgent v0.1.0 — 恢复了上次会话..."</span>)
+<span class="k">print</span>(<span class="s">"NsAgent v0.1.0 — 输入 /exit 退出\n"</span>)</pre>
+      </div>
+      <div class="fix">
+        <div class="fix-label">修复建议</div>
+        <p>把版本号做成常量（<code>core/__init__.py</code> 定义 <code>__version__</code>），所有打印都引用它：</p>
+<pre style="margin-top: 8px;"><span class="c"># core/__init__.py</span>
+<span class="n">__version__</span> = <span class="s">"0.3.0"</span>
+
+<span class="c"># core/agent.py</span>
+<span class="k">from</span> core <span class="k">import</span> __version__
+<span class="k">print</span>(<span class="s">f"NsAgent v{__version__} — ..."</span>)</pre>
+      </div>
+    </div>
+
+    <!-- 2. TOOL_DEFINITION 命名 -->
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#2</span>
+        <h3>TOOL_DEFINITION 命名违反 §3.1</h3>
+        <span class="pri pri-p0">P0</span>
+      </div>
+      <span class="issue-loc">tools/time_tool.py:13</span>
+      <div class="issue-desc">
+        <p><code>CONVENTIONS.md §3.1</code> 明文写「常量名 = <code>功能名大写_DEF</code>」。同目录其他工具都是 <code>READ_DEF</code> / <code>WRITE_DEF</code> / <code>TERMINAL_DEF</code> / <code>PRICE_DEF</code> / <code>REPORT_DEF</code>，唯独 <code>time_tool.py</code> 用了 <code>TOOL_DEFINITION</code>。</p>
+      </div>
+      <div class="code-wrap">
+        <div class="code-label good">修复后</div>
+<pre><span class="c"># tools/time_tool.py</span>
+TIME_DEF = {
+    <span class="s">"type"</span>: <span class="s">"function"</span>,
+    <span class="s">"function"</span>: {
+        <span class="s">"name"</span>: <span class="s">"get_current_time"</span>,
+        ...
+    },
+}
+<span class="f">register</span>(<span class="s">"get_current_time"</span>, TIME_DEF, get_current_time)</pre>
+      </div>
+    </div>
+
+    <!-- 3. 硬编码路径 -->
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#3</span>
+        <h3>terminal_tool 硬编码绝对路径</h3>
+        <span class="pri pri-p0">P0</span>
+      </div>
+      <span class="issue-loc">tools/terminal_tool.py:17</span>
+      <div class="issue-desc">
+        <ul>
+          <li><code>CONVENTIONS.md §8</code> 明文要求「用 <code>Path(__file__).parent</code> 相对计算，不写死绝对路径」。</li>
+          <li>换机器 / 改项目位置后 <code>terminal</code> 工具全错；当前能跑只是巧合。</li>
+          <li>安全风险：别人 fork 你的项目，这个 cwd 会指向一个不存在的目录。</li>
+        </ul>
+      </div>
+      <div class="code-wrap">
+        <div class="code-label bad">问题代码</div>
+<pre>result = <span class="f">subprocess.run</span>(
+    command,
+    shell=<span class="k">True</span>,
+    capture_output=<span class="k">True</span>,
+    text=<span class="k">True</span>,
+    timeout=timeout,
+    <span class="h">cwd=<span class="s">"/Users/ns/Projects/ns-agent"</span>,</span>   <span class="c"># 硬编码</span>
+)</pre>
+      </div>
+      <div class="fix">
+        <div class="fix-label">修复建议</div>
+<pre><span class="c"># tools/terminal_tool.py</span>
+<span class="k">from</span> pathlib <span class="k">import</span> Path
+
+_DEFAULT_CWD = <span class="k">str</span>(<span class="f">Path</span>(__file__).parent.parent)
+
+<span class="k">def</span> <span class="f">run_command</span>(command, timeout=<span class="n">30</span>):
+    <span class="k">try</span>:
+        result = <span class="f">subprocess.run</span>(
+            command, shell=<span class="k">True</span>, capture_output=<span class="k">True</span>,
+            text=<span class="k">True</span>, timeout=timeout, cwd=_DEFAULT_CWD,
+        )
+        ...</pre>
+        <p style="margin-top: 8px;">或者干脆删掉 <code>cwd</code> 参数（让 subprocess 继承父进程工作目录）。</p>
+      </div>
+    </div>
+
+    <!-- 4. 静默截断 -->
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#4</span>
+        <h3>core/context.py 静默截断摘要</h3>
+        <span class="pri pri-p0">P0</span>
+      </div>
+      <span class="issue-loc">core/context.py:50</span>
+      <div class="issue-desc">
+        <p><code>middle_text[:2000]</code> 没有任何提示就把中间对话砍到 2000 字符。LLM 看到的是「无征兆的信息丢失」，可能基于残缺内容产生幻觉。</p>
+      </div>
+      <div class="code-wrap">
+        <div class="code-label bad">问题代码</div>
+<pre>summary = <span class="s">f"[上下文摘要] 以下为之前对话的关键信息：\n{middle_text[:2000]}"</span></pre>
+      </div>
+      <div class="fix">
+        <div class="fix-label">修复建议（最小改动）</div>
+<pre>SUMMARY_MAX_CHARS = <span class="n">2000</span>
+
+truncated = middle_text[:SUMMARY_MAX_CHARS]
+<span class="k">if</span> <span class="f">len</span>(middle_text) > SUMMARY_MAX_CHARS:
+    truncated += <span class="s">"\n...（已截断）"</span>
+summary = <span class="s">f"[上下文摘要] 以下为之前对话的关键信息：\n{truncated}"</span></pre>
+        <p style="margin-top: 8px;"><strong>更彻底的方案</strong>：改用 LLM 自己生成摘要（既然已经累计 4000+ tokens，再调一次 API 做摘要更可靠）。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ P1 ============ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="pri pri-p1">P1</span>
+      <h2>强烈建议</h2>
+      <span class="count">5 项</span>
+    </div>
+
+    <!-- 5. logging -->
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#5</span>
+        <h3>库代码用 print() 而非 logging（项目级）</h3>
+        <span class="pri pri-p1">P1</span>
+      </div>
+      <span class="issue-loc">core/agent.py (14) · core/retry.py (1) · knowledge/ingest_wiki.py (5) — 共 20 处</span>
+      <div class="issue-desc">
+        <ul>
+          <li>REPL 用户和开发者看到同一份输出，无法分级（<code>--verbose</code> / <code>--debug</code>）。</li>
+          <li>库代码（<code>core</code> / <code>tools</code>）的输出和 REPL 的提示符耦合，未来做 Web 界面 / IDE 插件时这层 <code>print</code> 全要改。</li>
+          <li>工具出错时返回字符串给 LLM，但用户看不到 stderr。</li>
+        </ul>
+      </div>
+      <div class="fix">
+        <div class="fix-label">修复建议</div>
+<pre><span class="c"># core/agent.py</span>
+<span class="k">import</span> logging
+log = logging.<span class="f">getLogger</span>(<span class="s">"nsagent"</span>)
+
+log.<span class="f">info</span>(<span class="s">"已加载 %d 个工具"</span>, <span class="f">len</span>(tools))
+log.<span class="f">debug</span>(<span class="s">">>> 发送请求（%d 条消息）..."</span>, ...)
+log.<span class="f">error</span>(<span class="s">"NsAgent 错误 [%s]: %s"</span>, e.code, e.message)
+
+<span class="c"># main.py 入口</span>
+logging.<span class="f">basicConfig</span>(
+    level=os.<span class="f">getenv</span>(<span class="s">"NSAGENT_LOG"</span>, <span class="s">"INFO"</span>),
+    format=<span class="s">"%(message)s"</span>,   <span class="c"># 保留原输出风格</span>
+)</pre>
+      </div>
+    </div>
+
+    <!-- 6. 错误体系未使用 -->
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#6</span>
+        <h3>core/errors.py 异常体系未使用（死代码）</h3>
+        <span class="pri pri-p1">P1</span>
+      </div>
+      <span class="issue-loc">core/errors.py:22-31</span>
+      <div class="issue-desc">
+        <ul>
+          <li><code>CONVENTIONS.md §3.4</code> 说工具层「返回错误字符串不抛异常」，所以 <code>APIError</code> / <code>ToolError</code> / <code>ConfigError</code> 没人 <code>raise</code> 也没人 <code>except</code>。</li>
+          <li><code>core/agent.py:130</code> 写的 <code>except NsAgentError as e:</code> 接不住 OpenAI 原生异常（重试耗尽后 <code>retry.py:38</code> 抛的是 <code>APIConnectionError</code>）。</li>
+        </ul>
+      </div>
+      <div class="fix">
+        <div class="fix-label">修复建议（方案 A：retry.py 改抛 APIError）</div>
+<pre><span class="c"># core/retry.py</span>
+<span class="k">from</span> core.errors <span class="k">import</span> APIError
+
+<span class="k">if</span> last_error:
+    <span class="k">raise</span> <span class="f">APIError</span>(
+        <span class="s">f"API 调用失败（已重试 {MAX_RETRIES} 次）: {last_error}"</span>,
+        code=<span class="s">"API_RETRY_EXHAUSTED"</span>,
+        details={<span class="s">"original"</span>: <span class="k">str</span>(last_error)},
+    ) <span class="k">from</span> last_error</pre>
+        <p style="margin-top: 8px;">或者方案 B：删掉三个子类，保留 <code>NsAgentError</code>，避免误导。</p>
+      </div>
+    </div>
+
+    <!-- 7. 技能匹配 -->
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#7</span>
+        <h3>match_skills 关键词匹配逻辑偏弱</h3>
+        <span class="pri pri-p1">P1</span>
+      </div>
+      <span class="issue-loc">skills/registry.py:34-38</span>
+      <div class="issue-desc">
+        <p>纯子串匹配 → 「毛利率」会被「成<strong>本率</strong>」误命中；「年报」会命中「<strong>年报</strong>纸」。技能是知识模块，误激活比漏激活危害大（System Prompt 膨胀，token 浪费 + 噪声增加）。</p>
+      </div>
+      <div class="fix">
+        <div class="fix-label">修复建议</div>
+<pre><span class="k">import</span> re
+
+<span class="k">def</span> <span class="f">match_skills</span>(user_input: <span class="k">str</span>) -> <span class="k">list</span>[<span class="k">dict</span>[<span class="k">str</span>, <span class="k">Any</span>]]:
+    matched = []
+    <span class="k">for</span> _name, skill <span class="k">in</span> _skills.<span class="f">items</span>():
+        keywords = [kw.<span class="f">strip</span>() <span class="k">for</span> kw <span class="k">in</span> skill[<span class="s">"trigger"</span>].<span class="f">split</span>(<span class="s">"|"</span>)]
+        <span class="k">for</span> kw <span class="k">in</span> keywords:
+            <span class="c"># 单词边界匹配 + 不区分大小写</span>
+            <span class="k">if</span> re.<span class="f">search</span>(<span class="s">rf"\b{re.escape(kw)}\b"</span>, user_input, re.IGNORECASE):
+                matched.<span class="f">append</span>(skill)
+                <span class="k">break</span>
+    <span class="k">return</span> matched</pre>
+      </div>
+    </div>
+
+    <!-- 8. prompt 双源 -->
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#8</span>
+        <h3>prompt.py 工具描述与 XXX_DEF.description 重复维护两套</h3>
+        <span class="pri pri-p1">P1</span>
+      </div>
+      <span class="issue-loc">core/prompt.py:6-13</span>
+      <div class="issue-desc">
+        <p>每个工具的 <code>XXX_DEF["function"]["description"]</code> 在 <code>core/prompt.py</code> 也写了一遍。**加新工具要改两处**，漏改一处 LLM 就看到不一致信息。</p>
+      </div>
+      <div class="fix">
+        <div class="fix-label">修复建议（单源真相）</div>
+<pre><span class="c"># core/prompt.py</span>
+<span class="k">from</span> tools.registry <span class="k">import</span> get_tool_definitions
+
+<span class="k">def</span> <span class="f">build_prompt</span>(skills_text: <span class="k">str</span> = <span class="s">""</span>) -> <span class="k">str</span>:
+    tool_lines = <span class="s">"\n"</span>.<span class="f">join</span>(
+        <span class="s">f"- {d['function']['name']}: {d['function']['description']}"</span>
+        <span class="k">for</span> d <span class="k">in</span> <span class="f">get_tool_definitions</span>()
+    )
+    tools_layer = <span class="s">f"你有以下工具可以使用：\n{tool_lines}"</span>
+    layers = [IDENTITY, tools_layer, RULES, SAFETY]
+    <span class="k">if</span> skills_text:
+        layers.<span class="f">append</span>(skills_text)
+    <span class="k">return</span> <span class="s">"\n\n"</span>.<span class="f">join</span>(layers)</pre>
+      </div>
+    </div>
+
+    <!-- 9. 客户端全局副作用 -->
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#9</span>
+        <h3>core/agent.py 顶层副作用太多</h3>
+        <span class="pri pri-p1">P1</span>
+      </div>
+      <span class="issue-loc">core/agent.py:19, 21</span>
+      <div class="issue-desc">
+        <ul>
+          <li><code>load_dotenv(...)</code> 和 <code>client = OpenAI(...)</code> 都是模块级副作用 — <code>import core.agent</code> 时就会执行。</li>
+          <li><code>CONVENTIONS.md §8</code> 提了「私有连接：模块级 <code>_client</code> <code>_embed_model</code> 懒初始化」，但 <code>agent.py</code> 自己反而全局初始化。</li>
+          <li><code>DEEPSEEK_API_KEY</code> 没值时 <code>api_key=None</code> 会等到第一次请求才报错。</li>
+        </ul>
+      </div>
+      <div class="fix">
+        <div class="fix-label">修复建议</div>
+<pre><span class="c"># core/agent.py</span>
+_client: OpenAI | <span class="k">None</span> = <span class="k">None</span>
+
+<span class="k">def</span> <span class="f">_get_client</span>() -> OpenAI:
+    <span class="s">"""懒初始化 OpenAI 客户端。"""</span>
+    <span class="k">global</span> _client
+    <span class="k">if</span> _client <span class="k">is</span> <span class="k">None</span>:
+        <span class="f">load_dotenv</span>(<span class="f">Path</span>(__file__).parent.parent / <span class="s">".env"</span>)
+        api_key = os.<span class="f">getenv</span>(<span class="s">"DEEPSEEK_API_KEY"</span>)
+        <span class="k">if</span> <span class="k">not</span> api_key:
+            <span class="k">raise</span> <span class="f">ConfigError</span>(
+                <span class="s">"缺少 DEEPSEEK_API_KEY 环境变量"</span>,
+                code=<span class="s">"CONFIG_MISSING_API_KEY"</span>,
+            )
+        _client = <span class="f">OpenAI</span>(api_key=api_key, base_url=<span class="s">"https://api.deepseek.com"</span>)
+    <span class="k">return</span> _client</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ P2 ============ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="pri pri-p2">P2</span>
+      <h2>锦上添花</h2>
+      <span class="count">9 项</span>
+    </div>
+
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#10</span>
+        <h3>compress() 触发条件抖动</h3>
+        <span class="pri pri-p2">P2</span>
+      </div>
+      <span class="issue-loc">core/agent.py:36 + core/context.py:43</span>
+      <div class="issue-desc">
+        <p>进入压缩后<strong>每次循环都压缩</strong>，可能从 4001 立刻压到 ~2000 字符反复抖动（触发阈值与目标阈值都是 4000）。</p>
+        <p><strong>修复</strong>：触发阈值 &gt; 目标阈值，给一个滞回带（4500 → 3000）。</p>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#11</span>
+        <h3>memory/session.py 每次操作都开关连接</h3>
+        <span class="pri pri-p2">P2</span>
+      </div>
+      <span class="issue-loc">memory/session.py — 21 处 _connect/close</span>
+      <div class="issue-desc">
+        <p>SQLite 适合长连接 + 事务复用，每条消息 4 次系统调用浪费。建议用 <code>threading.Lock</code> + 单例连接 + <code>check_same_thread=False</code>。</p>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#12</span>
+        <h3>tools/registry.py 文件尾大段 docstring 误用</h3>
+        <span class="pri pri-p2">P2</span>
+      </div>
+      <span class="issue-loc">tools/registry.py:26-37</span>
+      <div class="issue-desc">
+        <p>模块 docstring 后又开了一个 <code>"""</code>，实际成为模块 docstring 的延续（PEP 257 不推荐）。建议挪到 <code>register()</code> 函数 docstring 里。</p>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#13</span>
+        <h3>main.py 导入顺序违反 §1.2</h3>
+        <span class="pri pri-p2">P2</span>
+      </div>
+      <span class="issue-loc">main.py:4-11</span>
+      <div class="issue-desc">
+        <p>第 1 行是 <code>from core.agent import chat</code>（项目内），后面才是 <code>import skills.finance</code>。<code>§1.2</code> 要求「先 <code>import</code> 第三方再 <code>from ...</code>」。</p>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#14</span>
+        <h3>测试目录缺失</h3>
+        <span class="pri pri-p2">P2</span>
+      </div>
+      <span class="issue-loc">项目根目录</span>
+      <div class="issue-desc">
+        <p><code>pyproject.toml:60</code> 配了 <code>testpaths = ["tests"]</code>，但项目根<strong>没有 <code>tests/</code> 目录</strong>，<code>pytest</code> 直接报 "no tests ran"。建议至少加 3 个核心测试：<code>test_registry.py</code> / <code>test_compress.py</code> / <code>test_skill_match.py</code>。</p>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#15</span>
+        <h3>read_file 错误信息冒号不一致</h3>
+        <span class="pri pri-p2">P2</span>
+      </div>
+      <span class="issue-loc">tools/file_tools.py + tools/finance/*.py</span>
+      <div class="issue-desc">
+        <p><code>file_tools.py</code> 用全角冒号（<code>错误：</code>），<code>market_data.py</code> / <code>financial_report.py</code> 用半角冒号（<code>查询失败:</code>）。建议统一为全角冒号（更符合中文排版）。</p>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#16</span>
+        <h3>core/agent.py 导入分组空行不足</h3>
+        <span class="pri pri-p2">P2</span>
+      </div>
+      <span class="issue-loc">core/agent.py:3-7</span>
+      <div class="issue-desc">
+        <p><code>§7</code> 说「顶层函数之间 2 个空行」，导入分组之间也是 1 个空行。ruff 不会报但人眼读起来密集。</p>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#17</span>
+        <h3>ingest_wiki.py 导入字母序不一致</h3>
+        <span class="pri pri-p2">P2</span>
+      </div>
+      <span class="issue-loc">knowledge/ingest_wiki.py:3-4</span>
+      <div class="issue-desc">
+        <p><code>from pathlib import Path</code> 写在 <code>import re</code> 前面，但字母序应该是 <code>import re</code> 在前（<code>i</code> &lt; <code>p</code>）。</p>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-title">
+        <span class="num">#18</span>
+        <h3>chat() 缺少 /help 命令</h3>
+        <span class="pri pri-p2">P2</span>
+      </div>
+      <span class="issue-loc">core/agent.py:104-116</span>
+      <div class="issue-desc">
+        <p>当前只支持 <code>/exit</code> 和 <code>/new</code>。用户首次使用不知道有 <code>/exit</code> 之外的命令。建议加 <code>/help</code> 列出全部命令。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 路线图 ============ -->
+  <div class="roadmap">
+    <h3>实施路线图</h3>
+    <div class="wave">
+      <div class="wave-card w1">
+        <h4>第一波（30 分钟）</h4>
+        <div class="wave-time">修 P0 共 4 项</div>
+        <ul>
+          <li>修版本号（用 <code>__version__</code>）</li>
+          <li><code>TOOL_DEFINITION</code> → <code>TIME_DEF</code></li>
+          <li>terminal_tool 硬编码路径改 <code>Path(__file__).parent.parent</code></li>
+          <li>compress 截断加「（已截断）」后缀 + 提常量</li>
+        </ul>
+      </div>
+      <div class="wave-card w2">
+        <h4>第二波（半天）</h4>
+        <div class="wave-time">P1 共 5 项</div>
+        <ul>
+          <li>引入 <code>logging</code>（保留原 print 格式）</li>
+          <li>修 <code>retry.py</code> 抛 <code>APIError</code></li>
+          <li><code>match_skills</code> 用正则单词边界</li>
+          <li><code>build_prompt</code> 改读 <code>get_tool_definitions()</code></li>
+          <li>OpenAI 客户端懒初始化 + <code>ConfigError</code> 校验</li>
+        </ul>
+      </div>
+      <div class="wave-card w3">
+        <h4>第三波（有空就做）</h4>
+        <div class="wave-time">P2 共 9 项</div>
+        <ul>
+          <li>各项清理：import、测试、错误信息、help 命令等</li>
+          <li>SQLite 连接复用</li>
+          <li>触发阈值加滞回</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 验证清单 ============ -->
+  <div class="checklist">
+    <h3>验证清单</h3>
+    <div class="check-item"><code>ruff check .</code> 通过</div>
+    <div class="check-item"><code>ruff format --check .</code> 通过</div>
+    <div class="check-item"><code>python main.py</code> 启动横幅显示 <code>v0.3.0</code></div>
+    <div class="check-item"><code>from tools.time_tool import TIME_DEF</code> 可导入</div>
+    <div class="check-item"><code>terminal_tool</code> 在新机器/不同路径下也能跑</div>
+    <div class="check-item">触发压缩后摘要末尾有「（已截断）」</div>
+    <div class="check-item">故意输错 API key 启动时立即抛 <code>ConfigError</code>，而不是第一次请求才报</div>
+    <div class="check-item">输入「成本率分析」不会激活 finance 技能</div>
+    <div class="check-item">加新工具时只需要改工具文件，prompt 自动同步</div>
+  </div>
+
+</div>
+
+<!-- ============ 脚注 ============ -->
+<div id="footer">
+  <p>NsAgent 代码优化建议报告 · 2026-06-17 · v0.3.0</p>
+  <p style="margin-top: 6px;">对照文档：<a href="../CONVENTIONS.md">CONVENTIONS.md</a> · <a href="ENTERPRISE-STANDARDS.md">ENTERPRISE-STANDARDS.md</a></p>
+</div>
+
+</body>
+</html>
