@@ -38,7 +38,7 @@ def single_query(query: str):
     messages = [{"role": "system", "content": SUBAGENT_PROMPT}]
     messages.append({"role": "user", "content": query})
     log.info("subagent.start", query=query[:100])
-    run(messages=messages, log=log)
+    run(messages=messages, log=log, stream=False)
     log.info("subagent.end")
 
 
