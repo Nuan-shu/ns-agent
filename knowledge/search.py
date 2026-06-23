@@ -11,7 +11,11 @@ from sentence_transformers import SentenceTransformer
 
 # === 初始化 ===
 
-CHROMA_PATH = str(Path(__file__).parent.parent.parent / "AI工程/rag-project/backend/chroma_data")
+# ECS 部署路径（本地开发用相对路径回退）
+import os as _os
+CHROMA_PATH = "/root/rag-project/backend/chroma_data"
+if not _os.path.exists(CHROMA_PATH):
+    CHROMA_PATH = str(Path(__file__).parent.parent.parent / "AI工程/rag-project/backend/chroma_data")
 
 _client = chromadb.PersistentClient(path=CHROMA_PATH)
 
