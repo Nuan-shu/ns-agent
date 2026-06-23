@@ -3,7 +3,7 @@
 统一 AI Agent 框架 — 1 个 Agent + N 个工具集。本地运行的迷你版 Hermes。
 
 [![Version](https://img.shields.io/badge/version-0.4.0-blue)](https://github.com/Nuan-shu/ns-agent/releases)
-[![Files](https://img.shields.io/badge/files-30-green)]()
+[![Files](https://img.shields.io/badge/files-33-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
 ## 架构
